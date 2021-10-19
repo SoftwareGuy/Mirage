@@ -219,18 +219,52 @@ namespace Mirage
 
                 NetworkBehaviour[] components = GetComponentsInChildren<NetworkBehaviour>(true);
 
-#if DEBUG
-                foreach (NetworkBehaviour item in components)
-                {
-                    logger.Assert(item.Identity == this, $"Child NetworkBehaviour had a different Identity, this:{name}, Child Identity:{item.Identity.name}");
-                }
-#endif
+                EnsureBehavioursBelongToThisIdentity(ref components);
 
                 if (components.Length > byte.MaxValue)
                     throw new InvalidOperationException("Only 255 NetworkBehaviour per gameobject allowed");
 
                 networkBehavioursCache = components;
                 return networkBehavioursCache;
+            }
+        }
+
+        /// <summary>
+        /// Removes NetworkBehaviour that belong to another NetworkIdentity from the components array
+        /// <para>
+        ///     If there are nested NetworkIdentities then Behaviour that belong to those Identities will be found by GetComponentsInChildren if the child object is added before the Array is intialized.
+        ///     This method will check each Behaviour to make sure that the Identity is the same as the current Identity, and if it is not remove it from the array
+        /// </para>
+        /// </summary>
+        /// <param name="components"></param>
+        private void EnsureBehavioursBelongToThisIdentity(ref NetworkBehaviour[] components)
+        {
+            // keep track of read and write index
+            // if we find a NB that belongs to another NI then we set it to null
+            // then if any have been set to null we shift the remaining NB down to the write index as we continue the loop
+            // after the loop we resize the array if we have removed any
+            int w = 0;
+            for (int r = 0; r < components.Length; r++)
+            {
+                NetworkBehaviour item = components[r];
+                if (item.Identity != this)
+                {
+                    if (logger.LogEnabled()) logger.Log($"Child NetworkBehaviour had a different Identity, this:{name}, Child Identity:{item.Identity.name}");
+                    components[r] = null;
+                    continue;
+                }
+
+                if (r != w)
+                {
+                    logger.Assert(components[r] == null, "Overwriting component in array");
+                    components[r] = components[w];
+                }
+                w++;
+            }
+
+            if (w != components.Length)
+            {
+                Array.Resize(ref components, w);
             }
         }
 
