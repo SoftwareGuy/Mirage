@@ -9030,12 +9030,6 @@ references:
   commentId: T:Mirage.PlayerSceneChangeEvent
   fullName: Mirage.PlayerSceneChangeEvent
   nameWithType: PlayerSceneChangeEvent
-- uid: Mirage.ReadOnlyInspectorAttribute
-  name: ReadOnlyInspectorAttribute
-  href: api/Mirage.ReadOnlyInspectorAttribute.html
-  commentId: T:Mirage.ReadOnlyInspectorAttribute
-  fullName: Mirage.ReadOnlyInspectorAttribute
-  nameWithType: ReadOnlyInspectorAttribute
 - uid: Mirage.RemoteCalls
   name: Mirage.RemoteCalls
   href: api/Mirage.RemoteCalls.html
