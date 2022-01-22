@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class FloatPackAttribute
+    <title>Class ReadOnlyInspectorAttribute
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class FloatPackAttribute
+    <meta name="title" content="Class ReadOnlyInspectorAttribute
    ">
     <meta name="generator" content="docfx 2.56.6.0">
     
@@ -95,23 +95,26 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Mirage.Serialization.FloatPackAttribute">
+            <article class="content wrap" id="_content" data-uid="Mirage.ReadOnlyInspectorAttribute">
   
   
-  <h1 id="Mirage_Serialization_FloatPackAttribute" data-uid="Mirage.Serialization.FloatPackAttribute" class="text-break">Class FloatPackAttribute
+  <h1 id="Mirage_ReadOnlyInspectorAttribute" data-uid="Mirage.ReadOnlyInspectorAttribute" class="text-break">Class ReadOnlyInspectorAttribute
   </h1>
-  <div class="markdown level0 summary"><p>Packs a float field, clamped from -max to +max, with</p>
-<p>Also See: <a href="https://miragenet.github.io/Mirage/Articles/Guides/BitPacking/BitCountFromRange.html">Bit Packing Documentation</a></p>
+  <div class="markdown level0 summary"><p>Draws UnityEvent as a foldout</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.attribute">Attribute</a></div>
-    <div class="level2"><span class="xref">FloatPackAttribute</span></div>
+    <div class="level2"><a class="xref" href="https://docs.unity3d.com/ScriptReference/PropertyAttribute.html">PropertyAttribute</a></div>
+    <div class="level3"><span class="xref">ReadOnlyInspectorAttribute</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://docs.unity3d.com/ScriptReference/PropertyAttribute-order.html">PropertyAttribute.order</a>
+    </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.attribute.equals#system-attribute-equals(system-object)">Attribute.Equals(Object)</a>
     </div>
@@ -239,93 +242,13 @@
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#system-object-tostring">Object.ToString()</a>
     </div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Mirage.Serialization.html">Mirage.Serialization</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Mirage.html">Mirage</a></h6>
   <h6><strong>Assembly</strong>: Mirage.dll</h6>
-  <h5 id="Mirage_Serialization_FloatPackAttribute_syntax">Syntax</h5>
+  <h5 id="Mirage_ReadOnlyInspectorAttribute_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter)]
-public class FloatPackAttribute : Attribute</code></pre>
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Field)]
+public sealed class ReadOnlyInspectorAttribute : PropertyAttribute</code></pre>
   </div>
-  <h3 id="constructors">Constructors
-  </h3>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_Serialization_FloatPackAttribute__ctor_System_Single_System_Int32_.md&amp;value=---%0Auid%3A%20Mirage.Serialization.FloatPackAttribute.%23ctor(System.Single%2CSystem.Int32)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/d7ffd73496ceb7226750d2071f8462a3cbc838dd/Assets/Mirage/Runtime/Serialization/WeaverAttributes.cs/#L64">View Source</a>
-  </span>
-  <a id="Mirage_Serialization_FloatPackAttribute__ctor_" data-uid="Mirage.Serialization.FloatPackAttribute.#ctor*"></a>
-  <h4 id="Mirage_Serialization_FloatPackAttribute__ctor_System_Single_System_Int32_" data-uid="Mirage.Serialization.FloatPackAttribute.#ctor(System.Single,System.Int32)">FloatPackAttribute(Single, Int32)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FloatPackAttribute(float max, int bitCount)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.single">Single</a></td>
-        <td><span class="parametername">max</span></td>
-        <td><p>Max value of the float</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td><span class="parametername">bitCount</span></td>
-        <td><p>number of bits to pack the field into</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_Serialization_FloatPackAttribute__ctor_System_Single_System_Single_.md&amp;value=---%0Auid%3A%20Mirage.Serialization.FloatPackAttribute.%23ctor(System.Single%2CSystem.Single)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/d7ffd73496ceb7226750d2071f8462a3cbc838dd/Assets/Mirage/Runtime/Serialization/WeaverAttributes.cs/#L60">View Source</a>
-  </span>
-  <a id="Mirage_Serialization_FloatPackAttribute__ctor_" data-uid="Mirage.Serialization.FloatPackAttribute.#ctor*"></a>
-  <h4 id="Mirage_Serialization_FloatPackAttribute__ctor_System_Single_System_Single_" data-uid="Mirage.Serialization.FloatPackAttribute.#ctor(System.Single,System.Single)">FloatPackAttribute(Single, Single)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FloatPackAttribute(float max, float precision)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.single">Single</a></td>
-        <td><span class="parametername">max</span></td>
-        <td><p>Max value of the float</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.single">Single</a></td>
-        <td><span class="parametername">precision</span></td>
-        <td><p>Smallest possible value of the field. Real precision woll be caculated using bitcount but will always be lower than this parameter</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
 </article>
           </div>
           
@@ -334,10 +257,10 @@ public class FloatPackAttribute : Attribute</code></pre>
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_Serialization_FloatPackAttribute.md&amp;value=---%0Auid%3A%20Mirage.Serialization.FloatPackAttribute%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_ReadOnlyInspectorAttribute.md&amp;value=---%0Auid%3A%20Mirage.ReadOnlyInspectorAttribute%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
                   </li>
                   <li>
-                    <a href="https://github.com/MirageNet/Mirage/blob/d7ffd73496ceb7226750d2071f8462a3cbc838dd/Assets/Mirage/Runtime/Serialization/WeaverAttributes.cs/#L55" class="contribution-link">View Source</a>
+                    <a href="https://github.com/MirageNet/Mirage/blob/d7ffd73496ceb7226750d2071f8462a3cbc838dd/Assets/Mirage/Runtime/CustomAttributes.cs/#L140" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

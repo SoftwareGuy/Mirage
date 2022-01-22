@@ -234,12 +234,12 @@ references:
   isSpec: "True"
   fullName: Mirage.CharacterSpawner.GetStartPosition
   nameWithType: CharacterSpawner.GetStartPosition
-- uid: Mirage.CharacterSpawner.OnClientFinishedSceneChange(System.String,Mirage.SceneOperation)
-  name: OnClientFinishedSceneChange(String, SceneOperation)
-  href: api/Mirage.CharacterSpawner.html#Mirage_CharacterSpawner_OnClientFinishedSceneChange_System_String_Mirage_SceneOperation_
-  commentId: M:Mirage.CharacterSpawner.OnClientFinishedSceneChange(System.String,Mirage.SceneOperation)
-  fullName: Mirage.CharacterSpawner.OnClientFinishedSceneChange(System.String, Mirage.SceneOperation)
-  nameWithType: CharacterSpawner.OnClientFinishedSceneChange(String, SceneOperation)
+- uid: Mirage.CharacterSpawner.OnClientFinishedSceneChange(UnityEngine.SceneManagement.Scene,Mirage.SceneOperation)
+  name: OnClientFinishedSceneChange(Scene, SceneOperation)
+  href: api/Mirage.CharacterSpawner.html#Mirage_CharacterSpawner_OnClientFinishedSceneChange_UnityEngine_SceneManagement_Scene_Mirage_SceneOperation_
+  commentId: M:Mirage.CharacterSpawner.OnClientFinishedSceneChange(UnityEngine.SceneManagement.Scene,Mirage.SceneOperation)
+  fullName: Mirage.CharacterSpawner.OnClientFinishedSceneChange(UnityEngine.SceneManagement.Scene, Mirage.SceneOperation)
+  nameWithType: CharacterSpawner.OnClientFinishedSceneChange(Scene, SceneOperation)
 - uid: Mirage.CharacterSpawner.OnClientFinishedSceneChange*
   name: OnClientFinishedSceneChange
   href: api/Mirage.CharacterSpawner.html#Mirage_CharacterSpawner_OnClientFinishedSceneChange_
@@ -9030,6 +9030,12 @@ references:
   commentId: T:Mirage.PlayerSceneChangeEvent
   fullName: Mirage.PlayerSceneChangeEvent
   nameWithType: PlayerSceneChangeEvent
+- uid: Mirage.ReadOnlyInspectorAttribute
+  name: ReadOnlyInspectorAttribute
+  href: api/Mirage.ReadOnlyInspectorAttribute.html
+  commentId: T:Mirage.ReadOnlyInspectorAttribute
+  fullName: Mirage.ReadOnlyInspectorAttribute
+  nameWithType: ReadOnlyInspectorAttribute
 - uid: Mirage.RemoteCalls
   name: Mirage.RemoteCalls
   href: api/Mirage.RemoteCalls.html
@@ -9227,12 +9233,18 @@ references:
   commentId: T:Mirage.SceneAttribute
   fullName: Mirage.SceneAttribute
   nameWithType: SceneAttribute
-- uid: Mirage.SceneChangeEvent
-  name: SceneChangeEvent
-  href: api/Mirage.SceneChangeEvent.html
-  commentId: T:Mirage.SceneChangeEvent
-  fullName: Mirage.SceneChangeEvent
-  nameWithType: SceneChangeEvent
+- uid: Mirage.SceneChangeFinishedEvent
+  name: SceneChangeFinishedEvent
+  href: api/Mirage.SceneChangeFinishedEvent.html
+  commentId: T:Mirage.SceneChangeFinishedEvent
+  fullName: Mirage.SceneChangeFinishedEvent
+  nameWithType: SceneChangeFinishedEvent
+- uid: Mirage.SceneChangeStartedEvent
+  name: SceneChangeStartedEvent
+  href: api/Mirage.SceneChangeStartedEvent.html
+  commentId: T:Mirage.SceneChangeStartedEvent
+  fullName: Mirage.SceneChangeStartedEvent
+  nameWithType: SceneChangeStartedEvent
 - uid: Mirage.SceneMessage
   name: SceneMessage
   href: api/Mirage.SceneMessage.html

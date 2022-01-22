@@ -243,12 +243,20 @@ This is used in network communications to be able to lookup game objects on diff
       <section></section>
       <h4><a class="xref" href="Mirage.PlayerSceneChangeEvent.html">PlayerSceneChangeEvent</a></h4>
       <section></section>
+      <h4><a class="xref" href="Mirage.ReadOnlyInspectorAttribute.html">ReadOnlyInspectorAttribute</a></h4>
+      <section><p>Draws UnityEvent as a foldout</p>
+</section>
       <h4><a class="xref" href="Mirage.SceneAttribute.html">SceneAttribute</a></h4>
       <section><p>Converts a string property into a Scene property in the inspector</p>
 </section>
-      <h4><a class="xref" href="Mirage.SceneChangeEvent.html">SceneChangeEvent</a></h4>
-      <section><p>Event fires from <a class="xref" href="Mirage.INetworkSceneManager.html">INetworkSceneManager</a> when a scene change happens on either Server or Client.</p>
-<p>string - New ScenePath</p>
+      <h4><a class="xref" href="Mirage.SceneChangeFinishedEvent.html">SceneChangeFinishedEvent</a></h4>
+      <section><p>Event fires from <a class="xref" href="Mirage.INetworkSceneManager.html">INetworkSceneManager</a> when a scene change finishes on either Server or Client.</p>
+<p>Scene - Loaded scene</p>
+<p>SceneOperation - Scene change type (Normal, Additive Load, Additive Unload).</p>
+</section>
+      <h4><a class="xref" href="Mirage.SceneChangeStartedEvent.html">SceneChangeStartedEvent</a></h4>
+      <section><p>Event fires from <a class="xref" href="Mirage.INetworkSceneManager.html">INetworkSceneManager</a> when a scene change begins on either Server or Client.</p>
+<p>Scene - Name or path of the scene that&apos;s about to be loaded</p>
 <p>SceneOperation - Scene change type (Normal, Additive Load, Additive Unload).</p>
 </section>
       <h4><a class="xref" href="Mirage.SceneVisibilityChecker.html">SceneVisibilityChecker</a></h4>
