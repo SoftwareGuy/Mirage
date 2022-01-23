@@ -10553,15 +10553,15 @@ references:
   isSpec: "True"
   fullName: Mirage.Serialization.NetworkReader.PadAndCopy
   nameWithType: NetworkReader.PadAndCopy
-- uid: Mirage.Serialization.NetworkReader.PadAndCopy``1(System.Int32,``0@)
-  name: PadAndCopy<T>(Int32, out T)
-  href: api/Mirage.Serialization.NetworkReader.html#Mirage_Serialization_NetworkReader_PadAndCopy__1_System_Int32___0__
-  commentId: M:Mirage.Serialization.NetworkReader.PadAndCopy``1(System.Int32,``0@)
-  name.vb: PadAndCopy(Of T)(Int32, ByRef T)
-  fullName: Mirage.Serialization.NetworkReader.PadAndCopy<T>(System.Int32, out T)
-  fullName.vb: Mirage.Serialization.NetworkReader.PadAndCopy(Of T)(System.Int32, ByRef T)
-  nameWithType: NetworkReader.PadAndCopy<T>(Int32, out T)
-  nameWithType.vb: NetworkReader.PadAndCopy(Of T)(Int32, ByRef T)
+- uid: Mirage.Serialization.NetworkReader.PadAndCopy``1(``0@)
+  name: PadAndCopy<T>(out T)
+  href: api/Mirage.Serialization.NetworkReader.html#Mirage_Serialization_NetworkReader_PadAndCopy__1___0__
+  commentId: M:Mirage.Serialization.NetworkReader.PadAndCopy``1(``0@)
+  name.vb: PadAndCopy(Of T)(ByRef T)
+  fullName: Mirage.Serialization.NetworkReader.PadAndCopy<T>(out T)
+  fullName.vb: Mirage.Serialization.NetworkReader.PadAndCopy(Of T)(ByRef T)
+  nameWithType: NetworkReader.PadAndCopy<T>(out T)
+  nameWithType.vb: NetworkReader.PadAndCopy(Of T)(ByRef T)
 - uid: Mirage.Serialization.NetworkReader.Read(System.Int32)
   name: Read(Int32)
   href: api/Mirage.Serialization.NetworkReader.html#Mirage_Serialization_NetworkReader_Read_System_Int32_
