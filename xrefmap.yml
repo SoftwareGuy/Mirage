@@ -3989,6 +3989,15 @@ references:
   isSpec: "True"
   fullName: Mirage.IMessageSender.Send
   nameWithType: IMessageSender.Send
+- uid: Mirage.IMessageSender.Send``1(``0,Mirage.SocketLayer.INotifyCallBack)
+  name: Send<T>(T, INotifyCallBack)
+  href: api/Mirage.IMessageSender.html#Mirage_IMessageSender_Send__1___0_Mirage_SocketLayer_INotifyCallBack_
+  commentId: M:Mirage.IMessageSender.Send``1(``0,Mirage.SocketLayer.INotifyCallBack)
+  name.vb: Send(Of T)(T, INotifyCallBack)
+  fullName: Mirage.IMessageSender.Send<T>(T, Mirage.SocketLayer.INotifyCallBack)
+  fullName.vb: Mirage.IMessageSender.Send(Of T)(T, Mirage.SocketLayer.INotifyCallBack)
+  nameWithType: IMessageSender.Send<T>(T, INotifyCallBack)
+  nameWithType.vb: IMessageSender.Send(Of T)(T, INotifyCallBack)
 - uid: Mirage.IMessageSender.Send``1(``0,System.Int32)
   name: Send<T>(T, Int32)
   href: api/Mirage.IMessageSender.html#Mirage_IMessageSender_Send__1___0_System_Int32_
@@ -4101,6 +4110,19 @@ references:
   isSpec: "True"
   fullName: Mirage.INetworkClient.IsLocalClient
   nameWithType: INetworkClient.IsLocalClient
+- uid: Mirage.INetworkClient.MessageHandler
+  name: MessageHandler
+  href: api/Mirage.INetworkClient.html#Mirage_INetworkClient_MessageHandler
+  commentId: P:Mirage.INetworkClient.MessageHandler
+  fullName: Mirage.INetworkClient.MessageHandler
+  nameWithType: INetworkClient.MessageHandler
+- uid: Mirage.INetworkClient.MessageHandler*
+  name: MessageHandler
+  href: api/Mirage.INetworkClient.html#Mirage_INetworkClient_MessageHandler_
+  commentId: Overload:Mirage.INetworkClient.MessageHandler
+  isSpec: "True"
+  fullName: Mirage.INetworkClient.MessageHandler
+  nameWithType: INetworkClient.MessageHandler
 - uid: Mirage.INetworkClient.Player
   name: Player
   href: api/Mirage.INetworkClient.html#Mirage_INetworkClient_Player
@@ -4401,6 +4423,19 @@ references:
   isSpec: "True"
   fullName: Mirage.INetworkServer.LocalPlayer
   nameWithType: INetworkServer.LocalPlayer
+- uid: Mirage.INetworkServer.MessageHandler
+  name: MessageHandler
+  href: api/Mirage.INetworkServer.html#Mirage_INetworkServer_MessageHandler
+  commentId: P:Mirage.INetworkServer.MessageHandler
+  fullName: Mirage.INetworkServer.MessageHandler
+  nameWithType: INetworkServer.MessageHandler
+- uid: Mirage.INetworkServer.MessageHandler*
+  name: MessageHandler
+  href: api/Mirage.INetworkServer.html#Mirage_INetworkServer_MessageHandler_
+  commentId: Overload:Mirage.INetworkServer.MessageHandler
+  isSpec: "True"
+  fullName: Mirage.INetworkServer.MessageHandler
+  nameWithType: INetworkServer.MessageHandler
 - uid: Mirage.INetworkServer.OnStartHost
   name: OnStartHost
   href: api/Mirage.INetworkServer.html#Mirage_INetworkServer_OnStartHost
@@ -6253,6 +6288,15 @@ references:
   isSpec: "True"
   fullName: Mirage.NetworkClient.Send
   nameWithType: NetworkClient.Send
+- uid: Mirage.NetworkClient.Send``1(``0,Mirage.SocketLayer.INotifyCallBack)
+  name: Send<T>(T, INotifyCallBack)
+  href: api/Mirage.NetworkClient.html#Mirage_NetworkClient_Send__1___0_Mirage_SocketLayer_INotifyCallBack_
+  commentId: M:Mirage.NetworkClient.Send``1(``0,Mirage.SocketLayer.INotifyCallBack)
+  name.vb: Send(Of T)(T, INotifyCallBack)
+  fullName: Mirage.NetworkClient.Send<T>(T, Mirage.SocketLayer.INotifyCallBack)
+  fullName.vb: Mirage.NetworkClient.Send(Of T)(T, Mirage.SocketLayer.INotifyCallBack)
+  nameWithType: NetworkClient.Send<T>(T, INotifyCallBack)
+  nameWithType.vb: NetworkClient.Send(Of T)(T, INotifyCallBack)
 - uid: Mirage.NetworkClient.Send``1(``0,System.Int32)
   name: Send<T>(T, Int32)
   href: api/Mirage.NetworkClient.html#Mirage_NetworkClient_Send__1___0_System_Int32_
@@ -7373,6 +7417,15 @@ references:
   isSpec: "True"
   fullName: Mirage.NetworkPlayer.Send
   nameWithType: NetworkPlayer.Send
+- uid: Mirage.NetworkPlayer.Send``1(``0,Mirage.SocketLayer.INotifyCallBack)
+  name: Send<T>(T, INotifyCallBack)
+  href: api/Mirage.NetworkPlayer.html#Mirage_NetworkPlayer_Send__1___0_Mirage_SocketLayer_INotifyCallBack_
+  commentId: M:Mirage.NetworkPlayer.Send``1(``0,Mirage.SocketLayer.INotifyCallBack)
+  name.vb: Send(Of T)(T, INotifyCallBack)
+  fullName: Mirage.NetworkPlayer.Send<T>(T, Mirage.SocketLayer.INotifyCallBack)
+  fullName.vb: Mirage.NetworkPlayer.Send(Of T)(T, Mirage.SocketLayer.INotifyCallBack)
+  nameWithType: NetworkPlayer.Send<T>(T, INotifyCallBack)
+  nameWithType.vb: NetworkPlayer.Send(Of T)(T, INotifyCallBack)
 - uid: Mirage.NetworkPlayer.Send``1(``0,System.Int32)
   name: Send<T>(T, Int32)
   href: api/Mirage.NetworkPlayer.html#Mirage_NetworkPlayer_Send__1___0_System_Int32_
