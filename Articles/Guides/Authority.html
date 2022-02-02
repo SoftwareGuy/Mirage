@@ -130,6 +130,8 @@ void PickupItem(NetworkIdentity item)
 <p>Authority can't be removed from the character object. Instead you will have to replace the character object using <code>NetworkServer.ReplaceCharacter</code>.</p>
 <h2 id="on-authority">On Authority</h2>
 <p>When authority is given to or removed from an object a message will be sent to that client to notify them. This will cause the <code>OnAuthorityChanged(bool)</code> functions to be called.</p>
+<h2 id="on-destroy">On Destroy</h2>
+<p>if the client has authority, then <code>OnAuthorityChanged(false)</code> will be called on the object when it is destroyed.</p>
 <h2 id="check-authority">Check Authority</h2>
 <h3 id="client-side">Client Side</h3>
 <p>The <code>identity.hasAuthority</code> property can be used to check if the local player has authority over an object.</p>
