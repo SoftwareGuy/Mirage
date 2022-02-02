@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class Channel
+    <title>Class ServerRpcSender
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class Channel
+    <meta name="title" content="Class ServerRpcSender
    ">
     <meta name="generator" content="docfx 2.56.6.0">
     
@@ -95,17 +95,18 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Mirage.Channel">
+            <article class="content wrap" id="_content" data-uid="Mirage.RemoteCalls.ServerRpcSender">
   
   
-  <h1 id="Mirage_Channel" data-uid="Mirage.Channel" class="text-break">Class Channel
+  <h1 id="Mirage_RemoteCalls_ServerRpcSender" data-uid="Mirage.RemoteCalls.ServerRpcSender" class="text-break">Class ServerRpcSender
   </h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Methods used by weaver to send RPCs</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">Channel</span></div>
+    <div class="level1"><span class="xref">ServerRpcSender</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -131,58 +132,119 @@
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#system-object-tostring">Object.ToString()</a>
     </div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Mirage.html">Mirage</a></h6>
-  <h6><strong>Assembly</strong>: Mirage.SocketLayer.dll</h6>
-  <h5 id="Mirage_Channel_syntax">Syntax</h5>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Mirage.RemoteCalls.html">Mirage.RemoteCalls</a></h6>
+  <h6><strong>Assembly</strong>: Mirage.dll</h6>
+  <h5 id="Mirage_RemoteCalls_ServerRpcSender_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class Channel</code></pre>
+    <pre><code class="lang-csharp hljs">public static class ServerRpcSender</code></pre>
   </div>
-  <h3 id="fields">Fields
+  <h3 id="methods">Methods
   </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_Channel_Reliable.md&amp;value=---%0Auid%3A%20Mirage.Channel.Reliable%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_ServerRpcSender_Send_Mirage_NetworkBehaviour_System_Int32_Mirage_Serialization_NetworkWriter_System_Int32_System_Boolean_.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.ServerRpcSender.Send(Mirage.NetworkBehaviour%2CSystem.Int32%2CMirage.Serialization.NetworkWriter%2CSystem.Int32%2CSystem.Boolean)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/32153cb656a1a60bd31c9fbaf51a93f3b30cbdfa/Assets/Mirage/Runtime/SocketLayer/Channel.cs/#L8">View Source</a>
+    <a href="https://github.com/MirageNet/Mirage/blob/32153cb656a1a60bd31c9fbaf51a93f3b30cbdfa/Assets/Mirage/Runtime/RemoteCalls/ServerRpcSender.cs/#L13">View Source</a>
   </span>
-  <h4 id="Mirage_Channel_Reliable" data-uid="Mirage.Channel.Reliable">Reliable</h4>
+  <a id="Mirage_RemoteCalls_ServerRpcSender_Send_" data-uid="Mirage.RemoteCalls.ServerRpcSender.Send*"></a>
+  <h4 id="Mirage_RemoteCalls_ServerRpcSender_Send_Mirage_NetworkBehaviour_System_Int32_Mirage_Serialization_NetworkWriter_System_Int32_System_Boolean_" data-uid="Mirage.RemoteCalls.ServerRpcSender.Send(Mirage.NetworkBehaviour,System.Int32,Mirage.Serialization.NetworkWriter,System.Int32,System.Boolean)">Send(NetworkBehaviour, Int32, NetworkWriter, Int32, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const int Reliable = 0</code></pre>
+    <pre><code class="lang-csharp hljs">public static void Send(NetworkBehaviour behaviour, int hash, NetworkWriter writer, int channelId, bool requireAuthority)</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
+  <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
         <th>Type</th>
+        <th>Name</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
       <tr>
+        <td><a class="xref" href="Mirage.NetworkBehaviour.html">NetworkBehaviour</a></td>
+        <td><span class="parametername">behaviour</span></td>
+        <td></td>
+      </tr>
+      <tr>
         <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">hash</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Mirage.Serialization.NetworkWriter.html">NetworkWriter</a></td>
+        <td><span class="parametername">writer</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">channelId</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">requireAuthority</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_Channel_Unreliable.md&amp;value=---%0Auid%3A%20Mirage.Channel.Unreliable%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_ServerRpcSender_SendWithReturn__1_Mirage_NetworkBehaviour_System_Int32_Mirage_Serialization_NetworkWriter_System_Int32_System_Boolean_.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.ServerRpcSender.SendWithReturn%60%601(Mirage.NetworkBehaviour%2CSystem.Int32%2CMirage.Serialization.NetworkWriter%2CSystem.Int32%2CSystem.Boolean)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/32153cb656a1a60bd31c9fbaf51a93f3b30cbdfa/Assets/Mirage/Runtime/SocketLayer/Channel.cs/#L9">View Source</a>
+    <a href="https://github.com/MirageNet/Mirage/blob/32153cb656a1a60bd31c9fbaf51a93f3b30cbdfa/Assets/Mirage/Runtime/RemoteCalls/ServerRpcSender.cs/#L20">View Source</a>
   </span>
-  <h4 id="Mirage_Channel_Unreliable" data-uid="Mirage.Channel.Unreliable">Unreliable</h4>
+  <a id="Mirage_RemoteCalls_ServerRpcSender_SendWithReturn_" data-uid="Mirage.RemoteCalls.ServerRpcSender.SendWithReturn*"></a>
+  <h4 id="Mirage_RemoteCalls_ServerRpcSender_SendWithReturn__1_Mirage_NetworkBehaviour_System_Int32_Mirage_Serialization_NetworkWriter_System_Int32_System_Boolean_" data-uid="Mirage.RemoteCalls.ServerRpcSender.SendWithReturn``1(Mirage.NetworkBehaviour,System.Int32,Mirage.Serialization.NetworkWriter,System.Int32,System.Boolean)">SendWithReturn&lt;T&gt;(NetworkBehaviour, Int32, NetworkWriter, Int32, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const int Unreliable = 1</code></pre>
+    <pre><code class="lang-csharp hljs">public static UniTask&lt;T&gt; SendWithReturn&lt;T&gt;(NetworkBehaviour behaviour, int hash, NetworkWriter writer, int channelId, bool requireAuthority)</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Mirage.NetworkBehaviour.html">NetworkBehaviour</a></td>
+        <td><span class="parametername">behaviour</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">hash</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Mirage.Serialization.NetworkWriter.html">NetworkWriter</a></td>
+        <td><span class="parametername">writer</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">channelId</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">requireAuthority</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -192,7 +254,22 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="xref">Cysharp.Threading.Tasks.UniTask</span>&lt;T&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -205,10 +282,10 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_Channel.md&amp;value=---%0Auid%3A%20Mirage.Channel%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_ServerRpcSender.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.ServerRpcSender%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
                   </li>
                   <li>
-                    <a href="https://github.com/MirageNet/Mirage/blob/32153cb656a1a60bd31c9fbaf51a93f3b30cbdfa/Assets/Mirage/Runtime/SocketLayer/Channel.cs/#L3" class="contribution-link">View Source</a>
+                    <a href="https://github.com/MirageNet/Mirage/blob/32153cb656a1a60bd31c9fbaf51a93f3b30cbdfa/Assets/Mirage/Runtime/RemoteCalls/ServerRpcSender.cs/#L11" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

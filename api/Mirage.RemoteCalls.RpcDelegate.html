@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Delegate SpawnHandlerDelegate
+    <title>Delegate RpcDelegate
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Delegate SpawnHandlerDelegate
+    <meta name="title" content="Delegate RpcDelegate
    ">
     <meta name="generator" content="docfx 2.56.6.0">
     
@@ -95,18 +95,19 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Mirage.SpawnHandlerDelegate">
+            <article class="content wrap" id="_content" data-uid="Mirage.RemoteCalls.RpcDelegate">
   
   
-  <h1 id="Mirage_SpawnHandlerDelegate" data-uid="Mirage.SpawnHandlerDelegate" class="text-break">Delegate SpawnHandlerDelegate
+  <h1 id="Mirage_RemoteCalls_RpcDelegate" data-uid="Mirage.RemoteCalls.RpcDelegate" class="text-break">Delegate RpcDelegate
   </h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Delegate for ServerRpc functions.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Mirage.html">Mirage</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Mirage.RemoteCalls.html">Mirage.RemoteCalls</a></h6>
   <h6><strong>Assembly</strong>: Mirage.dll</h6>
-  <h5 id="Mirage_SpawnHandlerDelegate_syntax">Syntax</h5>
+  <h5 id="Mirage_RemoteCalls_RpcDelegate_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public delegate NetworkIdentity SpawnHandlerDelegate(SpawnMessage msg);</code></pre>
+    <pre><code class="lang-csharp hljs">public delegate void RpcDelegate(NetworkBehaviour obj, NetworkReader reader, INetworkPlayer senderPlayer, int replyId);</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -119,23 +120,23 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Mirage.SpawnMessage.html">SpawnMessage</a></td>
-        <td><span class="parametername">msg</span></td>
+        <td><a class="xref" href="Mirage.NetworkBehaviour.html">NetworkBehaviour</a></td>
+        <td><span class="parametername">obj</span></td>
         <td></td>
       </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
       <tr>
-        <th>Type</th>
-        <th>Description</th>
+        <td><a class="xref" href="Mirage.Serialization.NetworkReader.html">NetworkReader</a></td>
+        <td><span class="parametername">reader</span></td>
+        <td></td>
       </tr>
-    </thead>
-    <tbody>
       <tr>
-        <td><a class="xref" href="Mirage.NetworkIdentity.html">NetworkIdentity</a></td>
+        <td><a class="xref" href="Mirage.INetworkPlayer.html">INetworkPlayer</a></td>
+        <td><span class="parametername">senderPlayer</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">replyId</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -148,10 +149,10 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_SpawnHandlerDelegate.md&amp;value=---%0Auid%3A%20Mirage.SpawnHandlerDelegate%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RpcDelegate.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RpcDelegate%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
                   </li>
                   <li>
-                    <a href="https://github.com/MirageNet/Mirage/blob/32153cb656a1a60bd31c9fbaf51a93f3b30cbdfa/Assets/Mirage/Runtime/IClientObjectManager.cs/#L6" class="contribution-link">View Source</a>
+                    <a href="https://github.com/MirageNet/Mirage/blob/32153cb656a1a60bd31c9fbaf51a93f3b30cbdfa/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L15" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>
