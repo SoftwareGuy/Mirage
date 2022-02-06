@@ -5,22 +5,20 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Delegate Pool&lt;T&gt;.CreateNewItem
-   </title>
+    <title>Generics In mirage </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Delegate Pool&lt;T&gt;.CreateNewItem
-   ">
+    <meta name="title" content="Generics In mirage ">
     <meta name="generator" content="docfx 2.56.6.0">
     
-    <link rel="shortcut icon" href="../favicon.ico">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../">
+    <meta property="docfx:rel" content="../../">
     
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
@@ -39,7 +37,7 @@
               </button>
               
               <a class="navbar-brand" style="display:flex;" href="https://github.com/MirageNet/Mirage">
-                <img id="logo" class="svg" style="vertical-align: middle;align-self:center;" src="../logo.png" alt="">
+                <img id="logo" class="svg" style="vertical-align: middle;align-self:center;" src="../../logo.png" alt="">
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
@@ -56,7 +54,7 @@
                   <div class="icon">
                     <i aria-hidden="true">🌙</i>
                   </div>
-                    <script type="text/javascript" src="../styles/toggle-theme.js"></script>
+                    <script type="text/javascript" src="../../styles/toggle-theme.js"></script>
                   </div>
                   <div class="form-group">
                     <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
@@ -95,56 +93,54 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Mirage.SocketLayer.Pool`1.CreateNewItem">
-  
-  
-  <h1 id="Mirage_SocketLayer_Pool_1_CreateNewItem" data-uid="Mirage.SocketLayer.Pool`1.CreateNewItem" class="text-break">Delegate Pool&lt;T&gt;.CreateNewItem
-  </h1>
-  <div class="markdown level0 summary"></div>
-  <div class="markdown level0 conceptual"></div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Mirage.SocketLayer.html">Mirage.SocketLayer</a></h6>
-  <h6><strong>Assembly</strong>: Mirage.SocketLayer.dll</h6>
-  <h5 id="Mirage_SocketLayer_Pool_1_CreateNewItem_syntax">Syntax</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public delegate T CreateNewItem(int bufferSize, Pool&lt;T&gt; pool);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td><span class="parametername">bufferSize</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="Mirage.SocketLayer.Pool-1.html">Pool</a>&lt;T&gt;</td>
-        <td><span class="parametername">pool</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">T</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="generics-in-mirage">Generics In mirage</h1>
+
+<p>Mirage supports generic types for <a href="Sync/SyncVars.html">SyncVars</a>, <a href="RemoteCalls/index.html">Rpcs</a>, and for fields in <a href="RemoteCalls/NetworkMessages.html">NetworkMessages</a>.</p>
+<h2 id="networkbehaviour">NetworkBehaviour</h2>
+<p>By making a <a href="GameObjects/NetworkBehaviour.html">NetworkBehaviour</a> generic you can then use generic SyncVar fields or use the generic in an rpc</p>
+<pre><code class="lang-cs">public class MyGenericBehaviour&lt;T&gt; : NetworkBehaviour
+{
+    [SyncVar]
+    public T Value;
+
+    public void MyRpc(T value) 
+    {
+        // do stuff
+    }
+}
+</code></pre>
+<p>[!WARNING] making the rpc itself generic does not work. for example <code>MyRpc&lt;T&gt;(T value)</code> will not work. This is because the receiver will have no idea what generic to invoke the type as.</p>
+<h2 id="network-messages">Network Messages</h2>
+<p><em>Coming soon</em></p>
+<p>Generic Message are current <strong>NOT</strong> supported, but might be added in the future</p>
+<pre><code class="lang-cs">[NetworkMessage]
+public struct MyMessage&lt;T&gt;
+{
+    public int Value;
+}
+</code></pre>
+<h2 id="ensure-type-has-write-and-read-functions">Ensure Type has Write and Read functions</h2>
+<p>In order for a type to work as a generic, it must have Write and Read that Mirage can find. For built in types this is done automatically (see <a href="Serialization.html">Serialization</a>).</p>
+<p>For custom types Mirage will try to automatically find them and generate functions, however this does not always work. Adding <code>[NetworkMessage]</code> to the type will tell Mirage to generate functions for it.</p>
+<pre><code class="lang-cs">[NetworkMessage]
+public struct MyCustomType
+{
+    public int Value;
+}
+</code></pre>
+<p>Alternatively you can manually create Write and Read functions for your type</p>
+<pre><code class="lang-cs">public static class MyCustomTypeExtensions 
+{
+    public static void Write(this NetworkWriter writer, MyCustomType value) {
+        // write here
+    }
+
+    public static MyCustomType Read(this NetworkReader reader) {
+        // read here
+    }
+}
+</code></pre>
 </article>
           </div>
           
@@ -153,10 +149,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_SocketLayer_Pool_1_CreateNewItem.md&amp;value=---%0Auid%3A%20Mirage.SocketLayer.Pool%601.CreateNewItem%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
-                  </li>
-                  <li>
-                    <a href="https://github.com/MirageNet/Mirage/blob/bb0f7922e4d7fe8cc8def3fb395079577f8065cf/Assets/Mirage/Runtime/SocketLayer/Pool.cs/#L18" class="contribution-link">View Source</a>
+                    <a href="https://github.com/MirageNet/Mirage/blob/master/doc/Articles/Guides/Generics.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
@@ -183,8 +176,8 @@
       </footer>
     </div>
     
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
   </body>
 </html>
