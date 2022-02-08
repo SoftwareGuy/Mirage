@@ -135,6 +135,60 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class RemoteCall</code></pre>
   </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RemoteCall__ctor_System_Type_Mirage_RemoteCalls_RpcInvokeType_Mirage_RemoteCalls_RpcDelegate_System_Boolean_System_String_.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RemoteCall.%23ctor(System.Type%2CMirage.RemoteCalls.RpcInvokeType%2CMirage.RemoteCalls.RpcDelegate%2CSystem.Boolean%2CSystem.String)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/MirageNet/Mirage/blob/c50bbc1e9014402fb33566a17ec0d4f064efeb4b/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L110">View Source</a>
+  </span>
+  <a id="Mirage_RemoteCalls_RemoteCall__ctor_" data-uid="Mirage.RemoteCalls.RemoteCall.#ctor*"></a>
+  <h4 id="Mirage_RemoteCalls_RemoteCall__ctor_System_Type_Mirage_RemoteCalls_RpcInvokeType_Mirage_RemoteCalls_RpcDelegate_System_Boolean_System_String_" data-uid="Mirage.RemoteCalls.RemoteCall.#ctor(System.Type,Mirage.RemoteCalls.RpcInvokeType,Mirage.RemoteCalls.RpcDelegate,System.Boolean,System.String)">RemoteCall(Type, RpcInvokeType, RpcDelegate, Boolean, String)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RemoteCall(Type declaringType, RpcInvokeType invokeType, RpcDelegate function, bool requireAuthority, string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="parametername">declaringType</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Mirage.RemoteCalls.RpcInvokeType.html">RpcInvokeType</a></td>
+        <td><span class="parametername">invokeType</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Mirage.RemoteCalls.RpcDelegate.html">RpcDelegate</a></td>
+        <td><span class="parametername">function</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">requireAuthority</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">name</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="fields">Fields
   </h3>
   <span class="small pull-right mobile-hide">
@@ -142,7 +196,7 @@
     <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RemoteCall_DeclaringType.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RemoteCall.DeclaringType%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/5ab48ba614f66c3bb33cc8843e0c8985c9b00f80/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L33">View Source</a>
+    <a href="https://github.com/MirageNet/Mirage/blob/c50bbc1e9014402fb33566a17ec0d4f064efeb4b/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L92">View Source</a>
   </span>
   <h4 id="Mirage_RemoteCalls_RemoteCall_DeclaringType" data-uid="Mirage.RemoteCalls.RemoteCall.DeclaringType">DeclaringType</h4>
   <div class="markdown level1 summary"><p>Type that rpc was declared in</p>
@@ -150,7 +204,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Type DeclaringType</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly Type DeclaringType</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -172,7 +226,7 @@
     <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RemoteCall_function.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RemoteCall.function%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/5ab48ba614f66c3bb33cc8843e0c8985c9b00f80/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L41">View Source</a>
+    <a href="https://github.com/MirageNet/Mirage/blob/c50bbc1e9014402fb33566a17ec0d4f064efeb4b/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L100">View Source</a>
   </span>
   <h4 id="Mirage_RemoteCalls_RemoteCall_function" data-uid="Mirage.RemoteCalls.RemoteCall.function">function</h4>
   <div class="markdown level1 summary"><p>Function to be invoked when receiving message</p>
@@ -180,7 +234,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public RpcDelegate function</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly RpcDelegate function</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -202,7 +256,7 @@
     <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RemoteCall_InvokeType.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RemoteCall.InvokeType%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/5ab48ba614f66c3bb33cc8843e0c8985c9b00f80/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L37">View Source</a>
+    <a href="https://github.com/MirageNet/Mirage/blob/c50bbc1e9014402fb33566a17ec0d4f064efeb4b/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L96">View Source</a>
   </span>
   <h4 id="Mirage_RemoteCalls_RemoteCall_InvokeType" data-uid="Mirage.RemoteCalls.RemoteCall.InvokeType">InvokeType</h4>
   <div class="markdown level1 summary"><p>Server rpc or client rpc</p>
@@ -210,7 +264,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public RpcInvokeType InvokeType</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly RpcInvokeType InvokeType</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -232,7 +286,7 @@
     <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RemoteCall_name.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RemoteCall.name%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/5ab48ba614f66c3bb33cc8843e0c8985c9b00f80/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L49">View Source</a>
+    <a href="https://github.com/MirageNet/Mirage/blob/c50bbc1e9014402fb33566a17ec0d4f064efeb4b/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L108">View Source</a>
   </span>
   <h4 id="Mirage_RemoteCalls_RemoteCall_name" data-uid="Mirage.RemoteCalls.RemoteCall.name">name</h4>
   <div class="markdown level1 summary"><p>User friendly name</p>
@@ -240,7 +294,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string name</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly string name</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -262,7 +316,7 @@
     <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RemoteCall_RequireAuthority.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RemoteCall.RequireAuthority%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/5ab48ba614f66c3bb33cc8843e0c8985c9b00f80/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L45">View Source</a>
+    <a href="https://github.com/MirageNet/Mirage/blob/c50bbc1e9014402fb33566a17ec0d4f064efeb4b/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L104">View Source</a>
   </span>
   <h4 id="Mirage_RemoteCalls_RemoteCall_RequireAuthority" data-uid="Mirage.RemoteCalls.RemoteCall.RequireAuthority">RequireAuthority</h4>
   <div class="markdown level1 summary"><p>Used by ServerRpc</p>
@@ -270,7 +324,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool RequireAuthority</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly bool RequireAuthority</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -294,7 +348,7 @@
     <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RemoteCall_AreEqual_System_Type_Mirage_RemoteCalls_RpcInvokeType_Mirage_RemoteCalls_RpcDelegate_.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RemoteCall.AreEqual(System.Type%2CMirage.RemoteCalls.RpcInvokeType%2CMirage.RemoteCalls.RpcDelegate)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/5ab48ba614f66c3bb33cc8843e0c8985c9b00f80/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L51">View Source</a>
+    <a href="https://github.com/MirageNet/Mirage/blob/c50bbc1e9014402fb33566a17ec0d4f064efeb4b/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L119">View Source</a>
   </span>
   <a id="Mirage_RemoteCalls_RemoteCall_AreEqual_" data-uid="Mirage.RemoteCalls.RemoteCall.AreEqual*"></a>
   <h4 id="Mirage_RemoteCalls_RemoteCall_AreEqual_System_Type_Mirage_RemoteCalls_RpcInvokeType_Mirage_RemoteCalls_RpcDelegate_" data-uid="Mirage.RemoteCalls.RemoteCall.AreEqual(System.Type,Mirage.RemoteCalls.RpcInvokeType,Mirage.RemoteCalls.RpcDelegate)">AreEqual(Type, RpcInvokeType, RpcDelegate)</h4>
@@ -351,7 +405,7 @@
     <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RemoteCall_ToString.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RemoteCall.ToString%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/MirageNet/Mirage/blob/5ab48ba614f66c3bb33cc8843e0c8985c9b00f80/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L94">View Source</a>
+    <a href="https://github.com/MirageNet/Mirage/blob/c50bbc1e9014402fb33566a17ec0d4f064efeb4b/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L162">View Source</a>
   </span>
   <a id="Mirage_RemoteCalls_RemoteCall_ToString_" data-uid="Mirage.RemoteCalls.RemoteCall.ToString*"></a>
   <h4 id="Mirage_RemoteCalls_RemoteCall_ToString" data-uid="Mirage.RemoteCalls.RemoteCall.ToString">ToString()</h4>
@@ -390,7 +444,7 @@
                     <a href="https://github.com/MirageNet/Mirage/new/master/apiSpec/new?filename=Mirage_RemoteCalls_RemoteCall.md&amp;value=---%0Auid%3A%20Mirage.RemoteCalls.RemoteCall%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
                   </li>
                   <li>
-                    <a href="https://github.com/MirageNet/Mirage/blob/5ab48ba614f66c3bb33cc8843e0c8985c9b00f80/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L28" class="contribution-link">View Source</a>
+                    <a href="https://github.com/MirageNet/Mirage/blob/c50bbc1e9014402fb33566a17ec0d4f064efeb4b/Assets/Mirage/Runtime/RemoteCalls/RemoteCallHelper.cs/#L87" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

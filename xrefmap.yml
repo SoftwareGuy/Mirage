@@ -5585,6 +5585,19 @@ references:
   commentId: T:Mirage.NetworkBehaviour
   fullName: Mirage.NetworkBehaviour
   nameWithType: NetworkBehaviour
+- uid: Mirage.NetworkBehaviour.#ctor
+  name: NetworkBehaviour()
+  href: api/Mirage.NetworkBehaviour.html#Mirage_NetworkBehaviour__ctor
+  commentId: M:Mirage.NetworkBehaviour.#ctor
+  fullName: Mirage.NetworkBehaviour.NetworkBehaviour()
+  nameWithType: NetworkBehaviour.NetworkBehaviour()
+- uid: Mirage.NetworkBehaviour.#ctor*
+  name: NetworkBehaviour
+  href: api/Mirage.NetworkBehaviour.html#Mirage_NetworkBehaviour__ctor_
+  commentId: Overload:Mirage.NetworkBehaviour.#ctor
+  isSpec: "True"
+  fullName: Mirage.NetworkBehaviour.NetworkBehaviour
+  nameWithType: NetworkBehaviour.NetworkBehaviour
 - uid: Mirage.NetworkBehaviour.ClearAllDirtyBits
   name: ClearAllDirtyBits()
   href: api/Mirage.NetworkBehaviour.html#Mirage_NetworkBehaviour_ClearAllDirtyBits
@@ -5656,6 +5669,19 @@ references:
   isSpec: "True"
   fullName: Mirage.NetworkBehaviour.DeserializeSyncVars
   nameWithType: NetworkBehaviour.DeserializeSyncVars
+- uid: Mirage.NetworkBehaviour.GetRpcCount
+  name: GetRpcCount()
+  href: api/Mirage.NetworkBehaviour.html#Mirage_NetworkBehaviour_GetRpcCount
+  commentId: M:Mirage.NetworkBehaviour.GetRpcCount
+  fullName: Mirage.NetworkBehaviour.GetRpcCount()
+  nameWithType: NetworkBehaviour.GetRpcCount()
+- uid: Mirage.NetworkBehaviour.GetRpcCount*
+  name: GetRpcCount
+  href: api/Mirage.NetworkBehaviour.html#Mirage_NetworkBehaviour_GetRpcCount_
+  commentId: Overload:Mirage.NetworkBehaviour.GetRpcCount
+  isSpec: "True"
+  fullName: Mirage.NetworkBehaviour.GetRpcCount
+  nameWithType: NetworkBehaviour.GetRpcCount
 - uid: Mirage.NetworkBehaviour.GetSyncVarHookGuard(System.UInt64)
   name: GetSyncVarHookGuard(UInt64)
   href: api/Mirage.NetworkBehaviour.html#Mirage_NetworkBehaviour_GetSyncVarHookGuard_System_UInt64_
@@ -5864,6 +5890,12 @@ references:
   isSpec: "True"
   fullName: Mirage.NetworkBehaviour.Owner
   nameWithType: NetworkBehaviour.Owner
+- uid: Mirage.NetworkBehaviour.remoteCallCollection
+  name: remoteCallCollection
+  href: api/Mirage.NetworkBehaviour.html#Mirage_NetworkBehaviour_remoteCallCollection
+  commentId: F:Mirage.NetworkBehaviour.remoteCallCollection
+  fullName: Mirage.NetworkBehaviour.remoteCallCollection
+  nameWithType: NetworkBehaviour.remoteCallCollection
 - uid: Mirage.NetworkBehaviour.SerializeObjectsAll(Mirage.Serialization.NetworkWriter)
   name: SerializeObjectsAll(NetworkWriter)
   href: api/Mirage.NetworkBehaviour.html#Mirage_NetworkBehaviour_SerializeObjectsAll_Mirage_Serialization_NetworkWriter_
@@ -9078,6 +9110,19 @@ references:
   commentId: T:Mirage.RemoteCalls.RemoteCall
   fullName: Mirage.RemoteCalls.RemoteCall
   nameWithType: RemoteCall
+- uid: Mirage.RemoteCalls.RemoteCall.#ctor(System.Type,Mirage.RemoteCalls.RpcInvokeType,Mirage.RemoteCalls.RpcDelegate,System.Boolean,System.String)
+  name: RemoteCall(Type, RpcInvokeType, RpcDelegate, Boolean, String)
+  href: api/Mirage.RemoteCalls.RemoteCall.html#Mirage_RemoteCalls_RemoteCall__ctor_System_Type_Mirage_RemoteCalls_RpcInvokeType_Mirage_RemoteCalls_RpcDelegate_System_Boolean_System_String_
+  commentId: M:Mirage.RemoteCalls.RemoteCall.#ctor(System.Type,Mirage.RemoteCalls.RpcInvokeType,Mirage.RemoteCalls.RpcDelegate,System.Boolean,System.String)
+  fullName: Mirage.RemoteCalls.RemoteCall.RemoteCall(System.Type, Mirage.RemoteCalls.RpcInvokeType, Mirage.RemoteCalls.RpcDelegate, System.Boolean, System.String)
+  nameWithType: RemoteCall.RemoteCall(Type, RpcInvokeType, RpcDelegate, Boolean, String)
+- uid: Mirage.RemoteCalls.RemoteCall.#ctor*
+  name: RemoteCall
+  href: api/Mirage.RemoteCalls.RemoteCall.html#Mirage_RemoteCalls_RemoteCall__ctor_
+  commentId: Overload:Mirage.RemoteCalls.RemoteCall.#ctor
+  isSpec: "True"
+  fullName: Mirage.RemoteCalls.RemoteCall.RemoteCall
+  nameWithType: RemoteCall.RemoteCall
 - uid: Mirage.RemoteCalls.RemoteCall.AreEqual(System.Type,Mirage.RemoteCalls.RpcInvokeType,Mirage.RemoteCalls.RpcDelegate)
   name: AreEqual(Type, RpcInvokeType, RpcDelegate)
   href: api/Mirage.RemoteCalls.RemoteCall.html#Mirage_RemoteCalls_RemoteCall_AreEqual_System_Type_Mirage_RemoteCalls_RpcInvokeType_Mirage_RemoteCalls_RpcDelegate_
@@ -9134,70 +9179,73 @@ references:
   isSpec: "True"
   fullName: Mirage.RemoteCalls.RemoteCall.ToString
   nameWithType: RemoteCall.ToString
-- uid: Mirage.RemoteCalls.RemoteCallHelper
-  name: RemoteCallHelper
-  href: api/Mirage.RemoteCalls.RemoteCallHelper.html
-  commentId: T:Mirage.RemoteCalls.RemoteCallHelper
-  fullName: Mirage.RemoteCalls.RemoteCallHelper
-  nameWithType: RemoteCallHelper
-- uid: Mirage.RemoteCalls.RemoteCallHelper.GetCall(System.Int32)
-  name: GetCall(Int32)
-  href: api/Mirage.RemoteCalls.RemoteCallHelper.html#Mirage_RemoteCalls_RemoteCallHelper_GetCall_System_Int32_
-  commentId: M:Mirage.RemoteCalls.RemoteCallHelper.GetCall(System.Int32)
-  fullName: Mirage.RemoteCalls.RemoteCallHelper.GetCall(System.Int32)
-  nameWithType: RemoteCallHelper.GetCall(Int32)
-- uid: Mirage.RemoteCalls.RemoteCallHelper.GetCall*
-  name: GetCall
-  href: api/Mirage.RemoteCalls.RemoteCallHelper.html#Mirage_RemoteCalls_RemoteCallHelper_GetCall_
-  commentId: Overload:Mirage.RemoteCalls.RemoteCallHelper.GetCall
+- uid: Mirage.RemoteCalls.RemoteCallCollection
+  name: RemoteCallCollection
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html
+  commentId: T:Mirage.RemoteCalls.RemoteCallCollection
+  fullName: Mirage.RemoteCalls.RemoteCallCollection
+  nameWithType: RemoteCallCollection
+- uid: Mirage.RemoteCalls.RemoteCallCollection.#ctor(Mirage.NetworkBehaviour)
+  name: RemoteCallCollection(NetworkBehaviour)
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html#Mirage_RemoteCalls_RemoteCallCollection__ctor_Mirage_NetworkBehaviour_
+  commentId: M:Mirage.RemoteCalls.RemoteCallCollection.#ctor(Mirage.NetworkBehaviour)
+  fullName: Mirage.RemoteCalls.RemoteCallCollection.RemoteCallCollection(Mirage.NetworkBehaviour)
+  nameWithType: RemoteCallCollection.RemoteCallCollection(NetworkBehaviour)
+- uid: Mirage.RemoteCalls.RemoteCallCollection.#ctor*
+  name: RemoteCallCollection
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html#Mirage_RemoteCalls_RemoteCallCollection__ctor_
+  commentId: Overload:Mirage.RemoteCalls.RemoteCallCollection.#ctor
   isSpec: "True"
-  fullName: Mirage.RemoteCalls.RemoteCallHelper.GetCall
-  nameWithType: RemoteCallHelper.GetCall
-- uid: Mirage.RemoteCalls.RemoteCallHelper.Register(System.Type,System.String,System.Int32,Mirage.RemoteCalls.RpcInvokeType,Mirage.RemoteCalls.RpcDelegate,System.Boolean)
-  name: Register(Type, String, Int32, RpcInvokeType, RpcDelegate, Boolean)
-  href: api/Mirage.RemoteCalls.RemoteCallHelper.html#Mirage_RemoteCalls_RemoteCallHelper_Register_System_Type_System_String_System_Int32_Mirage_RemoteCalls_RpcInvokeType_Mirage_RemoteCalls_RpcDelegate_System_Boolean_
-  commentId: M:Mirage.RemoteCalls.RemoteCallHelper.Register(System.Type,System.String,System.Int32,Mirage.RemoteCalls.RpcInvokeType,Mirage.RemoteCalls.RpcDelegate,System.Boolean)
-  fullName: Mirage.RemoteCalls.RemoteCallHelper.Register(System.Type, System.String, System.Int32, Mirage.RemoteCalls.RpcInvokeType, Mirage.RemoteCalls.RpcDelegate, System.Boolean)
-  nameWithType: RemoteCallHelper.Register(Type, String, Int32, RpcInvokeType, RpcDelegate, Boolean)
-- uid: Mirage.RemoteCalls.RemoteCallHelper.Register*
+  fullName: Mirage.RemoteCalls.RemoteCallCollection.RemoteCallCollection
+  nameWithType: RemoteCallCollection.RemoteCallCollection
+- uid: Mirage.RemoteCalls.RemoteCallCollection.Get(System.Int32)
+  name: Get(Int32)
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html#Mirage_RemoteCalls_RemoteCallCollection_Get_System_Int32_
+  commentId: M:Mirage.RemoteCalls.RemoteCallCollection.Get(System.Int32)
+  fullName: Mirage.RemoteCalls.RemoteCallCollection.Get(System.Int32)
+  nameWithType: RemoteCallCollection.Get(Int32)
+- uid: Mirage.RemoteCalls.RemoteCallCollection.Get*
+  name: Get
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html#Mirage_RemoteCalls_RemoteCallCollection_Get_
+  commentId: Overload:Mirage.RemoteCalls.RemoteCallCollection.Get
+  isSpec: "True"
+  fullName: Mirage.RemoteCalls.RemoteCallCollection.Get
+  nameWithType: RemoteCallCollection.Get
+- uid: Mirage.RemoteCalls.RemoteCallCollection.Register(System.Int32,System.Type,System.String,Mirage.RemoteCalls.RpcInvokeType,Mirage.RemoteCalls.RpcDelegate,System.Boolean)
+  name: Register(Int32, Type, String, RpcInvokeType, RpcDelegate, Boolean)
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html#Mirage_RemoteCalls_RemoteCallCollection_Register_System_Int32_System_Type_System_String_Mirage_RemoteCalls_RpcInvokeType_Mirage_RemoteCalls_RpcDelegate_System_Boolean_
+  commentId: M:Mirage.RemoteCalls.RemoteCallCollection.Register(System.Int32,System.Type,System.String,Mirage.RemoteCalls.RpcInvokeType,Mirage.RemoteCalls.RpcDelegate,System.Boolean)
+  fullName: Mirage.RemoteCalls.RemoteCallCollection.Register(System.Int32, System.Type, System.String, Mirage.RemoteCalls.RpcInvokeType, Mirage.RemoteCalls.RpcDelegate, System.Boolean)
+  nameWithType: RemoteCallCollection.Register(Int32, Type, String, RpcInvokeType, RpcDelegate, Boolean)
+- uid: Mirage.RemoteCalls.RemoteCallCollection.Register*
   name: Register
-  href: api/Mirage.RemoteCalls.RemoteCallHelper.html#Mirage_RemoteCalls_RemoteCallHelper_Register_
-  commentId: Overload:Mirage.RemoteCalls.RemoteCallHelper.Register
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html#Mirage_RemoteCalls_RemoteCallCollection_Register_
+  commentId: Overload:Mirage.RemoteCalls.RemoteCallCollection.Register
   isSpec: "True"
-  fullName: Mirage.RemoteCalls.RemoteCallHelper.Register
-  nameWithType: RemoteCallHelper.Register
-- uid: Mirage.RemoteCalls.RemoteCallHelper.RegisterRequest*
+  fullName: Mirage.RemoteCalls.RemoteCallCollection.Register
+  nameWithType: RemoteCallCollection.Register
+- uid: Mirage.RemoteCalls.RemoteCallCollection.RegisterRequest*
   name: RegisterRequest
-  href: api/Mirage.RemoteCalls.RemoteCallHelper.html#Mirage_RemoteCalls_RemoteCallHelper_RegisterRequest_
-  commentId: Overload:Mirage.RemoteCalls.RemoteCallHelper.RegisterRequest
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html#Mirage_RemoteCalls_RemoteCallCollection_RegisterRequest_
+  commentId: Overload:Mirage.RemoteCalls.RemoteCallCollection.RegisterRequest
   isSpec: "True"
-  fullName: Mirage.RemoteCalls.RemoteCallHelper.RegisterRequest
-  nameWithType: RemoteCallHelper.RegisterRequest
-- uid: Mirage.RemoteCalls.RemoteCallHelper.RegisterRequest``1(System.Type,System.String,System.Int32,Mirage.RemoteCalls.RequestDelegate{``0},System.Boolean)
-  name: RegisterRequest<T>(Type, String, Int32, RequestDelegate<T>, Boolean)
-  href: api/Mirage.RemoteCalls.RemoteCallHelper.html#Mirage_RemoteCalls_RemoteCallHelper_RegisterRequest__1_System_Type_System_String_System_Int32_Mirage_RemoteCalls_RequestDelegate___0__System_Boolean_
-  commentId: M:Mirage.RemoteCalls.RemoteCallHelper.RegisterRequest``1(System.Type,System.String,System.Int32,Mirage.RemoteCalls.RequestDelegate{``0},System.Boolean)
-  name.vb: RegisterRequest(Of T)(Type, String, Int32, RequestDelegate(Of T), Boolean)
-  fullName: Mirage.RemoteCalls.RemoteCallHelper.RegisterRequest<T>(System.Type, System.String, System.Int32, Mirage.RemoteCalls.RequestDelegate<T>, System.Boolean)
-  fullName.vb: Mirage.RemoteCalls.RemoteCallHelper.RegisterRequest(Of T)(System.Type, System.String, System.Int32, Mirage.RemoteCalls.RequestDelegate(Of T), System.Boolean)
-  nameWithType: RemoteCallHelper.RegisterRequest<T>(Type, String, Int32, RequestDelegate<T>, Boolean)
-  nameWithType.vb: RemoteCallHelper.RegisterRequest(Of T)(Type, String, Int32, RequestDelegate(Of T), Boolean)
-- uid: Mirage.RemoteCalls.RemoteCallHelper.TryGetCall(System.Int32,Mirage.RemoteCalls.RemoteCall@)
-  name: TryGetCall(Int32, out RemoteCall)
-  href: api/Mirage.RemoteCalls.RemoteCallHelper.html#Mirage_RemoteCalls_RemoteCallHelper_TryGetCall_System_Int32_Mirage_RemoteCalls_RemoteCall__
-  commentId: M:Mirage.RemoteCalls.RemoteCallHelper.TryGetCall(System.Int32,Mirage.RemoteCalls.RemoteCall@)
-  name.vb: TryGetCall(Int32, ByRef RemoteCall)
-  fullName: Mirage.RemoteCalls.RemoteCallHelper.TryGetCall(System.Int32, out Mirage.RemoteCalls.RemoteCall)
-  fullName.vb: Mirage.RemoteCalls.RemoteCallHelper.TryGetCall(System.Int32, ByRef Mirage.RemoteCalls.RemoteCall)
-  nameWithType: RemoteCallHelper.TryGetCall(Int32, out RemoteCall)
-  nameWithType.vb: RemoteCallHelper.TryGetCall(Int32, ByRef RemoteCall)
-- uid: Mirage.RemoteCalls.RemoteCallHelper.TryGetCall*
-  name: TryGetCall
-  href: api/Mirage.RemoteCalls.RemoteCallHelper.html#Mirage_RemoteCalls_RemoteCallHelper_TryGetCall_
-  commentId: Overload:Mirage.RemoteCalls.RemoteCallHelper.TryGetCall
-  isSpec: "True"
-  fullName: Mirage.RemoteCalls.RemoteCallHelper.TryGetCall
-  nameWithType: RemoteCallHelper.TryGetCall
+  fullName: Mirage.RemoteCalls.RemoteCallCollection.RegisterRequest
+  nameWithType: RemoteCallCollection.RegisterRequest
+- uid: Mirage.RemoteCalls.RemoteCallCollection.RegisterRequest``1(System.Int32,System.Type,System.String,Mirage.RemoteCalls.RequestDelegate{``0},System.Boolean)
+  name: RegisterRequest<T>(Int32, Type, String, RequestDelegate<T>, Boolean)
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html#Mirage_RemoteCalls_RemoteCallCollection_RegisterRequest__1_System_Int32_System_Type_System_String_Mirage_RemoteCalls_RequestDelegate___0__System_Boolean_
+  commentId: M:Mirage.RemoteCalls.RemoteCallCollection.RegisterRequest``1(System.Int32,System.Type,System.String,Mirage.RemoteCalls.RequestDelegate{``0},System.Boolean)
+  name.vb: RegisterRequest(Of T)(Int32, Type, String, RequestDelegate(Of T), Boolean)
+  fullName: Mirage.RemoteCalls.RemoteCallCollection.RegisterRequest<T>(System.Int32, System.Type, System.String, Mirage.RemoteCalls.RequestDelegate<T>, System.Boolean)
+  fullName.vb: Mirage.RemoteCalls.RemoteCallCollection.RegisterRequest(Of T)(System.Int32, System.Type, System.String, Mirage.RemoteCalls.RequestDelegate(Of T), System.Boolean)
+  nameWithType: RemoteCallCollection.RegisterRequest<T>(Int32, Type, String, RequestDelegate<T>, Boolean)
+  nameWithType.vb: RemoteCallCollection.RegisterRequest(Of T)(Int32, Type, String, RequestDelegate(Of T), Boolean)
+- uid: Mirage.RemoteCalls.RemoteCallCollection.remoteCalls
+  name: remoteCalls
+  href: api/Mirage.RemoteCalls.RemoteCallCollection.html#Mirage_RemoteCalls_RemoteCallCollection_remoteCalls
+  commentId: F:Mirage.RemoteCalls.RemoteCallCollection.remoteCalls
+  fullName: Mirage.RemoteCalls.RemoteCallCollection.remoteCalls
+  nameWithType: RemoteCallCollection.remoteCalls
 - uid: Mirage.RemoteCalls.RequestDelegate`1
   name: RequestDelegate<T>
   href: api/Mirage.RemoteCalls.RequestDelegate-1.html
@@ -9302,12 +9350,12 @@ references:
   commentId: F:Mirage.RpcMessage.componentIndex
   fullName: Mirage.RpcMessage.componentIndex
   nameWithType: RpcMessage.componentIndex
-- uid: Mirage.RpcMessage.functionHash
-  name: functionHash
-  href: api/Mirage.RpcMessage.html#Mirage_RpcMessage_functionHash
-  commentId: F:Mirage.RpcMessage.functionHash
-  fullName: Mirage.RpcMessage.functionHash
-  nameWithType: RpcMessage.functionHash
+- uid: Mirage.RpcMessage.functionIndex
+  name: functionIndex
+  href: api/Mirage.RpcMessage.html#Mirage_RpcMessage_functionIndex
+  commentId: F:Mirage.RpcMessage.functionIndex
+  fullName: Mirage.RpcMessage.functionIndex
+  nameWithType: RpcMessage.functionIndex
 - uid: Mirage.RpcMessage.netId
   name: netId
   href: api/Mirage.RpcMessage.html#Mirage_RpcMessage_netId
@@ -13173,12 +13221,12 @@ references:
   commentId: F:Mirage.ServerRpcMessage.componentIndex
   fullName: Mirage.ServerRpcMessage.componentIndex
   nameWithType: ServerRpcMessage.componentIndex
-- uid: Mirage.ServerRpcMessage.functionHash
-  name: functionHash
-  href: api/Mirage.ServerRpcMessage.html#Mirage_ServerRpcMessage_functionHash
-  commentId: F:Mirage.ServerRpcMessage.functionHash
-  fullName: Mirage.ServerRpcMessage.functionHash
-  nameWithType: ServerRpcMessage.functionHash
+- uid: Mirage.ServerRpcMessage.functionIndex
+  name: functionIndex
+  href: api/Mirage.ServerRpcMessage.html#Mirage_ServerRpcMessage_functionIndex
+  commentId: F:Mirage.ServerRpcMessage.functionIndex
+  fullName: Mirage.ServerRpcMessage.functionIndex
+  nameWithType: ServerRpcMessage.functionIndex
 - uid: Mirage.ServerRpcMessage.netId
   name: netId
   href: api/Mirage.ServerRpcMessage.html#Mirage_ServerRpcMessage_netId
