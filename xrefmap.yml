@@ -558,6 +558,12 @@ references:
   commentId: F:Mirage.ClientStoppedReason.InvalidPacket
   fullName: Mirage.ClientStoppedReason.InvalidPacket
   nameWithType: ClientStoppedReason.InvalidPacket
+- uid: Mirage.ClientStoppedReason.KeyInvalid
+  name: KeyInvalid
+  href: api/Mirage.ClientStoppedReason.html#Mirage_ClientStoppedReason_KeyInvalid
+  commentId: F:Mirage.ClientStoppedReason.KeyInvalid
+  fullName: Mirage.ClientStoppedReason.KeyInvalid
+  nameWithType: ClientStoppedReason.KeyInvalid
 - uid: Mirage.ClientStoppedReason.LocalConnectionClosed
   name: LocalConnectionClosed
   href: api/Mirage.ClientStoppedReason.html#Mirage_ClientStoppedReason_LocalConnectionClosed
@@ -13539,6 +13545,12 @@ references:
   commentId: F:Mirage.SocketLayer.Config.KeepAliveInterval
   fullName: Mirage.SocketLayer.Config.KeepAliveInterval
   nameWithType: Config.KeepAliveInterval
+- uid: Mirage.SocketLayer.Config.key
+  name: key
+  href: api/Mirage.SocketLayer.Config.html#Mirage_SocketLayer_Config_key
+  commentId: F:Mirage.SocketLayer.Config.key
+  fullName: Mirage.SocketLayer.Config.key
+  nameWithType: Config.key
 - uid: Mirage.SocketLayer.Config.MaxConnectAttempts
   name: MaxConnectAttempts
   href: api/Mirage.SocketLayer.Config.html#Mirage_SocketLayer_Config_MaxConnectAttempts
@@ -14879,6 +14891,12 @@ references:
   commentId: F:Mirage.SocketLayer.RejectReason.ClosedByPeer
   fullName: Mirage.SocketLayer.RejectReason.ClosedByPeer
   nameWithType: RejectReason.ClosedByPeer
+- uid: Mirage.SocketLayer.RejectReason.KeyInvalid
+  name: KeyInvalid
+  href: api/Mirage.SocketLayer.RejectReason.html#Mirage_SocketLayer_RejectReason_KeyInvalid
+  commentId: F:Mirage.SocketLayer.RejectReason.KeyInvalid
+  fullName: Mirage.SocketLayer.RejectReason.KeyInvalid
+  nameWithType: RejectReason.KeyInvalid
 - uid: Mirage.SocketLayer.RejectReason.None
   name: None
   href: api/Mirage.SocketLayer.RejectReason.html#Mirage_SocketLayer_RejectReason_None
