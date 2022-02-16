@@ -13245,12 +13245,6 @@ references:
   commentId: F:Mirage.ServerRpcMessage.payload
   fullName: Mirage.ServerRpcMessage.payload
   nameWithType: ServerRpcMessage.payload
-- uid: Mirage.ServerRpcMessage.replyId
-  name: replyId
-  href: api/Mirage.ServerRpcMessage.html#Mirage_ServerRpcMessage_replyId
-  commentId: F:Mirage.ServerRpcMessage.replyId
-  fullName: Mirage.ServerRpcMessage.replyId
-  nameWithType: ServerRpcMessage.replyId
 - uid: Mirage.ServerRpcReply
   name: ServerRpcReply
   href: api/Mirage.ServerRpcReply.html
@@ -13269,6 +13263,42 @@ references:
   commentId: F:Mirage.ServerRpcReply.replyId
   fullName: Mirage.ServerRpcReply.replyId
   nameWithType: ServerRpcReply.replyId
+- uid: Mirage.ServerRpcWithReplyMessage
+  name: ServerRpcWithReplyMessage
+  href: api/Mirage.ServerRpcWithReplyMessage.html
+  commentId: T:Mirage.ServerRpcWithReplyMessage
+  fullName: Mirage.ServerRpcWithReplyMessage
+  nameWithType: ServerRpcWithReplyMessage
+- uid: Mirage.ServerRpcWithReplyMessage.componentIndex
+  name: componentIndex
+  href: api/Mirage.ServerRpcWithReplyMessage.html#Mirage_ServerRpcWithReplyMessage_componentIndex
+  commentId: F:Mirage.ServerRpcWithReplyMessage.componentIndex
+  fullName: Mirage.ServerRpcWithReplyMessage.componentIndex
+  nameWithType: ServerRpcWithReplyMessage.componentIndex
+- uid: Mirage.ServerRpcWithReplyMessage.functionIndex
+  name: functionIndex
+  href: api/Mirage.ServerRpcWithReplyMessage.html#Mirage_ServerRpcWithReplyMessage_functionIndex
+  commentId: F:Mirage.ServerRpcWithReplyMessage.functionIndex
+  fullName: Mirage.ServerRpcWithReplyMessage.functionIndex
+  nameWithType: ServerRpcWithReplyMessage.functionIndex
+- uid: Mirage.ServerRpcWithReplyMessage.netId
+  name: netId
+  href: api/Mirage.ServerRpcWithReplyMessage.html#Mirage_ServerRpcWithReplyMessage_netId
+  commentId: F:Mirage.ServerRpcWithReplyMessage.netId
+  fullName: Mirage.ServerRpcWithReplyMessage.netId
+  nameWithType: ServerRpcWithReplyMessage.netId
+- uid: Mirage.ServerRpcWithReplyMessage.payload
+  name: payload
+  href: api/Mirage.ServerRpcWithReplyMessage.html#Mirage_ServerRpcWithReplyMessage_payload
+  commentId: F:Mirage.ServerRpcWithReplyMessage.payload
+  fullName: Mirage.ServerRpcWithReplyMessage.payload
+  nameWithType: ServerRpcWithReplyMessage.payload
+- uid: Mirage.ServerRpcWithReplyMessage.replyId
+  name: replyId
+  href: api/Mirage.ServerRpcWithReplyMessage.html#Mirage_ServerRpcWithReplyMessage_replyId
+  commentId: F:Mirage.ServerRpcWithReplyMessage.replyId
+  fullName: Mirage.ServerRpcWithReplyMessage.replyId
+  nameWithType: ServerRpcWithReplyMessage.replyId
 - uid: Mirage.ShowInInspectorAttribute
   name: ShowInInspectorAttribute
   href: api/Mirage.ShowInInspectorAttribute.html
