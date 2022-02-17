@@ -110,16 +110,10 @@
     }
 }
 </code></pre>
-<p>[!WARNING] making the rpc itself generic does not work. for example <code>MyRpc&lt;T&gt;(T value)</code> will not work. This is because the receiver will have no idea what generic to invoke the type as.</p>
-<h2 id="network-messages">Network Messages</h2>
-<p><em>Coming soon</em></p>
-<p>Generic Message are current <strong>NOT</strong> supported, but might be added in the future</p>
-<pre><code class="lang-cs">[NetworkMessage]
-public struct MyMessage&lt;T&gt;
-{
-    public int Value;
-}
-</code></pre>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>making the rpc itself generic does not work. for example <code>MyRpc&lt;T&gt;(T value)</code> will not work. This is because the receiver will have no idea what generic to invoke the type as.</p>
+</div>
 <h2 id="ensure-type-has-write-and-read-functions">Ensure Type has Write and Read functions</h2>
 <p>In order for a type to work as a generic, it must have Write and Read that Mirage can find. For built in types this is done automatically (see <a href="Serialization.html">Serialization</a>).</p>
 <p>For custom types Mirage will try to automatically find them and generate functions, however this does not always work. Adding <code>[NetworkMessage]</code> to the type will tell Mirage to generate functions for it.</p>
@@ -139,6 +133,43 @@ public struct MyCustomType
     public static MyCustomType Read(this NetworkReader reader) {
         // read here
     }
+}
+</code></pre>
+<h2 id="network-messages-and-other-types">Network Messages and other types</h2>
+<p>Generic message are partly supported. Generic Instance can be used as messages, For example using <code>MyMessage&lt;int&gt;</code> in the example below.</p>
+<p>This also includes using generic types in RPC or inside other types as long they are generic instances.</p>
+<pre><code class="lang-cs">public struct MyMessage&lt;T&gt;
+{
+    public T Value;
+}
+
+class Manager 
+{
+    void Start() 
+    {
+        Server.MessageHandler.RegisterHandler&lt;MyMessage&lt;int&gt;&gt;(HandleMessage);
+    }
+
+    void HandleIntMessage(INetworkPlayer player, MyMessage&lt;int&gt; msg)
+    {
+        // do stuff
+    }
+}
+</code></pre>
+<div class="NOTE">
+<h5>Note</h5>
+<p>generic message should not have <code>[NetworkMessage]</code> because this cause Mirage to try to make writer for the generic itself. Only generic instances (eg MyMessage<int>) can have serialize functions<p>
+</int></div>
+<h2 id="synclist-syncdictionary-syncset">SyncList, SyncDictionary, SyncSet</h2>
+<p>SyncList, SyncDictionary and SyncSet can have generic types as their element type as long as it is a generic instance (eg <code>MyType&lt;int&gt;</code> not <code>MyType&lt;T&gt;</code>).</p>
+<pre><code class="lang-cs">public struct MyType&lt;T&gt;
+{
+    public bool Option;
+    public T Value;
+}
+public class MyBehaviour : NetworkBehaviour
+{
+    public SyncList&lt;MyType&lt;float&gt;&gt; myList;
 }
 </code></pre>
 </article>
