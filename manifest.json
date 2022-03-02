@@ -2348,7 +2348,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.AddCharacterMessage.html",
-          "hash": "irr3p83CGx2cg924uQzZJg=="
+          "hash": "lSmqA9vFGVMQY/xww5ThHQ=="
         }
       },
       "is_incremental": false,
@@ -2360,7 +2360,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Authenticators.BasicAuthenticator.html",
-          "hash": "cE8ZWOWCryciyln6ZUR5Lw=="
+          "hash": "GJA3L9d87dqqwyjn8XzSxg=="
         }
       },
       "is_incremental": false,
@@ -2372,7 +2372,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Authenticators.TimeoutAuthenticator.html",
-          "hash": "HRyC0ijQ1rfEcXgdGXQAEA=="
+          "hash": "MQWPJ0WBdoBG2KTeN/xN9w=="
         }
       },
       "is_incremental": false,
@@ -2396,7 +2396,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Channel.html",
-          "hash": "kJYJSAImDl3QveNBmooQsw=="
+          "hash": "yBjl+mhKdS4PlcmLTO2/GQ=="
         }
       },
       "is_incremental": false,
@@ -2408,7 +2408,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.CharacterSpawner.PlayerSpawnMethod.html",
-          "hash": "n4/D1VdvXIyctjxYgVIZsQ=="
+          "hash": "laeXmZMPBA8mUeG8we7lVA=="
         }
       },
       "is_incremental": false,
@@ -2420,7 +2420,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.CharacterSpawner.html",
-          "hash": "oI9NPQe384/RGxoS/otCFA=="
+          "hash": "N/tRX2gA3Scr4I6Nnz0Ryg=="
         }
       },
       "is_incremental": false,
@@ -2432,7 +2432,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ClientAttribute.html",
-          "hash": "wbE5LUkaV+VcHVRXqigugg=="
+          "hash": "8wXnfZMJ/WmuGudgrt3Wgg=="
         }
       },
       "is_incremental": false,
@@ -2444,7 +2444,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ClientObjectManager.html",
-          "hash": "i/RmNmsa+cDOYjl8u4/onQ=="
+          "hash": "FRyy9smKHiZxGrD7zacMBQ=="
         }
       },
       "is_incremental": false,
@@ -2456,7 +2456,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ClientRpcAttribute.html",
-          "hash": "0wovDWG3xsgKj8X1pWm/Rw=="
+          "hash": "be/RU2BQe56gEUOAO9aDOw=="
         }
       },
       "is_incremental": false,
@@ -2468,7 +2468,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ClientStoppedReason.html",
-          "hash": "TgSWF/nP4O8+9ibm6fWblw=="
+          "hash": "ppp0reZRl8KpUgWYVMooQQ=="
         }
       },
       "is_incremental": false,
@@ -2480,7 +2480,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Collections.ISyncObject.html",
-          "hash": "WNJ95iXIuAK4bBbJvxcyqg=="
+          "hash": "2hetQWootXwWzeliWNIBEw=="
         }
       },
       "is_incremental": false,
@@ -2492,7 +2492,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Collections.SyncDictionary-2.html",
-          "hash": "YjnlIY51XcbPTKzTsXb77A=="
+          "hash": "Mehy/4cCtzsRf/hvfC5KeQ=="
         }
       },
       "is_incremental": false,
@@ -2504,7 +2504,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Collections.SyncHashSet-1.html",
-          "hash": "/W8EOcG2+KLJCIcsjp6I1Q=="
+          "hash": "5SUkKcU1V9ksi5Bp4dAUBg=="
         }
       },
       "is_incremental": false,
@@ -2516,7 +2516,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Collections.SyncIDictionary-2.html",
-          "hash": "Mo48R5ojwhLrRItYRAEHjg=="
+          "hash": "3cUSYzN2H1ryOm4AayDjTA=="
         }
       },
       "is_incremental": false,
@@ -2528,7 +2528,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Collections.SyncList-1.Enumerator.html",
-          "hash": "RA24fctsnwLQRKDdpg6k8w=="
+          "hash": "rNCAND81gRtjEm4pXNYhhg=="
         }
       },
       "is_incremental": false,
@@ -2540,7 +2540,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Collections.SyncList-1.html",
-          "hash": "wuTkNj+VRj7xPuTkAUdK9w=="
+          "hash": "XbJfLbgqBMwjZk4J2C6cBg=="
         }
       },
       "is_incremental": false,
@@ -2552,7 +2552,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Collections.SyncSet-1.html",
-          "hash": "EYCBfL9XtM3llGAYqB7qVA=="
+          "hash": "EilgtuebGlY5kp6hGPRxmg=="
         }
       },
       "is_incremental": false,
@@ -2564,7 +2564,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Collections.SyncSortedSet-1.html",
-          "hash": "nMZMOHtrUp1i5lNBsZ+HNw=="
+          "hash": "q79VWsRt5FH4kCeRS+tIIg=="
         }
       },
       "is_incremental": false,
@@ -2588,7 +2588,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ConnectState.html",
-          "hash": "QkaCqYMi92vzQzfFtJDlmw=="
+          "hash": "i4vOLtv1dFz5ukjWhHxNaQ=="
         }
       },
       "is_incremental": false,
@@ -2600,7 +2600,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.DeserializeFailedException.html",
-          "hash": "QHSM/DHtBWwNwvDWbLuSfg=="
+          "hash": "y4RuHK/8WKd6Uab52zmm2g=="
         }
       },
       "is_incremental": false,
@@ -2612,7 +2612,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.DisplayMetrics.DisplayMetricsAverageGui.html",
-          "hash": "RjMV5eyOg28r3yO/fPfAJg=="
+          "hash": "jIy26xei+3/Kz9nX0qzo+w=="
         }
       },
       "is_incremental": false,
@@ -2624,7 +2624,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.DisplayMetrics.RequestServerMetrics.html",
-          "hash": "frRtbIwCbxNuH4nl4o+qWg=="
+          "hash": "OA0TVEEL1x2rhAjNLlR0DA=="
         }
       },
       "is_incremental": false,
@@ -2636,7 +2636,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.DisplayMetrics.SetDisplayMetrics.html",
-          "hash": "oyVFrP1CYO3hMl1vNzQmkA=="
+          "hash": "/HLQoZDjJe+pcQdEzh+PVg=="
         }
       },
       "is_incremental": false,
@@ -2660,7 +2660,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.AddLateEvent-2.html",
-          "hash": "iBaJCGdr2ESpi45dPlSelQ=="
+          "hash": "bdMawv/5NcRJRo/DVmqRVA=="
         }
       },
       "is_incremental": false,
@@ -2672,7 +2672,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.AddLateEvent-3.html",
-          "hash": "aXQgEpFWswO9csVBjoRtOw=="
+          "hash": "FsenKfW2mKXy2L0e6redQA=="
         }
       },
       "is_incremental": false,
@@ -2684,7 +2684,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.AddLateEvent.html",
-          "hash": "3br08jPup1JKvV9DjEgLBw=="
+          "hash": "bfzsrigTmksg+66cmfNiSw=="
         }
       },
       "is_incremental": false,
@@ -2696,7 +2696,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.AddLateEventBase.html",
-          "hash": "QFM91fjwUunEGV/wPGA5JA=="
+          "hash": "kry6RPAj0yvXwDLmFQRo2Q=="
         }
       },
       "is_incremental": false,
@@ -2708,7 +2708,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.BoolAddLateEvent.html",
-          "hash": "/o+T80t6ovUmDz8mvy9tSg=="
+          "hash": "qhkV33b5PB1D6HOiuXcSFA=="
         }
       },
       "is_incremental": false,
@@ -2720,7 +2720,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.BoolUnityEvent.html",
-          "hash": "2W4OISZ7chz4OlavYErPGQ=="
+          "hash": "Xf6eLOqrWbIP4mFqsMWnvw=="
         }
       },
       "is_incremental": false,
@@ -2732,7 +2732,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.DisconnectAddLateEvent.html",
-          "hash": "WRkekNW5GTE19lRvw0Xc0A=="
+          "hash": "psWf1uORAuuCNA+jrOugxQ=="
         }
       },
       "is_incremental": false,
@@ -2744,7 +2744,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.DisconnectEvent.html",
-          "hash": "IQO4izpOWBEz53QPlMfA6g=="
+          "hash": "daC7VJBkJ0KD+7odJiPGnw=="
         }
       },
       "is_incremental": false,
@@ -2756,7 +2756,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.IAddLateEvent-1.html",
-          "hash": "DuZHhDJYyQSR/Aq7waGOKQ=="
+          "hash": "7N1PP6mhchCxNdjX7L2GVA=="
         }
       },
       "is_incremental": false,
@@ -2768,7 +2768,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.IAddLateEvent-2.html",
-          "hash": "5r6JhAWWdXwPQ6R7A+jDqw=="
+          "hash": "YE23mqUQ5VpxYoybVjlAPw=="
         }
       },
       "is_incremental": false,
@@ -2780,7 +2780,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.IAddLateEvent.html",
-          "hash": "pSP9J0VU3hIbHC/dRiPn0g=="
+          "hash": "8QZJzcK4sOem5LdQY1BOQA=="
         }
       },
       "is_incremental": false,
@@ -2792,7 +2792,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.NetworkPlayerAddLateEvent.html",
-          "hash": "nwxQXHWzzlFT17zslyTOwQ=="
+          "hash": "FewHPNRR7a5gy4ue50Xd7Q=="
         }
       },
       "is_incremental": false,
@@ -2804,7 +2804,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Events.NetworkPlayerEvent.html",
-          "hash": "LvZ92nW/sKTdf97WGD/yrg=="
+          "hash": "xf05bevIelWp2vlEsY9fsQ=="
         }
       },
       "is_incremental": false,
@@ -2828,7 +2828,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Experimental.NetworkLerpRigidbody.html",
-          "hash": "U2OUksjGm1vXQsFGp50/HA=="
+          "hash": "s/eE7Mo9MFr9g38qJ0SoZQ=="
         }
       },
       "is_incremental": false,
@@ -2840,7 +2840,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Experimental.NetworkRigidbody.ClientSyncState.html",
-          "hash": "jdhSIqD1KQ+Ixg6r8/x/jA=="
+          "hash": "sZSd/PJH7RsXjFmwcVYHaw=="
         }
       },
       "is_incremental": false,
@@ -2852,7 +2852,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Experimental.NetworkRigidbody.html",
-          "hash": "k31VbHgqNQi4KANYGj7H9A=="
+          "hash": "X1pX94jLDEuwX3k9RVsHoQ=="
         }
       },
       "is_incremental": false,
@@ -2864,7 +2864,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Experimental.NetworkTransform.html",
-          "hash": "ty1+NVaeX/wOTLU/dR/6Dw=="
+          "hash": "/RuvYArsWCElLRcLagROqw=="
         }
       },
       "is_incremental": false,
@@ -2876,7 +2876,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Experimental.NetworkTransformBase.DataPoint.html",
-          "hash": "DOoNZVGUgaC0numkKugXCQ=="
+          "hash": "aFHEFEMfMYWRj3i056XQjw=="
         }
       },
       "is_incremental": false,
@@ -2888,7 +2888,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Experimental.NetworkTransformBase.html",
-          "hash": "/TZ86FnJe6OvTjRSWez2cg=="
+          "hash": "20IxdKORh65/XbMVFRE+BQ=="
         }
       },
       "is_incremental": false,
@@ -2900,7 +2900,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Experimental.NetworkTransformChild.html",
-          "hash": "TGs7nWAtPu3nRD1atpHndg=="
+          "hash": "R5YqdTDph+YvsZ2qaY4q9g=="
         }
       },
       "is_incremental": false,
@@ -2924,7 +2924,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ExponentialMovingAverage.html",
-          "hash": "9MQ5VQo3P9ruAgPV9d4U0w=="
+          "hash": "q3vZRVwhEyOo1gf7AIJoTQ=="
         }
       },
       "is_incremental": false,
@@ -2936,7 +2936,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.FoldoutEventAttribute.html",
-          "hash": "GBK3ucEmTu0HSA81CD0FLA=="
+          "hash": "10cGW4Xw1iR+Jb+4qDzNlw=="
         }
       },
       "is_incremental": false,
@@ -2948,7 +2948,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.GameObjectSerializers.html",
-          "hash": "eDhpbW9+wySpQ7qonBrlEQ=="
+          "hash": "oj5tyCX+QiA7FXJtZodAvw=="
         }
       },
       "is_incremental": false,
@@ -2960,7 +2960,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.GameObjectSyncvar.html",
-          "hash": "tbQ8lC8+A12WBxboawsvxA=="
+          "hash": "7XyA7dLkh7Wa8a50LRfKkg=="
         }
       },
       "is_incremental": false,
@@ -2972,7 +2972,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.GameobjectExtension.html",
-          "hash": "5OUqb3XVYdCwYV3If60coQ=="
+          "hash": "zx6trgAH43SdLwacFF4tFg=="
         }
       },
       "is_incremental": false,
@@ -2984,7 +2984,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.HasAuthorityAttribute.html",
-          "hash": "aN6iM9+NiNotagLIvQvS/g=="
+          "hash": "W+Y5rrovg04MqCqLnS/zdA=="
         }
       },
       "is_incremental": false,
@@ -2996,7 +2996,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.HeadlessAutoStart.html",
-          "hash": "buEE5Uijq4nw7bX69K0yYg=="
+          "hash": "H5/gcer9Xsnw0iL78VG4ww=="
         }
       },
       "is_incremental": false,
@@ -3008,7 +3008,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.HeadlessFrameLimiter.html",
-          "hash": "rWfBI6GsDMJC1Er4fK5I/w=="
+          "hash": "HGcmNnV0G+5gNLWZcK/v2g=="
         }
       },
       "is_incremental": false,
@@ -3020,7 +3020,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.IAuthenticatedObject.html",
-          "hash": "Cl4l82zCdYYTiStaDYCTLA=="
+          "hash": "TGvhgzq+6sbzG3RQwFAPbw=="
         }
       },
       "is_incremental": false,
@@ -3032,7 +3032,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.IClientObjectManager.html",
-          "hash": "DlIfVFGS6B/yYRF/XGtCaw=="
+          "hash": "I5IFTH417g6ucF8DpQhTWA=="
         }
       },
       "is_incremental": false,
@@ -3044,7 +3044,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.IMessageReceiver.html",
-          "hash": "K97wnKorRfC+5oz8rR+6Uw=="
+          "hash": "AXLJmqvj9gkmVaM+GUxxsQ=="
         }
       },
       "is_incremental": false,
@@ -3056,7 +3056,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.IMessageSender.html",
-          "hash": "o/oA48sGu7pwKGd8I61BXA=="
+          "hash": "pNqJEmw/OqeXhw39j4UQpQ=="
         }
       },
       "is_incremental": false,
@@ -3068,7 +3068,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.INetIdGenerator.html",
-          "hash": "yEG8WarIYApMi769v9jwGw=="
+          "hash": "lWFn1VZfHn1fuXSETwGk0Q=="
         }
       },
       "is_incremental": false,
@@ -3080,7 +3080,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.INetworkClient.html",
-          "hash": "vFYpE0PAeVFO1YXh+Sr0YQ=="
+          "hash": "9FYugVtVwzXBTbdUXV7Q1w=="
         }
       },
       "is_incremental": false,
@@ -3092,7 +3092,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.INetworkPlayer.html",
-          "hash": "3JQHFElb3QqkaKAvXo2odg=="
+          "hash": "lMWTvEvFpp3yqsIqgGyaDw=="
         }
       },
       "is_incremental": false,
@@ -3104,7 +3104,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.INetworkSceneManager.html",
-          "hash": "42VafHus+y+GX2FH9jB8aw=="
+          "hash": "0IhqvrJHtU4jcZwuZpME3Q=="
         }
       },
       "is_incremental": false,
@@ -3116,7 +3116,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.INetworkServer.html",
-          "hash": "geuoPnLDax+qBubKbGJxJw=="
+          "hash": "XQa/MjAfQuxsir6/8oPYWQ=="
         }
       },
       "is_incremental": false,
@@ -3128,7 +3128,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.IObjectLocator.html",
-          "hash": "QX76cX+DuIo3G4Eu0gy5PQ=="
+          "hash": "j0jgCxuoo1YMPv45nQs3rQ=="
         }
       },
       "is_incremental": false,
@@ -3140,7 +3140,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.IObjectOwner.html",
-          "hash": "N/15mriV+VLSvQSJKhZFyg=="
+          "hash": "PN5LFHdwk2id5Dhi4445cA=="
         }
       },
       "is_incremental": false,
@@ -3152,7 +3152,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ISceneLoader.html",
-          "hash": "djXnnbxCg65q5W0+MFGAZg=="
+          "hash": "qK6teigrSH0NCXK2yMWI+w=="
         }
       },
       "is_incremental": false,
@@ -3164,7 +3164,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.IServerObjectManager.html",
-          "hash": "4IRPlvDIEcNjE7Q6jKwyuA=="
+          "hash": "BfpA3SRSGoX56VTPaG8iAw=="
         }
       },
       "is_incremental": false,
@@ -3176,7 +3176,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.IVisibilityTracker.html",
-          "hash": "Ki3rC+pJc+sNXNmPJw9dzw=="
+          "hash": "mRVQ7rdzqRokFyblbnZ0DQ=="
         }
       },
       "is_incremental": false,
@@ -3188,7 +3188,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.LobbyReady.html",
-          "hash": "iLi6rdhqWfD0RwiLYB+SrQ=="
+          "hash": "Mzy7tnwqX76iMAoUG3e6GQ=="
         }
       },
       "is_incremental": false,
@@ -3200,7 +3200,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.LocalPlayerAttribute.html",
-          "hash": "ujHDTirs3iOZnaLjBvy9bg=="
+          "hash": "wvFOo3Ygg9CVgmIKdU5z/w=="
         }
       },
       "is_incremental": false,
@@ -3212,7 +3212,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Logging.ILoggerExtensions.html",
-          "hash": "ReZ1lU7qIxq64ojIe5JiFg=="
+          "hash": "b45e/B4jeNlot8N+Q7vm0A=="
         }
       },
       "is_incremental": false,
@@ -3224,7 +3224,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Logging.LogFactory.html",
-          "hash": "UAm0dr2HQ4W/TKDzrhFE+Q=="
+          "hash": "R82hWrf+f+LfoeCRkVax9g=="
         }
       },
       "is_incremental": false,
@@ -3236,7 +3236,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Logging.LogSettings.html",
-          "hash": "zwlqCVhOc5SbTuUXqkllUA=="
+          "hash": "EUwhnsYZXF2cPxmGRGVSRA=="
         }
       },
       "is_incremental": false,
@@ -3248,7 +3248,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Logging.LogSettingsExtensions.html",
-          "hash": "UIsR93BwJt3/+KPI953rtg=="
+          "hash": "nhWwQKoME0TZwY9QuUGkiQ=="
         }
       },
       "is_incremental": false,
@@ -3260,7 +3260,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Logging.LogSettingsSO.LoggerSettings.html",
-          "hash": "/aI0Sm56jw7QPKN3pYR5ig=="
+          "hash": "Rz2mwBDnty5etT+Js9K+/Q=="
         }
       },
       "is_incremental": false,
@@ -3272,7 +3272,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Logging.LogSettingsSO.html",
-          "hash": "YQ0mOLOgTQWSkQtFcqTu6g=="
+          "hash": "jN/yI+X7V57QU7PGVguBKg=="
         }
       },
       "is_incremental": false,
@@ -3296,7 +3296,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.MessageDelegate-1.html",
-          "hash": "z9iDB9Jc13RsWVT9Hccvhg=="
+          "hash": "ovE/1jX7Vqit1zP082JHdA=="
         }
       },
       "is_incremental": false,
@@ -3308,7 +3308,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.MessageDelegateWithPlayer-1.html",
-          "hash": "YEytDWi/tfZhDDYle58Kow=="
+          "hash": "uSeo+ai3xlSnLT7i2AT5aQ=="
         }
       },
       "is_incremental": false,
@@ -3320,7 +3320,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.MessageHandler.html",
-          "hash": "TyGLag1GrQxW/EmGJkyFzw=="
+          "hash": "XY/BXaUIRAtBfI0lKn0nww=="
         }
       },
       "is_incremental": false,
@@ -3332,7 +3332,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.MethodInvocationException.html",
-          "hash": "bG3VMNnixsvgx1PPLayitA=="
+          "hash": "vs8fz4Ub6Cmwnays9nucXw=="
         }
       },
       "is_incremental": false,
@@ -3344,7 +3344,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkAnimator.html",
-          "hash": "wHexeqNJDe+S43g0YQfnQg=="
+          "hash": "VkZ1l0MhVjx8v30OmY/dxQ=="
         }
       },
       "is_incremental": false,
@@ -3356,7 +3356,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkAuthenticator.html",
-          "hash": "+xwBNp3eTIxJOXLz80V8zw=="
+          "hash": "UmeBA32eqhqD0IZ6gqfVgg=="
         }
       },
       "is_incremental": false,
@@ -3368,7 +3368,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkBehaviorSerializers.html",
-          "hash": "wWg3F0pgIsgphoW0s9ZehA=="
+          "hash": "zvZH8vFAQ1ayflPcwSIxsg=="
         }
       },
       "is_incremental": false,
@@ -3380,7 +3380,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkBehaviorSyncvar.html",
-          "hash": "1zc+85C248z7Gex0p9n0iQ=="
+          "hash": "/nzVFw2m+Dd7i3MwYzliCQ=="
         }
       },
       "is_incremental": false,
@@ -3392,7 +3392,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkBehaviour.html",
-          "hash": "Aboh/5HMhOs9Yh0q/7Q9mw=="
+          "hash": "fvaRyg3OzG0FbYqQcl/yqw=="
         }
       },
       "is_incremental": false,
@@ -3404,7 +3404,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkClient.html",
-          "hash": "sPQMdbgI6ec4eEJQgX1F7g=="
+          "hash": "9zbMFrQrIwrURgxi3uMHDg=="
         }
       },
       "is_incremental": false,
@@ -3416,7 +3416,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkDiagnostics.MessageInfo.html",
-          "hash": "jR6NRWMIBxTDSmyTFxJc5g=="
+          "hash": "fdiTiXNGV8DBhJ2T4dE69A=="
         }
       },
       "is_incremental": false,
@@ -3428,7 +3428,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkDiagnostics.html",
-          "hash": "rm2FBPyhMhES/4OE+5yT/A=="
+          "hash": "pSZkeic20rIf2zR6NSrbWg=="
         }
       },
       "is_incremental": false,
@@ -3440,7 +3440,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkIdentity.TransformSpawnSettings.html",
-          "hash": "1m2L3mHKHrAH/Lqrhz6eLA=="
+          "hash": "UJLGqYFVTYHIV6JprrDFZg=="
         }
       },
       "is_incremental": false,
@@ -3452,7 +3452,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkIdentity.html",
-          "hash": "fzS23bolht66zDOrZRucwQ=="
+          "hash": "haReK/Hv32BZ6dfnI6tc5Q=="
         }
       },
       "is_incremental": false,
@@ -3464,7 +3464,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkIdentitySerializers.html",
-          "hash": "sTVevPYWugHFS4foq3IQjg=="
+          "hash": "iSR9lju4dh7OjR0Coci+yA=="
         }
       },
       "is_incremental": false,
@@ -3476,7 +3476,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkIdentitySyncvar.html",
-          "hash": "JmiQih9ub1CHjgSL3tBtiw=="
+          "hash": "mBS4QgG/YuB8I5g7Z2J1/Q=="
         }
       },
       "is_incremental": false,
@@ -3488,7 +3488,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkManager.html",
-          "hash": "ZwhWkZPnTsYyZnnU+Kzmiw=="
+          "hash": "u+3Nmgl5lva8d84VBNj6Mw=="
         }
       },
       "is_incremental": false,
@@ -3500,7 +3500,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkManagerGUI.html",
-          "hash": "syfSoTNJ848uv1xg1r/ddg=="
+          "hash": "LLmVqfbo069Reb48dJh8Jg=="
         }
       },
       "is_incremental": false,
@@ -3512,7 +3512,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkManagerHud.html",
-          "hash": "OSG+7PCEiDjOFWE1+Ihwnw=="
+          "hash": "g64p/pVfIt/f5rLOQde1uA=="
         }
       },
       "is_incremental": false,
@@ -3524,7 +3524,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkManagerMode.html",
-          "hash": "CL5oblNDEm+JZ+FtLwmbPw=="
+          "hash": "fc6kiwotSxqx8GpiRgkAkQ=="
         }
       },
       "is_incremental": false,
@@ -3536,7 +3536,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkMatchChecker.html",
-          "hash": "EDDRakmkyE+MQ6KZQT1fug=="
+          "hash": "pTgpcCycDQJYyj1w6XuKfQ=="
         }
       },
       "is_incremental": false,
@@ -3548,7 +3548,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkMessageAttribute.html",
-          "hash": "ESXjIDFcV+r1XPZ5bVCiog=="
+          "hash": "aXkG5Vb+suPIXrFd/4sm0g=="
         }
       },
       "is_incremental": false,
@@ -3560,7 +3560,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkPingDisplay.html",
-          "hash": "AVaCIndXuZCVEoRPic6bKQ=="
+          "hash": "8wuKqjuKNEi/n4Lzdd30nw=="
         }
       },
       "is_incremental": false,
@@ -3572,7 +3572,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkPingMessage.html",
-          "hash": "/vdsbXvYbGwZX2aOrmAdhw=="
+          "hash": "G/0Dup1Y+zuYOXJCTQzP6w=="
         }
       },
       "is_incremental": false,
@@ -3584,7 +3584,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkPlayer.html",
-          "hash": "rUQ3iHGoTUdBD1g5o5tyig=="
+          "hash": "dqA7cVDqIHbIGyzko9TmvQ=="
         }
       },
       "is_incremental": false,
@@ -3596,7 +3596,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkPongMessage.html",
-          "hash": "0622B5Hysa3QUROUE7VBVA=="
+          "hash": "/Jt4cDWMOWEZWkQgp4U66A=="
         }
       },
       "is_incremental": false,
@@ -3608,7 +3608,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkProximityChecker.html",
-          "hash": "7ZBIk2ErCde0kammdWEEFg=="
+          "hash": "2jT2x0PucYpjpXwhaumqTw=="
         }
       },
       "is_incremental": false,
@@ -3620,7 +3620,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkSceneChecker.html",
-          "hash": "cMYUO7yi3i3tnr5Xpahq2Q=="
+          "hash": "mnuIo5J2jU6aw1HI9swikg=="
         }
       },
       "is_incremental": false,
@@ -3632,7 +3632,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkSceneManager.html",
-          "hash": "+hGdlhFwm9HrTue8PoYP6w=="
+          "hash": "qmeHuzjCzwWFODqmW5nXNQ=="
         }
       },
       "is_incremental": false,
@@ -3644,7 +3644,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkServer.html",
-          "hash": "Wa5QlmIg+ehh853D+zvO0w=="
+          "hash": "lz34J6QNRuUyfaddjoZQdg=="
         }
       },
       "is_incremental": false,
@@ -3656,7 +3656,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkTime.html",
-          "hash": "NYzbOWFuH+hPQ2FvN9bdBg=="
+          "hash": "gU9k5iedkrKAbggCDarb9g=="
         }
       },
       "is_incremental": false,
@@ -3668,7 +3668,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkTransform.html",
-          "hash": "HyTp3eg2GPuD0CULa9XqWA=="
+          "hash": "e6Pu2jdaZNGy3dpr6Q58FA=="
         }
       },
       "is_incremental": false,
@@ -3680,7 +3680,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkTransformBase.DataPoint.html",
-          "hash": "kVqVNpHIY7DYlbC8+TaUuw=="
+          "hash": "qCjJaLW7CuNsbV7h3a0HFw=="
         }
       },
       "is_incremental": false,
@@ -3692,7 +3692,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkTransformBase.html",
-          "hash": "aFUESrqb9Js509imByJprw=="
+          "hash": "8jkk+kEUblU5l7+Txupzjg=="
         }
       },
       "is_incremental": false,
@@ -3704,7 +3704,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkTransformChild.html",
-          "hash": "ozI0QFGkgqvHRVukTWmt8Q=="
+          "hash": "EjQONVIEOahgW77sFwcWSw=="
         }
       },
       "is_incremental": false,
@@ -3716,7 +3716,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkVisibility.html",
-          "hash": "48nVMCQVRyDyD7+GvU1cUw=="
+          "hash": "oBIHFK5mqPFO0mniLjPLMQ=="
         }
       },
       "is_incremental": false,
@@ -3728,7 +3728,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.NetworkWorld.html",
-          "hash": "eZuPzVukj0dZ0r5haSwZKA=="
+          "hash": "KgB5MokfDoRqwbF6eUq2kw=="
         }
       },
       "is_incremental": false,
@@ -3740,7 +3740,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ObjectDestroyMessage.html",
-          "hash": "k73J4xiQ0KMaKBJzOBnhqg=="
+          "hash": "cYEo4Y1xEOk7HfZBsWPE2w=="
         }
       },
       "is_incremental": false,
@@ -3752,7 +3752,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ObjectHideMessage.html",
-          "hash": "zKzqih1vtyuwnwNtAJEDYg=="
+          "hash": "c/uuelgXIhrcSzKFaUBaXQ=="
         }
       },
       "is_incremental": false,
@@ -3764,7 +3764,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ObjectReady.html",
-          "hash": "zNNeXj4ZnAr8P7z2Y+ndMQ=="
+          "hash": "FSsII267+LPC2n/f3H+lpA=="
         }
       },
       "is_incremental": false,
@@ -3776,7 +3776,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.OnlineOfflineScene.html",
-          "hash": "ourUe3P6rCGdDNgxDPXlQg=="
+          "hash": "dMiPGulvHIxeky55pFGjwA=="
         }
       },
       "is_incremental": false,
@@ -3788,7 +3788,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.PipePeerConnection.PipeEndPoint.html",
-          "hash": "n80P5gEFlk2LzsBMx62Agw=="
+          "hash": "jHq+6RtLyh0eMTcG5w0qJA=="
         }
       },
       "is_incremental": false,
@@ -3800,7 +3800,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.PipePeerConnection.PipeNotifyToken.html",
-          "hash": "+ELUE1hj9Tzw7TJ+YKjTwA=="
+          "hash": "iKf8ChEEZylD+ytfaMSZNg=="
         }
       },
       "is_incremental": false,
@@ -3812,7 +3812,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.PipePeerConnection.html",
-          "hash": "lj8cWP/6sn2/LgLGvGKO7A=="
+          "hash": "TbnxzfGWVQJySPfSDqoabQ=="
         }
       },
       "is_incremental": false,
@@ -3824,7 +3824,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.PlayerSceneChangeEvent.html",
-          "hash": "TWv4Tfg/HQMzGqMYzByDdg=="
+          "hash": "TShntvksODc9EgLBC40inA=="
         }
       },
       "is_incremental": false,
@@ -3836,7 +3836,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ReadOnlyInspectorAttribute.html",
-          "hash": "AgAMW8171n3RfMBlKRDJjw=="
+          "hash": "0Zm4VLRSsmr9d5cwKjkKWQ=="
         }
       },
       "is_incremental": false,
@@ -3848,7 +3848,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RemoteCalls.ClientRpcSender.html",
-          "hash": "3zmt0RQ6qgRKUdmWGodOAg=="
+          "hash": "t3CP3L7zG78zd1yv0yvKIw=="
         }
       },
       "is_incremental": false,
@@ -3860,7 +3860,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RemoteCalls.RemoteCall.html",
-          "hash": "LYlM71y16QGgG8qh5iMkTA=="
+          "hash": "qp+lkLF6juZGPeQDVtHZSw=="
         }
       },
       "is_incremental": false,
@@ -3872,7 +3872,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RemoteCalls.RemoteCallCollection.html",
-          "hash": "zZnvktfsU4z/17sBZIpV1Q=="
+          "hash": "li44jbvo0e82y60ZJaMdQQ=="
         }
       },
       "is_incremental": false,
@@ -3884,7 +3884,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RemoteCalls.RequestDelegate-1.html",
-          "hash": "qf7fngx/QQ6eX9Pc8T5y9g=="
+          "hash": "TS+p51tcxTePUgi7tmWf7Q=="
         }
       },
       "is_incremental": false,
@@ -3896,7 +3896,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RemoteCalls.RpcDelegate.html",
-          "hash": "EbwBvJ79agumCcG4dnr6CA=="
+          "hash": "DyuaOwHCDUL3satqBsBffw=="
         }
       },
       "is_incremental": false,
@@ -3908,7 +3908,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RemoteCalls.RpcInvokeType.html",
-          "hash": "gDIbMEwJHvC1L43gmfc0wg=="
+          "hash": "UIkRV1MC1F6TozOgh6B7ow=="
         }
       },
       "is_incremental": false,
@@ -3920,7 +3920,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RemoteCalls.ServerRpcSender.html",
-          "hash": "S+MVh/jVdyMJa7kgqgN3kQ=="
+          "hash": "tCwIRSFyr8xSVnZACkkZ+g=="
         }
       },
       "is_incremental": false,
@@ -3944,7 +3944,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RemoveAuthorityMessage.html",
-          "hash": "cLKi1C5zle/vLrF5rLmMkg=="
+          "hash": "E5P86AGux2Y4lh8J/8c+qA=="
         }
       },
       "is_incremental": false,
@@ -3956,7 +3956,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RemoveCharacterMessage.html",
-          "hash": "3/y1LZvSkefH4Bq+ESRkxA=="
+          "hash": "EQKbUXHTaqu7afLJB5DVVA=="
         }
       },
       "is_incremental": false,
@@ -3968,7 +3968,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RpcMessage.html",
-          "hash": "CiiFKwtXdBdB6bc0hfUxzw=="
+          "hash": "FgpTGGhwxzk2+QF1zOFDxQ=="
         }
       },
       "is_incremental": false,
@@ -3980,7 +3980,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.RpcTarget.html",
-          "hash": "wR1yJPnTVepVUyiqAN2sfA=="
+          "hash": "pSrdbk+E7/3hxdG2YGakSQ=="
         }
       },
       "is_incremental": false,
@@ -3992,7 +3992,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SceneAttribute.html",
-          "hash": "ZZGYR3hbq5NXP5vyWC8Gag=="
+          "hash": "zK00LND27Y72QcBJ48SJcQ=="
         }
       },
       "is_incremental": false,
@@ -4004,7 +4004,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SceneChangeFinishedEvent.html",
-          "hash": "pLwrr4PohbZJT+afFQlMBQ=="
+          "hash": "wDPKoDqH/UXRNagOEewJ+Q=="
         }
       },
       "is_incremental": false,
@@ -4016,7 +4016,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SceneChangeStartedEvent.html",
-          "hash": "yX6fYk/ZueiqyKL3bADcwg=="
+          "hash": "sMF6GjLPlMUBugG/ITSwrw=="
         }
       },
       "is_incremental": false,
@@ -4028,7 +4028,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SceneMessage.html",
-          "hash": "/UcG2BttXY7aFJHQ/ircUA=="
+          "hash": "K4+XxLRjlEGpPdg1UMtZ0Q=="
         }
       },
       "is_incremental": false,
@@ -4040,7 +4040,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SceneNotReadyMessage.html",
-          "hash": "0oscFzIIIUuAr8Yzab6Qqw=="
+          "hash": "+qHsmIqWmwQcqXo5fut/5w=="
         }
       },
       "is_incremental": false,
@@ -4052,7 +4052,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SceneOperation.html",
-          "hash": "D8rESua/C/XC2FEjsuDJRA=="
+          "hash": "LhS9VvgEKvZPRbL5u+wxRw=="
         }
       },
       "is_incremental": false,
@@ -4064,7 +4064,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SceneReadyMessage.html",
-          "hash": "kS33vGnANEotH0I5o3FY1A=="
+          "hash": "+UNiwlHHpjjrmz1wMscazg=="
         }
       },
       "is_incremental": false,
@@ -4076,7 +4076,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SceneVisibilityChecker.html",
-          "hash": "5GSdGmj8TbE5A54FqRVzBg=="
+          "hash": "KZuryfrIGFX6bLcKscVyHA=="
         }
       },
       "is_incremental": false,
@@ -4088,7 +4088,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.BitCountAttribute.html",
-          "hash": "Z68pXzfjTOg11qS5zmv/NA=="
+          "hash": "KPUdkOSk7UXy1slBP/3FnQ=="
         }
       },
       "is_incremental": false,
@@ -4100,7 +4100,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.BitCountFromRangeAttribute.html",
-          "hash": "uDqlDcWSC0NtEz61g2ahfw=="
+          "hash": "naoJQHYgK9+AGnDnwXXbnA=="
         }
       },
       "is_incremental": false,
@@ -4112,7 +4112,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.BitHelper.html",
-          "hash": "i1dkRiQjVxSKa+lLY7Q3vg=="
+          "hash": "2oLe7OwI6+A747a60LKSlQ=="
         }
       },
       "is_incremental": false,
@@ -4124,7 +4124,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.BitMask.html",
-          "hash": "a7OBctssGhw5gnvowAlMlQ=="
+          "hash": "em5a2aTuRAF1x8ub42/9Vg=="
         }
       },
       "is_incremental": false,
@@ -4136,7 +4136,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.CollectionExtensions.html",
-          "hash": "h46iM8AEW+hvOjYMFcfO7w=="
+          "hash": "mR2RsPQmDfBW6KStYn+geg=="
         }
       },
       "is_incremental": false,
@@ -4148,7 +4148,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.CompressedExtensions.html",
-          "hash": "ycupKquURIFu9vKRFWv0Pw=="
+          "hash": "qqiQ8dC8sVR+kBya4gkNWw=="
         }
       },
       "is_incremental": false,
@@ -4160,7 +4160,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.FloatPackAttribute.html",
-          "hash": "7mXpSUtPR8Syyhe++pqTbQ=="
+          "hash": "MiXy/zJhexrbG/PHUJydNg=="
         }
       },
       "is_incremental": false,
@@ -4172,7 +4172,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.FloatPacker.html",
-          "hash": "JvQGFySkTbGRdVF1aNk8WA=="
+          "hash": "L6KUOtwgwP4eguPey4wqUg=="
         }
       },
       "is_incremental": false,
@@ -4184,7 +4184,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.FromBitCount.html",
-          "hash": "zHC49DM2eiPmI2YLphZbCA=="
+          "hash": "93zgbVKxUrM4uO87RQYo1w=="
         }
       },
       "is_incremental": false,
@@ -4196,7 +4196,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.GenericTypesSerializationExtensions.html",
-          "hash": "FjUs1alCoWlnUFJx3pU7YA=="
+          "hash": "jCD5NfqTHRNNtJg5KPYHFQ=="
         }
       },
       "is_incremental": false,
@@ -4208,7 +4208,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.MessagePacker.html",
-          "hash": "x0V8ZANrm0U696GZ415ISw=="
+          "hash": "UZjdhaVi+L4F1lShi4GGMg=="
         }
       },
       "is_incremental": false,
@@ -4220,7 +4220,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.MirageTypesExtensions.html",
-          "hash": "jnKJMYldUWmYzFmTN5L7aw=="
+          "hash": "011pyJ9ffGehGD7LviFQSQ=="
         }
       },
       "is_incremental": false,
@@ -4232,7 +4232,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.NetworkReader.html",
-          "hash": "X/zfw1XYFnjPgagZgk9kjQ=="
+          "hash": "Ukvqz03QV11CvnRrW8QXhg=="
         }
       },
       "is_incremental": false,
@@ -4244,7 +4244,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.NetworkReaderPool.html",
-          "hash": "ipzfigduM2+lWbhkDFVrtQ=="
+          "hash": "1A7+gUQRzsbRCA0sqhe7bw=="
         }
       },
       "is_incremental": false,
@@ -4256,7 +4256,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.NetworkWriter.html",
-          "hash": "bEd1FQLC0JDLIZJ7k4xgWQ=="
+          "hash": "VPjexLrVpraDvY7YdoxkDw=="
         }
       },
       "is_incremental": false,
@@ -4268,7 +4268,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.NetworkWriterPool.html",
-          "hash": "HmO/2IDKnqlKWti7LAoerA=="
+          "hash": "5SZrsWjjdEGkhb6TA5MEhw=="
         }
       },
       "is_incremental": false,
@@ -4280,7 +4280,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.PackedExtensions.html",
-          "hash": "xshja7pfQQJeygh8sRKyeQ=="
+          "hash": "N89hU3uce1qvDa0D7BHFRw=="
         }
       },
       "is_incremental": false,
@@ -4292,7 +4292,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.PooledNetworkReader.html",
-          "hash": "wNa0kODvPtrMfDBn/VGR5A=="
+          "hash": "6cHFnvzQhpaEKntHFFLhfg=="
         }
       },
       "is_incremental": false,
@@ -4304,7 +4304,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.PooledNetworkWriter.html",
-          "hash": "IpMwvnYw93ughPIUydwwDA=="
+          "hash": "ernQYngy5J0azyX8oID0yg=="
         }
       },
       "is_incremental": false,
@@ -4316,7 +4316,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.QuaternionPackAttribute.html",
-          "hash": "HZD+UqotbAQ95F1m2/FZUg=="
+          "hash": "ozZiW2CUS+Um/9w/3PJa9g=="
         }
       },
       "is_incremental": false,
@@ -4328,7 +4328,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.QuaternionPacker.html",
-          "hash": "JJ3G9edk+DGP4nHThDTElA=="
+          "hash": "7c/bx+f4iDDTuxUyniskNw=="
         }
       },
       "is_incremental": false,
@@ -4340,7 +4340,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.Reader-1.html",
-          "hash": "JOFfmlo/qfDvffTuaCSOVw=="
+          "hash": "NfouQr5Gw2Ta5bhUFPyiTA=="
         }
       },
       "is_incremental": false,
@@ -4352,7 +4352,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.StringExtensions.html",
-          "hash": "TLfZ8ALPJ+XtoCg9DH8CVQ=="
+          "hash": "PMNx1rdXofqihGQD7V23/g=="
         }
       },
       "is_incremental": false,
@@ -4364,7 +4364,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.SystemTypesExtensions.html",
-          "hash": "sO5ZTv4zNLzUAHDkaH/aYQ=="
+          "hash": "Bk7OwzjdR3RjZKizzJmq/w=="
         }
       },
       "is_incremental": false,
@@ -4376,7 +4376,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.UnityTypesExtensions.html",
-          "hash": "rcRq+2T9wQ7mQNMLe3duyA=="
+          "hash": "Klnfv7jX9vpkOScGLBPfMw=="
         }
       },
       "is_incremental": false,
@@ -4388,7 +4388,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.VarFloatPacker.html",
-          "hash": "1XOSukSS2A5ACmMMjV7A8g=="
+          "hash": "fsXEMSYzHf7azN+PCCylZQ=="
         }
       },
       "is_incremental": false,
@@ -4400,7 +4400,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.VarIntAttribute.html",
-          "hash": "i63xwGok4kkOIjYBuCcS6A=="
+          "hash": "Epkabs76XszzfAHaYSOTHg=="
         }
       },
       "is_incremental": false,
@@ -4412,7 +4412,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.VarIntBlocksAttribute.html",
-          "hash": "8gzEUS4ezUJALQ4vBW8lyg=="
+          "hash": "bJdOMG0zZ12K/5HRy52Ztg=="
         }
       },
       "is_incremental": false,
@@ -4424,7 +4424,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.VarIntBlocksPacker.html",
-          "hash": "J/CvlSfDvz7TvW3PDl+sKA=="
+          "hash": "4BOjMjtmA+nZ23/RB5SKTg=="
         }
       },
       "is_incremental": false,
@@ -4436,7 +4436,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.VarIntPacker.html",
-          "hash": "9OeEAzW2x39IcB7bWac3Ug=="
+          "hash": "kNBQYjs+jMR5gaa0lfl9Aw=="
         }
       },
       "is_incremental": false,
@@ -4448,7 +4448,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.VarVector3Packer.html",
-          "hash": "/8ZLh6i3GM7OHBrtBPTcOQ=="
+          "hash": "et4XQbd7vBWSjQpv1euiMQ=="
         }
       },
       "is_incremental": false,
@@ -4460,7 +4460,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.Vector2PackAttribute.html",
-          "hash": "/5RJHvGyGrwuxTM9y/ai0A=="
+          "hash": "hZkdSM0Y6hcXB41VyyF4mw=="
         }
       },
       "is_incremental": false,
@@ -4472,7 +4472,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.Vector2Packer.html",
-          "hash": "wn5NvMyurFRiJIth6uP0Xw=="
+          "hash": "HVqeC9VB69f9wujXgjdZvA=="
         }
       },
       "is_incremental": false,
@@ -4484,7 +4484,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.Vector3PackAttribute.html",
-          "hash": "gCFb78WLt9J2C1q6WEHBDQ=="
+          "hash": "OBLit+ntsZ55RDhjaU48+w=="
         }
       },
       "is_incremental": false,
@@ -4496,7 +4496,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.Vector3Packer.html",
-          "hash": "69kRWD/2W19aGM7rMpY6MQ=="
+          "hash": "pj5jwhIP/ChddexQuIAJAw=="
         }
       },
       "is_incremental": false,
@@ -4508,7 +4508,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.WeaverIgnoreAttribute.html",
-          "hash": "1gc8FeKVSG5UqKaNwJd8Hw=="
+          "hash": "1F2I36LTofrDXbaMm0Yeyg=="
         }
       },
       "is_incremental": false,
@@ -4520,7 +4520,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.Writer-1.html",
-          "hash": "oFoxMMMz9OlF1lw29V0ijg=="
+          "hash": "A3jU1TcUyOsVxgLRkCJmnQ=="
         }
       },
       "is_incremental": false,
@@ -4532,7 +4532,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.ZigZag.html",
-          "hash": "59jHWE05GBjSvogd7HlImg=="
+          "hash": "0YiTcTO/sfi+6PnMavrDQQ=="
         }
       },
       "is_incremental": false,
@@ -4544,7 +4544,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Serialization.ZigZagEncodeAttribute.html",
-          "hash": "x+Wq1aTFF+RHCw0NL+CyHw=="
+          "hash": "83fgwpNqxISPPe8rETPAXg=="
         }
       },
       "is_incremental": false,
@@ -4568,7 +4568,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ServerAttribute.html",
-          "hash": "3AgVF4ZfvpyPSAra8LrYwA=="
+          "hash": "Nmdh1JT2ExeCLgsiNNd0Ag=="
         }
       },
       "is_incremental": false,
@@ -4580,7 +4580,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ServerObjectManager.html",
-          "hash": "EpAyJqzOU2U9/TH7dKlIAw=="
+          "hash": "ThzFtPP6QQyVmrefq5jmQw=="
         }
       },
       "is_incremental": false,
@@ -4592,7 +4592,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ServerRpcAttribute.html",
-          "hash": "UVhe4SebqrDOCEOcCm+24Q=="
+          "hash": "TuEle7z94kzLoyKhWfFUIw=="
         }
       },
       "is_incremental": false,
@@ -4604,7 +4604,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ServerRpcMessage.html",
-          "hash": "xlC+iFIW5p5PWBt2WAsgxA=="
+          "hash": "jgbzQhIRy4hTaL//a+aKiQ=="
         }
       },
       "is_incremental": false,
@@ -4616,7 +4616,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ServerRpcReply.html",
-          "hash": "mpkxfoMn0qOeYqkhYaqUPA=="
+          "hash": "9iHUPorIva2Fv9zfk4ugfQ=="
         }
       },
       "is_incremental": false,
@@ -4628,7 +4628,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ServerRpcWithReplyMessage.html",
-          "hash": "lYuHCygMzFkDqRxLNQpvgg=="
+          "hash": "MPa8nv9MsJBJwix0pda+gw=="
         }
       },
       "is_incremental": false,
@@ -4640,7 +4640,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.ShowInInspectorAttribute.html",
-          "hash": "7T5UJLHun4kbwGemo+MoAQ=="
+          "hash": "+HTp6bVTcT2RWz70GxkjJQ=="
         }
       },
       "is_incremental": false,
@@ -4652,7 +4652,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.ByteBuffer.html",
-          "hash": "llMP7LJWNIoha9lKwU+TGw=="
+          "hash": "wsL7LLGP6IsjagXq2b2cdQ=="
         }
       },
       "is_incremental": false,
@@ -4664,7 +4664,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.ByteUtils.html",
-          "hash": "gMnfF/G3SArXuyFUBkFs4Q=="
+          "hash": "J4CmZOYDOSx0ZPkT44++ag=="
         }
       },
       "is_incremental": false,
@@ -4676,7 +4676,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.Commands.html",
-          "hash": "3eZiMmGqXlhQI/dpxBcfiw=="
+          "hash": "fysTcELJewkezIRZCUyZ3A=="
         }
       },
       "is_incremental": false,
@@ -4688,7 +4688,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.Config.html",
-          "hash": "hwqwc0c0P1pOyB09k1VBDA=="
+          "hash": "HIMeo6ZgQ+vmIPDkADIDRQ=="
         }
       },
       "is_incremental": false,
@@ -4700,7 +4700,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.ConnectionState.html",
-          "hash": "tkQ3ihaytw5PQ/2RnZySYw=="
+          "hash": "zbZ7uncElZAvu3eBxvEIVw=="
         }
       },
       "is_incremental": false,
@@ -4712,7 +4712,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.DisconnectReason.html",
-          "hash": "pbsxcwR28Uhd+bNbZL/F/A=="
+          "hash": "6UTrwxWNmEaSqwt3tlkUUA=="
         }
       },
       "is_incremental": false,
@@ -4724,7 +4724,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.IConnection.html",
-          "hash": "MIpKpTIEzLElvR2HqXDUzw=="
+          "hash": "kP8RPIrwPPLFll59fvuZ5Q=="
         }
       },
       "is_incremental": false,
@@ -4736,7 +4736,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.IDataHandler.html",
-          "hash": "gt5GY1qOQ3+ZLrUWNrDqBw=="
+          "hash": "38pgTDrnn0zSF3posXeylQ=="
         }
       },
       "is_incremental": false,
@@ -4748,7 +4748,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.IEndPoint.html",
-          "hash": "V1C2e4tPRiD+afZ2UlNsiA=="
+          "hash": "xrvNzVtFyeuA8eLQDyo6AQ=="
         }
       },
       "is_incremental": false,
@@ -4760,7 +4760,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.IHasAddress.html",
-          "hash": "uiaOY3NfWs/xd/x9L7ECbw=="
+          "hash": "EJrfgh3ZhuzX1X23YLIRTA=="
         }
       },
       "is_incremental": false,
@@ -4772,7 +4772,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.IHasPort.html",
-          "hash": "O6PjueJOd5cIWkRQ5+y4cQ=="
+          "hash": "igXoU4J+7UVCLsJQSrDFSw=="
         }
       },
       "is_incremental": false,
@@ -4784,7 +4784,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.INotifyCallBack.html",
-          "hash": "dfawjmJ3ae8A4Jz9PVo/xQ=="
+          "hash": "tCKVRM994OQuM93gLhqlMg=="
         }
       },
       "is_incremental": false,
@@ -4796,7 +4796,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.INotifyCallBackExtensions.html",
-          "hash": "k0iPyTWvc2esIzLwp7EhHQ=="
+          "hash": "06UVhTo3YVxyEYXr6doCsg=="
         }
       },
       "is_incremental": false,
@@ -4808,7 +4808,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.INotifyToken.html",
-          "hash": "/rBqo0iFujX3NUY9iOKoJw=="
+          "hash": "sorR9nyaIW11fJvHA7QX1A=="
         }
       },
       "is_incremental": false,
@@ -4820,7 +4820,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.IPeer.html",
-          "hash": "uoAJEjCVExZ+mNePt8EP3w=="
+          "hash": "jOEzssmDuwMvvpaowuxjPA=="
         }
       },
       "is_incremental": false,
@@ -4832,7 +4832,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.ISocket.html",
-          "hash": "d/yvudWQc1yTMB+Wjm9fMA=="
+          "hash": "TmRHxChy24bZxZ/ufATSLA=="
         }
       },
       "is_incremental": false,
@@ -4844,7 +4844,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.ITime.html",
-          "hash": "SFd6/VhkOgUp9Tq6uCu3xw=="
+          "hash": "QuNFw0XmtOcVi+je2oigTg=="
         }
       },
       "is_incremental": false,
@@ -4856,7 +4856,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.Metrics.Frame.html",
-          "hash": "ZNQxu1DMNj7ZSap9RfiLFw=="
+          "hash": "uGHDgRgrONc44esyTehhsQ=="
         }
       },
       "is_incremental": false,
@@ -4868,7 +4868,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.Metrics.html",
-          "hash": "SKnVm0Y7ySRRZt90JKMddg=="
+          "hash": "RxL21gJDJum6qRAqMy/UOg=="
         }
       },
       "is_incremental": false,
@@ -4880,7 +4880,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.NotifyToken.html",
-          "hash": "3HOYgP7O/gsUPRF4IhFyFQ=="
+          "hash": "vLTlkb9FbZd6J8bodvSYRA=="
         }
       },
       "is_incremental": false,
@@ -4892,7 +4892,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.PacketType.html",
-          "hash": "IM1axr3OwlXn7L8EOVxr2Q=="
+          "hash": "SjYRyy4AHrnyCrpnGZuwbA=="
         }
       },
       "is_incremental": false,
@@ -4904,7 +4904,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.Peer.html",
-          "hash": "K65Y9DtbzgR9rgs3mG9Gwg=="
+          "hash": "OYXc9v3pix18tXrw6Y602Q=="
         }
       },
       "is_incremental": false,
@@ -4916,7 +4916,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.Pool-1.CreateNewItem.html",
-          "hash": "6mmlA67+zKlaVlA0t0q9gQ=="
+          "hash": "Pj/+DK64HuVvRvPECqHevw=="
         }
       },
       "is_incremental": false,
@@ -4928,7 +4928,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.Pool-1.html",
-          "hash": "3clwuKNov962MKOo/deajw=="
+          "hash": "yAz+6tW+nl9lgt4Wq4RyfQ=="
         }
       },
       "is_incremental": false,
@@ -4940,7 +4940,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.RejectReason.html",
-          "hash": "uOsQcIKBj7/3ZOGz97cHzQ=="
+          "hash": "iLQZswC1AmG9CCpB3QeWFg=="
         }
       },
       "is_incremental": false,
@@ -4952,7 +4952,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.RingBuffer-1.html",
-          "hash": "g1YfTBpzTNdQflLg6TBtvA=="
+          "hash": "hF4SJxgE90ijO2p+aGmwAA=="
         }
       },
       "is_incremental": false,
@@ -4964,7 +4964,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.Sequencer.html",
-          "hash": "GalyP1HXW05AmoYr5z05zw=="
+          "hash": "nosiobmR+4ACdNphSBXeCQ=="
         }
       },
       "is_incremental": false,
@@ -4976,7 +4976,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SocketLayer.SocketFactory.html",
-          "hash": "uwJ1bP45BLina3o+3HlXew=="
+          "hash": "Z5UhsoxZuXXFUAc9HHCowQ=="
         }
       },
       "is_incremental": false,
@@ -5000,7 +5000,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Sockets.Udp.EndPointWrapper.html",
-          "hash": "bacQ17wSWO2wQrtJ55ae7g=="
+          "hash": "fuM03BnDWb7QEA6bAUxDhg=="
         }
       },
       "is_incremental": false,
@@ -5012,7 +5012,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Sockets.Udp.NanoEndPoint.html",
-          "hash": "/X5sxh3YrrKxak3ZSqdQcA=="
+          "hash": "GdPGnWeY7FDArh6NGf1FOA=="
         }
       },
       "is_incremental": false,
@@ -5024,7 +5024,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Sockets.Udp.NanoSocket.html",
-          "hash": "/QI0jxwq85Q1+TCWVVDcIw=="
+          "hash": "OR+P8GVus+jr2zDe/KUm7w=="
         }
       },
       "is_incremental": false,
@@ -5036,7 +5036,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Sockets.Udp.NanoSocketException.html",
-          "hash": "qiHRoIlH33O9euO75MQeEA=="
+          "hash": "1XqUu7FaG88hxb8bnVLS2A=="
         }
       },
       "is_incremental": false,
@@ -5048,7 +5048,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Sockets.Udp.SocketLib.html",
-          "hash": "rReAtWmJ0lohUF0ooDt39w=="
+          "hash": "nh5e0B5rmxNmkcJ+jstsPA=="
         }
       },
       "is_incremental": false,
@@ -5060,7 +5060,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Sockets.Udp.UdpSocket.html",
-          "hash": "iV3SbBF34usWWPUyLxausA=="
+          "hash": "5NbGwjW/jhHQrZkvMrFHvw=="
         }
       },
       "is_incremental": false,
@@ -5072,7 +5072,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Sockets.Udp.UdpSocketFactory.html",
-          "hash": "NiVInw9IJBdxpvRkunX+Pg=="
+          "hash": "CxwXsuIWytbmXjAztLOgrA=="
         }
       },
       "is_incremental": false,
@@ -5096,7 +5096,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SpawnEvent.html",
-          "hash": "qRvwZBro4HZaqzLcKMUuDw=="
+          "hash": "Io3dP7kKoYNgLhFXjcjDaA=="
         }
       },
       "is_incremental": false,
@@ -5108,7 +5108,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SpawnHandlerDelegate.html",
-          "hash": "nXptXgsflJuIfNVoe+RLmQ=="
+          "hash": "x9pS1hM1/5eCGOT8LhMuLQ=="
         }
       },
       "is_incremental": false,
@@ -5120,7 +5120,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SpawnMessage.html",
-          "hash": "BNRir/X5xModX/3uJQM0bA=="
+          "hash": "4WAlBBpjeqC4kSGG6n8biQ=="
         }
       },
       "is_incremental": false,
@@ -5132,7 +5132,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.StringHash.html",
-          "hash": "BwSRMDE/c3hY+ypLdB6eVA=="
+          "hash": "3oTdkg5x2RiPcUS5wTqN/g=="
         }
       },
       "is_incremental": false,
@@ -5144,7 +5144,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SyncMode.html",
-          "hash": "YvEimfd/6prnUUvzvqCMIw=="
+          "hash": "EM384yJAR/cpA7QkAnF3JA=="
         }
       },
       "is_incremental": false,
@@ -5156,7 +5156,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SyncVarAttribute.html",
-          "hash": "QPUJwk5Tnng607mUwtekTA=="
+          "hash": "OcGJ+rIX9SdGKyoJNcHTjw=="
         }
       },
       "is_incremental": false,
@@ -5168,7 +5168,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SyncVarReceiver.html",
-          "hash": "aaBDci3q5gIMDJKFkgvjwQ=="
+          "hash": "358cxJTvOASzsSwrJE7esQ=="
         }
       },
       "is_incremental": false,
@@ -5180,7 +5180,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.SyncVarSender.html",
-          "hash": "l44yEkHRPkrrYERV0Ay89A=="
+          "hash": "2Cy1V+UZZfFV3h/O7CEtyg=="
         }
       },
       "is_incremental": false,
@@ -5192,7 +5192,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.UnSpawnDelegate.html",
-          "hash": "eRyLcEin4rB7guOH5pd/Rw=="
+          "hash": "5mrNZkiO72ffXvj2/+ihRw=="
         }
       },
       "is_incremental": false,
@@ -5204,7 +5204,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.UpdateVarsMessage.html",
-          "hash": "QPhex11mBqm1JaxAjpTA4g=="
+          "hash": "UweNq1fNnUyRgVoKCMcATw=="
         }
       },
       "is_incremental": false,
@@ -5216,7 +5216,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Mirage.Version.html",
-          "hash": "1IWrorK0cyycZ5hLKoATEQ=="
+          "hash": "dHKhVZcO9UluEmNC+lKewg=="
         }
       },
       "is_incremental": false,
@@ -5240,7 +5240,7 @@
       "output": {
         ".html": {
           "relative_path": "api/NanoSockets.Address.html",
-          "hash": "CyBA+CyQ09hq40aukAj5OQ=="
+          "hash": "zli36Ho5AfC2ktIkauYJGA=="
         }
       },
       "is_incremental": false,
@@ -5252,7 +5252,7 @@
       "output": {
         ".html": {
           "relative_path": "api/NanoSockets.Socket.html",
-          "hash": "XltMU6XI2+5aI8VA5vI+Ww=="
+          "hash": "6ezrwliSMgCGDeeH6vNGnw=="
         }
       },
       "is_incremental": false,
@@ -5264,7 +5264,7 @@
       "output": {
         ".html": {
           "relative_path": "api/NanoSockets.Status.html",
-          "hash": "UB4Pg+04oKxrEIeQ9SRZfg=="
+          "hash": "fVaw0++kJMomDLWytyaZpw=="
         }
       },
       "is_incremental": false,
@@ -5276,7 +5276,7 @@
       "output": {
         ".html": {
           "relative_path": "api/NanoSockets.UDP.html",
-          "hash": "sjNKM+0zp+uIyU6bJcHyKQ=="
+          "hash": "tGT80sTS2U1F0tDJMcJuLg=="
         }
       },
       "is_incremental": false,
