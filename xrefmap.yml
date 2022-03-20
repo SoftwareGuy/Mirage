@@ -13593,12 +13593,6 @@ references:
   commentId: F:Mirage.SocketLayer.Config.MaxConnections
   fullName: Mirage.SocketLayer.Config.MaxConnections
   nameWithType: Config.MaxConnections
-- uid: Mirage.SocketLayer.Config.MaxPacketSize
-  name: MaxPacketSize
-  href: api/Mirage.SocketLayer.Config.html#Mirage_SocketLayer_Config_MaxPacketSize
-  commentId: F:Mirage.SocketLayer.Config.MaxPacketSize
-  fullName: Mirage.SocketLayer.Config.MaxPacketSize
-  nameWithType: Config.MaxPacketSize
 - uid: Mirage.SocketLayer.Config.MaxReliableFragments
   name: MaxReliableFragments
   href: api/Mirage.SocketLayer.Config.html#Mirage_SocketLayer_Config_MaxReliableFragments
@@ -14726,12 +14720,12 @@ references:
   commentId: T:Mirage.SocketLayer.Peer
   fullName: Mirage.SocketLayer.Peer
   nameWithType: Peer
-- uid: Mirage.SocketLayer.Peer.#ctor(Mirage.SocketLayer.ISocket,Mirage.SocketLayer.IDataHandler,Mirage.SocketLayer.Config,UnityEngine.ILogger,Mirage.SocketLayer.Metrics)
-  name: Peer(ISocket, IDataHandler, Config, ILogger, Metrics)
-  href: api/Mirage.SocketLayer.Peer.html#Mirage_SocketLayer_Peer__ctor_Mirage_SocketLayer_ISocket_Mirage_SocketLayer_IDataHandler_Mirage_SocketLayer_Config_UnityEngine_ILogger_Mirage_SocketLayer_Metrics_
-  commentId: M:Mirage.SocketLayer.Peer.#ctor(Mirage.SocketLayer.ISocket,Mirage.SocketLayer.IDataHandler,Mirage.SocketLayer.Config,UnityEngine.ILogger,Mirage.SocketLayer.Metrics)
-  fullName: Mirage.SocketLayer.Peer.Peer(Mirage.SocketLayer.ISocket, Mirage.SocketLayer.IDataHandler, Mirage.SocketLayer.Config, UnityEngine.ILogger, Mirage.SocketLayer.Metrics)
-  nameWithType: Peer.Peer(ISocket, IDataHandler, Config, ILogger, Metrics)
+- uid: Mirage.SocketLayer.Peer.#ctor(Mirage.SocketLayer.ISocket,System.Int32,Mirage.SocketLayer.IDataHandler,Mirage.SocketLayer.Config,UnityEngine.ILogger,Mirage.SocketLayer.Metrics)
+  name: Peer(ISocket, Int32, IDataHandler, Config, ILogger, Metrics)
+  href: api/Mirage.SocketLayer.Peer.html#Mirage_SocketLayer_Peer__ctor_Mirage_SocketLayer_ISocket_System_Int32_Mirage_SocketLayer_IDataHandler_Mirage_SocketLayer_Config_UnityEngine_ILogger_Mirage_SocketLayer_Metrics_
+  commentId: M:Mirage.SocketLayer.Peer.#ctor(Mirage.SocketLayer.ISocket,System.Int32,Mirage.SocketLayer.IDataHandler,Mirage.SocketLayer.Config,UnityEngine.ILogger,Mirage.SocketLayer.Metrics)
+  fullName: Mirage.SocketLayer.Peer.Peer(Mirage.SocketLayer.ISocket, System.Int32, Mirage.SocketLayer.IDataHandler, Mirage.SocketLayer.Config, UnityEngine.ILogger, Mirage.SocketLayer.Metrics)
+  nameWithType: Peer.Peer(ISocket, Int32, IDataHandler, Config, ILogger, Metrics)
 - uid: Mirage.SocketLayer.Peer.#ctor*
   name: Peer
   href: api/Mirage.SocketLayer.Peer.html#Mirage_SocketLayer_Peer__ctor_
@@ -15417,6 +15411,19 @@ references:
   isSpec: "True"
   fullName: Mirage.SocketLayer.SocketFactory.GetConnectEndPoint
   nameWithType: SocketFactory.GetConnectEndPoint
+- uid: Mirage.SocketLayer.SocketFactory.MaxPacketSize
+  name: MaxPacketSize
+  href: api/Mirage.SocketLayer.SocketFactory.html#Mirage_SocketLayer_SocketFactory_MaxPacketSize
+  commentId: P:Mirage.SocketLayer.SocketFactory.MaxPacketSize
+  fullName: Mirage.SocketLayer.SocketFactory.MaxPacketSize
+  nameWithType: SocketFactory.MaxPacketSize
+- uid: Mirage.SocketLayer.SocketFactory.MaxPacketSize*
+  name: MaxPacketSize
+  href: api/Mirage.SocketLayer.SocketFactory.html#Mirage_SocketLayer_SocketFactory_MaxPacketSize_
+  commentId: Overload:Mirage.SocketLayer.SocketFactory.MaxPacketSize
+  isSpec: "True"
+  fullName: Mirage.SocketLayer.SocketFactory.MaxPacketSize
+  nameWithType: SocketFactory.MaxPacketSize
 - uid: Mirage.Sockets.Udp
   name: Mirage.Sockets.Udp
   href: api/Mirage.Sockets.Udp.html
@@ -15765,6 +15772,25 @@ references:
   commentId: F:Mirage.Sockets.Udp.SocketLib.Native
   fullName: Mirage.Sockets.Udp.SocketLib.Native
   nameWithType: SocketLib.Native
+- uid: Mirage.Sockets.Udp.UdpMTU
+  name: UdpMTU
+  href: api/Mirage.Sockets.Udp.UdpMTU.html
+  commentId: T:Mirage.Sockets.Udp.UdpMTU
+  fullName: Mirage.Sockets.Udp.UdpMTU
+  nameWithType: UdpMTU
+- uid: Mirage.Sockets.Udp.UdpMTU.MaxPacketSize
+  name: MaxPacketSize
+  href: api/Mirage.Sockets.Udp.UdpMTU.html#Mirage_Sockets_Udp_UdpMTU_MaxPacketSize
+  commentId: P:Mirage.Sockets.Udp.UdpMTU.MaxPacketSize
+  fullName: Mirage.Sockets.Udp.UdpMTU.MaxPacketSize
+  nameWithType: UdpMTU.MaxPacketSize
+- uid: Mirage.Sockets.Udp.UdpMTU.MaxPacketSize*
+  name: MaxPacketSize
+  href: api/Mirage.Sockets.Udp.UdpMTU.html#Mirage_Sockets_Udp_UdpMTU_MaxPacketSize_
+  commentId: Overload:Mirage.Sockets.Udp.UdpMTU.MaxPacketSize
+  isSpec: "True"
+  fullName: Mirage.Sockets.Udp.UdpMTU.MaxPacketSize
+  nameWithType: UdpMTU.MaxPacketSize
 - uid: Mirage.Sockets.Udp.UdpSocket
   name: UdpSocket
   href: api/Mirage.Sockets.Udp.UdpSocket.html
@@ -15928,6 +15954,19 @@ references:
   isSpec: "True"
   fullName: Mirage.Sockets.Udp.UdpSocketFactory.GetConnectEndPoint
   nameWithType: UdpSocketFactory.GetConnectEndPoint
+- uid: Mirage.Sockets.Udp.UdpSocketFactory.MaxPacketSize
+  name: MaxPacketSize
+  href: api/Mirage.Sockets.Udp.UdpSocketFactory.html#Mirage_Sockets_Udp_UdpSocketFactory_MaxPacketSize
+  commentId: P:Mirage.Sockets.Udp.UdpSocketFactory.MaxPacketSize
+  fullName: Mirage.Sockets.Udp.UdpSocketFactory.MaxPacketSize
+  nameWithType: UdpSocketFactory.MaxPacketSize
+- uid: Mirage.Sockets.Udp.UdpSocketFactory.MaxPacketSize*
+  name: MaxPacketSize
+  href: api/Mirage.Sockets.Udp.UdpSocketFactory.html#Mirage_Sockets_Udp_UdpSocketFactory_MaxPacketSize_
+  commentId: Overload:Mirage.Sockets.Udp.UdpSocketFactory.MaxPacketSize
+  isSpec: "True"
+  fullName: Mirage.Sockets.Udp.UdpSocketFactory.MaxPacketSize
+  nameWithType: UdpSocketFactory.MaxPacketSize
 - uid: Mirage.Sockets.Udp.UdpSocketFactory.Mirage#SocketLayer#IHasAddress#Address
   name: IHasAddress.Address
   href: api/Mirage.Sockets.Udp.UdpSocketFactory.html#Mirage_Sockets_Udp_UdpSocketFactory_Mirage_SocketLayer_IHasAddress_Address
