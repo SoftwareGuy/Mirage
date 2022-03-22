@@ -321,6 +321,19 @@ references:
   commentId: F:Mirage.CharacterSpawner.ServerObjectManager
   fullName: Mirage.CharacterSpawner.ServerObjectManager
   nameWithType: CharacterSpawner.ServerObjectManager
+- uid: Mirage.CharacterSpawner.SetCharacterName(Mirage.INetworkPlayer,Mirage.NetworkIdentity)
+  name: SetCharacterName(INetworkPlayer, NetworkIdentity)
+  href: api/Mirage.CharacterSpawner.html#Mirage_CharacterSpawner_SetCharacterName_Mirage_INetworkPlayer_Mirage_NetworkIdentity_
+  commentId: M:Mirage.CharacterSpawner.SetCharacterName(Mirage.INetworkPlayer,Mirage.NetworkIdentity)
+  fullName: Mirage.CharacterSpawner.SetCharacterName(Mirage.INetworkPlayer, Mirage.NetworkIdentity)
+  nameWithType: CharacterSpawner.SetCharacterName(INetworkPlayer, NetworkIdentity)
+- uid: Mirage.CharacterSpawner.SetCharacterName*
+  name: SetCharacterName
+  href: api/Mirage.CharacterSpawner.html#Mirage_CharacterSpawner_SetCharacterName_
+  commentId: Overload:Mirage.CharacterSpawner.SetCharacterName
+  isSpec: "True"
+  fullName: Mirage.CharacterSpawner.SetCharacterName
+  nameWithType: CharacterSpawner.SetCharacterName
 - uid: Mirage.CharacterSpawner.startPositionIndex
   name: startPositionIndex
   href: api/Mirage.CharacterSpawner.html#Mirage_CharacterSpawner_startPositionIndex
@@ -4161,6 +4174,19 @@ references:
   commentId: T:Mirage.INetworkPlayer
   fullName: Mirage.INetworkPlayer
   nameWithType: INetworkPlayer
+- uid: Mirage.INetworkPlayer.Address
+  name: Address
+  href: api/Mirage.INetworkPlayer.html#Mirage_INetworkPlayer_Address
+  commentId: P:Mirage.INetworkPlayer.Address
+  fullName: Mirage.INetworkPlayer.Address
+  nameWithType: INetworkPlayer.Address
+- uid: Mirage.INetworkPlayer.Address*
+  name: Address
+  href: api/Mirage.INetworkPlayer.html#Mirage_INetworkPlayer_Address_
+  commentId: Overload:Mirage.INetworkPlayer.Address
+  isSpec: "True"
+  fullName: Mirage.INetworkPlayer.Address
+  nameWithType: INetworkPlayer.Address
 - uid: Mirage.INetworkPlayer.Connection
   name: Connection
   href: api/Mirage.INetworkPlayer.html#Mirage_INetworkPlayer_Connection
