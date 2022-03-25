@@ -127,6 +127,18 @@
 <li>Mark the player as ready using: <code>player.SceneIsReady = true</code></li>
 <li>Call <a class="xref" href="../../../api/Mirage.ServerObjectManager.html#Mirage_ServerObjectManager_SpawnVisibleObjects_Mirage_INetworkPlayer_System_Boolean_">ServerObjectManager.SpawnVisibleObjects</a> or <a class="xref" href="../../../api/Mirage.ServerObjectManager.html#Mirage_ServerObjectManager_AddCharacter_Mirage_INetworkPlayer_Mirage_NetworkIdentity_">ServerObjectManager.AddCharacter</a> (Mirage will send spawn message to client)</li>
 </ol>
+<h3 id="spawnvisibleobjects-vs-addcharacter">SpawnVisibleObjects vs AddCharacter</h3>
+<p>When calling <code>SpawnVisibleObjects</code> it will only spawn objects if the player has a character. This check can be avoided by using the <code>ignoreHasCharacter</code> argument.</p>
+<p>When <code>AddCharacter</code> is called it will send a spawn message for the new character to the client. After that it will call <code>SpawnVisibleObjects</code> to spawn any objects that are visible to the new character.</p>
+<p>If your game has a player character you'll want to use <code>AddCharacter</code> most of the time. But if your game does not have a player character or you want to spawn objects earlier then you should use <code>SpawnVisibleObjects</code> with <code>ignoreHasCharacter</code> set up <code>true</code>.</p>
+<p>You can also use <code>SpawnVisibleObjects(player, true)</code> to spawn scene objects before the player character by calling it before <code>AddCharacter</code>.</p>
+<div class="NOTE">
+<h5>Note</h5>
+<p>Make sure to call <code>ClientObjectManager.PrepareToSpawnSceneObjects</code> client side before calling <code>SpawnVisibleObjects</code> or <code>AddCharacter</code>. If that function is not called the the client will not be able to find scene objects when spawn message are received.</p>
+</div>
+<h3 id="host-mode">Host mode</h3>
+<p>If using this setup in Host mode make sure you only load the Scene once, this can be done by checking if server is active before loading scene on client.</p>
+<p>The rest of the setup should stay the same. In host mode there will be 2 copies of the <code>NetworkPlayer</code> one for client side and one for server side. When using <code>player.SceneIsReady</code> you will need to make sure you are setting it on both copies of the player. The easiest way to do this is just treat the host client as a normal client and send message, but be aware of any functions you dont want called twice.</p>
 </article>
           </div>
           
