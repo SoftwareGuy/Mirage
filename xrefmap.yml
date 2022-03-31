@@ -4681,6 +4681,12 @@ references:
   isSpec: "True"
   fullName: Mirage.IObjectOwner.Identity
   nameWithType: IObjectOwner.Identity
+- uid: Mirage.IObjectOwner.OnIdentityChanged
+  name: OnIdentityChanged
+  href: api/Mirage.IObjectOwner.html#Mirage_IObjectOwner_OnIdentityChanged
+  commentId: E:Mirage.IObjectOwner.OnIdentityChanged
+  fullName: Mirage.IObjectOwner.OnIdentityChanged
+  nameWithType: IObjectOwner.OnIdentityChanged
 - uid: Mirage.IObjectOwner.RemoveOwnedObject(Mirage.NetworkIdentity)
   name: RemoveOwnedObject(NetworkIdentity)
   href: api/Mirage.IObjectOwner.html#Mirage_IObjectOwner_RemoveOwnedObject_Mirage_NetworkIdentity_
@@ -7358,6 +7364,12 @@ references:
   isSpec: "True"
   fullName: Mirage.NetworkPlayer.MarkAsDisconnected
   nameWithType: NetworkPlayer.MarkAsDisconnected
+- uid: Mirage.NetworkPlayer.OnIdentityChanged
+  name: OnIdentityChanged
+  href: api/Mirage.NetworkPlayer.html#Mirage_NetworkPlayer_OnIdentityChanged
+  commentId: E:Mirage.NetworkPlayer.OnIdentityChanged
+  fullName: Mirage.NetworkPlayer.OnIdentityChanged
+  nameWithType: NetworkPlayer.OnIdentityChanged
 - uid: Mirage.NetworkPlayer.RemoveAllVisibleObjects
   name: RemoveAllVisibleObjects()
   href: api/Mirage.NetworkPlayer.html#Mirage_NetworkPlayer_RemoveAllVisibleObjects
