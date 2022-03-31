@@ -522,7 +522,7 @@ namespace Mirage
 
             if (identity == null)
             {
-                logger.LogWarning($"Could not find this players' character");
+                logger.LogWarning($"Could not find this players' character.");
                 return;
             }
 
@@ -577,7 +577,7 @@ namespace Mirage
 
             if (!Client.World.TryGetIdentity(msg.netId, out NetworkIdentity identity))
             {
-                if (logger.WarnEnabled()) logger.LogWarning($"Spawned object not found when handling ClientRpc message for netId {msg.netId}");
+                if (logger.WarnEnabled()) logger.LogWarning($"Spawned object not found when handling ClientRpc message for netId {msg.netId}.");
                 return;
             }
 
@@ -604,7 +604,7 @@ namespace Mirage
                 // Set isLocalPlayer to true on this NetworkIdentity and trigger OnStartLocalPlayer in all scripts on the same GO
                 identity.StartLocalPlayer();
 
-                if (logger.LogEnabled()) logger.Log($"ClientScene.OnOwnerMessage: player {identity.name}");
+                if (logger.LogEnabled()) logger.Log($"ClientScene.OnOwnerMessage: Player {identity.name}");
             }
         }
 
