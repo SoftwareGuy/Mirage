@@ -56,12 +56,30 @@ namespace Mirage.Sockets.Udp
 			
 			// Are we a Unity Editor instance or standalone instance?
 #if UNITY_STANDALONE || UNITY_EDITOR
+			// OK. We are, but are we MacOS?
+#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+			// We are also MacOS. We need to switch to Managed.
+			Debug.LogWarning("Due to MacOS code signing requirements, MacOS can refuse to load the NanoSocket native libray. C# Managed Sockets will be used instead.");
+			SocketLib = SocketLib.Managed;
+			return;
+#endif
+			// Just initialize it.
+			InitializeNanoSockets();
+#else
+            Debug.LogWarning("NanoSocket does not support this platform (is this a Console or Mobile platform?). Switching to C# Managed sockets.");
+            SocketLib = SocketLib.Managed;
+#endif
+        }
+		
+		// Ensure that this function only is only available when NanoSocket is baked in.
+#if UNITY_STANDALONE || UNITY_EDITOR
+		void InitializeNanoSockets() {
+			if (!useNanoSocket) return;
+
+			// Attempt initialization of the NanoSocket native library.
 			try
             {
-                if (initCount == 0)
-                {
-                    UDP.Initialize();
-                }
+                if (initCount == 0) UDP.Initialize();
 
                 initCount++;
             }
@@ -71,11 +89,8 @@ namespace Mirage.Sockets.Udp
                 SocketLib = SocketLib.Managed;
                 return;
             }
-#else
-            Debug.LogWarning("NanoSocket does not support this platform, switching to C# Managed sockets.");
-            SocketLib = SocketLib.Managed;
+		}
 #endif
-        }
 
         void OnDestroy()
         {
