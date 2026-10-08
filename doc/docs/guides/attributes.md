@@ -5,11 +5,12 @@ sidebar_position: 4
 
 Networking attributes are added to members of [NetworkBehaviour](/docs/reference/Mirage/NetworkBehaviour) scripts to tell Mirage to do different things.
 
-There are 4 types of attributes that Mirage has:
+There are 5 types of attributes that Mirage has:
 - **[RPC Attributes](#rpc-attributes)**: Cause a method to send a network message so that the body of the method is invoked on either the server or client.
 - **[Block methods invokes](#block-methods-invokes)**: Attributes used to restrict method invocation to specific contexts.
-- **[SyncVar](/docs/guides/sync/sync-var)**: Add to Fields to cause their value to be automatically synced to clients.
-- **[Bit Packing](/docs/guides/bit-packing)**: These attributes modify how values are written, providing an easy way to compress values before they are sent over the network. They can be applied to Fields and method Parameters.
+- **[SyncVar](/docs/guides/sync/sync-var)**: Add to Properties to cause their value to be automatically synced to clients.
+- **[Bit Packing](/docs/guides/bit-packing)**: These attributes modify how values are written, providing an easy way to compress values before they are sent over the network. They can be applied to Network message fields, SyncVar properties and RPC method parameters.
+- **[MaxLength](#max-length-attribute)**: Restricts the deserialization size of strings and collections (arrays, lists) to protect against memory allocation attacks. It can be applied to Fields and method Parameters.
 
 
 ## RPC Attributes
@@ -52,19 +53,18 @@ These attributes can be used for Unity game loop methods like `Start`, `Update` 
 
 #### Examples:
 
-```cs
-[Server]
-void SpawnCoin() 
-{
-    // This method is only allowed to be invoked on the server.
-}
-```
+{{{ Path:'Snippets/General/AttributesSnippets.cs' Name:'attributes-server' }}}
 
-```cs
-[NetworkMethod(NetworkFlags.Server | NetworkFlags.NotActive)]
-public void StartGame()
-{
-    // This method will run on the server or in single-player mode.
-    // It will only be blocked if the client is active.
-}
-```
+{{{ Path:'Snippets/General/AttributesSnippets.cs' Name:'attributes-network-method' }}}
+
+## Max Length Attribute
+
+The `[MaxLength(int)]` attribute restricts the deserialization size of strings and collections (arrays, lists) per-field or per-parameter.
+
+It is highly recommended to use this attribute when receiving strings or collections from untrusted clients (e.g., in `[ServerRpc]` parameters or fields in `[NetworkMessage]` structs) to protect your server from **memory allocation attacks**.
+
+For details and usage, see:
+- **RPCs:** [Server Rpc](/docs/guides/remote-actions/server-rpc#protecting-against-memory-allocation-attacks-maxlength-attribute) / [Client Rpc](/docs/guides/remote-actions/client-rpc)
+- **SyncVars:** [Sync Var](/docs/guides/sync/sync-var#protecting-syncvars-from-allocation-attacks)
+- **Network Messages:** [Network Messages](/docs/guides/remote-actions/network-messages#protecting-network-messages-from-allocation-attacks)
+- **Error Handling:** [Error Handling](/docs/guides/error-handling#player-error-flags)

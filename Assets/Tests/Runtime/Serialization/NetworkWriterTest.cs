@@ -50,6 +50,31 @@ namespace Mirage.Tests.Runtime.Serialization
                 Assert.That(deserialized.Array[deserialized.Offset + i], Is.EqualTo(data[i]));
         }
 
+        [Test]
+        public void TestWriteReadSpanRaw()
+        {
+            byte[] data = { 10, 20, 30, 40, 50 };
+            writer.WriteSpanRaw(data);
+
+            reader.Reset(writer.ToArraySegment());
+            var buffer = new byte[data.Length];
+            reader.ReadSpanRaw(buffer);
+
+            Assert.That(buffer, Is.EqualTo(data));
+        }
+
+        [Test]
+        public void TestWriteReadSpanAndSize()
+        {
+            byte[] data = { 11, 22, 33, 44, 55 };
+            writer.WriteSpanAndSize(data); // Using byte overload
+
+            reader.Reset(writer.ToArraySegment());
+            var readSpan = reader.ReadSpanAndSize();
+
+            Assert.That(readSpan.ToArray(), Is.EqualTo(data));
+        }
+
         // write byte[], read segment
         [Test]
         public void TestWritingBytesAndReadingSegment()
@@ -575,12 +600,15 @@ namespace Mirage.Tests.Runtime.Serialization
         [Test, TestCaseSource(nameof(int32Fail))]
         public void TestPackedUInt32Failure(long data)
         {
-            Assert.Throws<OverflowException>(() =>
+            UnityEngine.TestTools.LogAssert.Expect(LogType.Error, "ReadPackedUInt32 Overflow");
+            // dont throw, hurts server performance
+            Assert.DoesNotThrow(() =>
             {
                 writer.WritePackedUInt64((ulong)data);
                 reader.Reset(writer.ToArraySegment());
                 reader.ReadPackedUInt32();
             });
+            UnityEngine.TestTools.LogAssert.NoUnexpectedReceived();
         }
 
         private static readonly int[] int32s =
@@ -620,12 +648,15 @@ namespace Mirage.Tests.Runtime.Serialization
         [Test, TestCaseSource(nameof(int32Fail))]
         public void TestPackedInt32Failure(long data)
         {
-            Assert.Throws<OverflowException>(() =>
+            UnityEngine.TestTools.LogAssert.Expect(LogType.Error, "ReadPackedUInt32 Overflow");
+            // dont throw, hurts server performance
+            Assert.DoesNotThrow(() =>
             {
                 writer.WritePackedInt64(data);
                 reader.Reset(writer.ToArraySegment());
                 reader.ReadPackedInt32();
             });
+            UnityEngine.TestTools.LogAssert.NoUnexpectedReceived();
         }
 
         private static readonly ulong[] uint64s =

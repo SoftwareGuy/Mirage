@@ -1,6 +1,5 @@
 using System;
 using Mirage.Serialization;
-using Mirage.Tests.Runtime.ClientServer;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -81,8 +80,10 @@ namespace Mirage.Tests.Runtime.Syncing
         [Test]
         public void TestSyncIntervalAndClearDirtyComponents()
         {
+            var now = Time.unscaledTimeAsDouble;
             var player = CreateBehaviour<MockPlayer>();
-            player._nextSyncTime = Time.time + 1f;
+            serverObjectManager.Spawn(player.Identity);
+            player._nextSyncTime = now + 1f;
             player.SyncSettings.Interval = 1f;
 
             player.guild = new MockPlayer.Guild
@@ -90,24 +91,31 @@ namespace Mirage.Tests.Runtime.Syncing
                 name = "Back street boys"
             };
 
-            Assert.That(player.ShouldSync(Time.time), Is.False, "Sync interval not met, so not dirty yet");
+            Assert.That(player.ShouldSync(now), Is.False, "Sync interval not met, so not dirty yet");
 
-            // ClearDirtyComponents should do nothing since syncInterval is not
+            // on serialize should do nothing since syncInterval is not
             // elapsed yet
-            player.Identity.ClearShouldSyncDirtyOnly();
+            player.Identity.OnSerializeDelta(now, ownerWriter, observersWriter);
+
+            Assert.That(player.AnyDirtyBits(), Is.True, "Should still be dirty");
 
             // set lastSyncTime far enough back to be ready for syncing
-            player._nextSyncTime = Time.time - 1f;
+            player._nextSyncTime = now - 1f;
 
             // should be dirty now
-            Assert.That(player.ShouldSync(Time.time), Is.True, "Sync interval met, should be dirty");
+            Assert.That(player.ShouldSync(now), Is.True, "Sync interval met, should be dirty");
+
+            // after serializing, the dirty bit should be cleared
+            player.Identity.OnSerializeDelta(now, ownerWriter, observersWriter);
+            Assert.That(player.AnyDirtyBits(), Is.False, "Dirty bit should be cleared after sync");
         }
 
         [Test]
         public void TestSyncIntervalAndClearAllComponents()
         {
+            var now = Time.unscaledTimeAsDouble;
             var player = CreateBehaviour<MockPlayer>();
-            player._nextSyncTime = Time.time + 1f;
+            player._nextSyncTime = now + 1f;
             player.SyncSettings.Interval = 1f;
 
             player.guild = new MockPlayer.Guild
@@ -115,17 +123,17 @@ namespace Mirage.Tests.Runtime.Syncing
                 name = "Back street boys"
             };
 
-            Assert.That(player.ShouldSync(Time.time), Is.False, "Sync interval not met, so not dirty yet");
+            Assert.That(player.ShouldSync(now), Is.False, "Sync interval not met, so not dirty yet");
 
             // ClearAllComponents should clear dirty even if syncInterval not
             // elapsed yet
-            player.Identity.ClearShouldSync();
+            player.Identity.ClearShouldSync(now);
 
             // set lastSyncTime far enough back to be ready for syncing
-            player._nextSyncTime = Time.time - 1f;
+            player._nextSyncTime = now - 1f;
 
             // should be dirty now
-            Assert.That(player.ShouldSync(Time.time), Is.False, "Sync interval met, should still not be dirty");
+            Assert.That(player.ShouldSync(now), Is.False, "Sync interval met, should still not be dirty");
         }
 
         [Test]
@@ -143,7 +151,7 @@ namespace Mirage.Tests.Runtime.Syncing
             serverObjectManager.Spawn(player1.Identity);
 
             //serialize all the data as we would for the network
-            var (ownerWritten, observersWritten) = player1.Identity.OnSerializeAll(true, ownerWriter, observersWriter);
+            var (ownerWritten, observersWritten) = player1.Identity.OnSerializeInitial(ownerWriter, observersWriter);
 
             Assert.That(ownerWritten, Is.EqualTo(0), "no owner, should have only written to observersWriter");
             Assert.That(observersWritten, Is.GreaterThanOrEqualTo(1), "should have written to observer writer");
@@ -169,6 +177,69 @@ namespace Mirage.Tests.Runtime.Syncing
             player.target = other.GetComponent<NetworkIdentity>();
 
             Assert.That(player.target, Is.EqualTo(other.GetComponent<NetworkIdentity>()));
+        }
+
+        [Test]
+        public void TestNullableSyncVarWithBranch()
+        {
+            var player = CreateBehaviour<MockPlayerWithNullable>();
+            // Since IsServer needs to be true for our mock method to proceed, let's spawn or set IsServer if needed.
+            // Wait, CreateBehaviour components have IsServer set to true by default when spawned in ClientServerSetup.
+            // Let's spawn the identity.
+            serverObjectManager.Spawn(player.Identity);
+
+            player.TestMethod(null, true);
+            Assert.That(player.controlColor, Is.Null);
+            player.TestMethod(null, true);
+            Assert.That(player.controlColor, Is.Null);
+
+            player.TestMethod(player, false);
+            Assert.That(player.controlColor, Is.EqualTo(Color.blue));
+            player.TestMethod(player, true);
+            Assert.That(player.controlColor, Is.EqualTo(Color.red));
+        }
+    }
+
+    public class MockPlayerWithNullable : NetworkBehaviour
+    {
+        [SyncVar]
+        public Color? controlColor = null;
+        private Storage _storage = new Storage { color = Color.blue };
+        private Color? Other = Color.clear;
+
+        public struct Storage
+        {
+            public Color color;
+        }
+
+        private Color GetColor(MockPlayerWithNullable value)
+        {
+            return Color.red;
+        }
+
+        public void TestMethod(MockPlayerWithNullable value, bool condition2)
+        {
+            if (!IsServer)
+                return;
+
+            if (value == null)
+            {
+                controlColor = null;
+                return;
+            }
+
+            if (condition2)
+            {
+                Debug.Assert(value.Other.HasValue, "Should have other value");
+                var teamColor = GetColor(value);
+                controlColor = teamColor;
+            }
+            else
+            {
+                // IMPORTANT the method needs this double line so it is the right length that the IL return breaks when inserting instructions
+                controlColor = value._storage.color;
+                controlColor = value._storage.color;
+            }
         }
     }
 }

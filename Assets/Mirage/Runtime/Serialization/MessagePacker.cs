@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Profiling;
 
 namespace Mirage.Serialization
 {
@@ -11,6 +12,9 @@ namespace Mirage.Serialization
     public static class MessageIdCache<T>
     {
         public static readonly int Id = MessagePacker.GetId(typeof(T));
+        public static readonly ProfilerMarker SendMarker = new ProfilerMarker($"Mirage.Message.{typeof(T).Name}.Send");
+        public static readonly ProfilerMarker SendNotifyMarker = new ProfilerMarker($"Mirage.Message.{typeof(T).Name}.SendNotify");
+        public static readonly ProfilerMarker SendToManyMarker = new ProfilerMarker($"Mirage.Message.{typeof(T).Name}.SendToMany");
     }
 
     // message packing all in one place, instead of constructing headers in all
@@ -26,6 +30,8 @@ namespace Mirage.Serialization
     //    (probably even shorter)
     public static class MessagePacker
     {
+        public const int ID_BYTE_SIZE = 2;
+
         /// <summary>
         /// Backing field for <see cref="MessageTypes"/>
         /// </summary>
@@ -86,7 +92,7 @@ namespace Mirage.Serialization
             // this works because value types cannot be derived
             // if it is a reference type (for example IMessageBase),
             // ask the message for the real type
-            var id = default(T) == null && message != null 
+            var id = default(T) == null && message != null
                 // for class we need to use GetType incase T is base class
                 ? GetId(message.GetType())
                 // for struct, we can use the cached Id
@@ -143,6 +149,7 @@ namespace Mirage.Serialization
             if (id != typeId)
                 throw new FormatException("Invalid message,  could not unpack " + typeof(T).FullName);
         }
+
 
         // unpack message after receiving
         // -> pass NetworkReader so it's less strange if we create it in here

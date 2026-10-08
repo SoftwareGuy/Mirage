@@ -36,14 +36,18 @@ namespace Mirage.SocketLayer
         /// <para>Called once when Sockets are created</para></summary>
         public abstract int MaxPacketSize { get; }
 
+        /// <summary>
+        /// Can be used on client (or server) to check if this Socket is supported on the current platform
+        /// </summary>
+        public abstract bool IsSupported { get; }
+
         /// <summary>Creates a <see cref="ISocket"/> to be used by <see cref="Peer"/> on the server</summary>
         /// <exception cref="NotSupportedException">Throw when Server is not supported on current platform</exception>
         public abstract ISocket CreateServerSocket();
 
         /// <summary>Creates the <see cref="EndPoint"/> that the Server Socket will bind to</summary>
         /// <exception cref="NotSupportedException">Throw when Client is not supported on current platform</exception>
-        public abstract IEndPoint GetBindEndPoint();
-
+        public abstract IBindEndPoint GetBindEndPoint();
 
         /// <summary>Creates a <see cref="ISocket"/> to be used by <see cref="Peer"/> on the client</summary>
         /// <exception cref="NotSupportedException">Throw when Client is not supported on current platform</exception>
@@ -51,6 +55,6 @@ namespace Mirage.SocketLayer
 
         /// <summary>Creates the <see cref="EndPoint"/> that the Client Socket will connect to using the parameter given</summary>
         /// <exception cref="NotSupportedException">Throw when Client is not supported on current platform</exception>
-        public abstract IEndPoint GetConnectEndPoint(string address = null, ushort? port = null);
+        public abstract IConnectEndPoint GetConnectEndPoint(string address = null, ushort? port = null);
     }
 }

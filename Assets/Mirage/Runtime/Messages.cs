@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -18,10 +17,7 @@ namespace Mirage
     [NetworkMessage]
     public struct SceneMessage
     {
-        public string MainActivateScene;
-        // Normal = 0, LoadAdditive = 1, UnloadAdditive = 2
-        public SceneOperation SceneOperation;
-        public List<string> AdditiveScenes;
+        public string ScenePath;
     }
 
     /// <summary>
@@ -57,7 +53,7 @@ namespace Mirage
         public int? PrefabHash;
 
         /// <summary>
-        /// Spawn values to set after spawning object, values based on <see cref="NetworkIdentity.TransformSpawnSettings"/>
+        /// Spawn values to set after spawning object, values based on <see cref="NetworkSpawnSettings"/>
         /// </summary>
         public SpawnValues SpawnValues;
 
@@ -73,7 +69,7 @@ namespace Mirage
             if (SceneId.HasValue)
                 spawnIDStr = $"SceneId:{SceneId.Value}";
             else if (PrefabHash.HasValue)
-                spawnIDStr = $"PrefabHash:{PrefabHash.Value:X}";
+                spawnIDStr = $"PrefabHash:{PrefabHash.Value}";
             else
                 spawnIDStr = $"SpawnId:Error";
 

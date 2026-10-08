@@ -11,64 +11,29 @@ Use `ClientObjectManager.RegisterSpawnHandler` or `ClientObjectManager.RegisterP
 The spawn/unspawn delegates will look something like this:
 
 **Spawn Handler**
-``` cs
-NetworkIdentity SpawnDelegate(SpawnMessage msg) 
-{
-    // do stuff here
-}
-```
+{{{ Path:'Snippets/GameObjects/CustomSpawnExample.cs' Name:'spawn-handler-delegate' }}}
 
 **UnSpawn Handler**
-```cs
-void UnSpawnDelegate(NetworkIdentity spawned) 
-{
-    // do stuff here
-}
-```
+{{{ Path:'Snippets/GameObjects/CustomSpawnExample.cs' Name:'unspawn-handler-delegate' }}}
 
 When a prefab is saved its `PrefabHash` field will be automatically set. If you want to create prefabs at runtime you will have to generate a new Hash instead.
 
 **Generate prefab at runtime**
-``` cs
-// Create a hash that can be generated on both server and client
-// using a string and GetStableHashCode is a good way to do this
-int coinHash = "MyCoin".GetStableHashCode();
-
-// register handlers using hash
-ClientObjectManager.RegisterSpawnHandler(coinHash, SpawnCoin, UnSpawnCoin);
-```
+{{{ Path:'Snippets/GameObjects/CustomSpawnExample.cs' Name:'generate-prefab-runtime' }}}
 
 :::note
 The unspawn function may be left as `null`, Mirage will then call `GameObject.Destroy` when the destroy message is received.
 :::
 
 **Use existing prefab**
-```cs
-// register handlers using prefab
-ClientObjectManager.RegisterPrefab(coin, SpawnCoin, UnSpawnCoin);
-```
+{{{ Path:'Snippets/GameObjects/CustomSpawnExample.cs' Name:'use-existing-prefab' }}}
 
 **Spawn on Server**
-```cs
-int coinHash = "MyCoin".GetStableHashCode();
-
-// spawn a coin - SpawnCoin is called on client
-// pass in coinHash so that it is set on the Identity before it is sent to client
-NetworkServer.Spawn(gameObject, coinHash);
-```
+{{{ Path:'Snippets/GameObjects/CustomSpawnExample.cs' Name:'spawn-on-server' }}}
 
 The spawn functions themselves are implemented with the delegate signature. Here is the coin spawner. The `SpawnCoin` would look the same, but have different spawn logic:
 
-``` cs
-public NetworkIdentity SpawnCoin(SpawnMessage msg)
-{
-    return Instantiate(m_CoinPrefab, msg.position, msg.rotation);
-}
-public void UnSpawnCoin(NetworkIdentity spawned)
-{
-    Destroy(spawned);
-}
-```
+{{{ Path:'Snippets/GameObjects/CustomSpawnExample.cs' Name:'spawn-coin-methods' }}}
 
 When using custom spawn functions, it is sometimes useful to be able to unspawn game objects without destroying them. This can be done by calling `NetworkServer.Destroy(identity, destroyServerObject: false)`, making sure that the 2nd argument is false. This causes the object to be `Reset` on the server and sends a `ObjectDestroyMessage` to clients. The `ObjectDestroyMessage` will cause the custom unspawn function to be called on the clients. If there is no unspawn function the object will instead be `Destroy`
 
@@ -80,24 +45,7 @@ you can use custom spawn handlers in order set up object pooling so you dont nee
 
 A full guide on pooling can be found here: [Spawn Object Pooling](./spawn-object-pooling)
 
-```cs
-void ClientConnected() 
-{
-    clientObjectManager.RegisterPrefab(prefab, PoolSpawnHandler, PoolUnspawnHandler);
-}
-
-// used by clientObjectManager.RegisterPrefab
-NetworkIdentity PoolSpawnHandler(SpawnMessage msg)
-{
-    return GetFromPool(msg.position, msg.rotation);
-}
-
-// used by clientObjectManager.RegisterPrefab
-void PoolUnspawnHandler(NetworkIdentity spawned)
-{
-    PutBackInPool(spawned);
-}
-```
+{{{ Path:'Snippets/GameObjects/CustomSpawnExample.cs' Name:'pool-spawn-handlers' }}}
 
 ## Dynamic spawning 
 
@@ -107,4 +55,26 @@ Below is an example where client pre-spawns objects while loading, and then netw
 
 Dynamic Handler avoid the need to add 1 spawn handler for each prefab hash. Instead you can just add a single dynamic handler that can then be used to find and return objects.
 
-{{{ Path:'Snippets/DynamicSpawning.cs' Name:'dynamic-spawning' }}}
+{{{ Path:'Snippets/Spawning/DynamicSpawning.cs' Name:'dynamic-spawning' }}}
+
+## Custom Spawn Values & Floating Origin (`ISpawnValuesHandler`)
+
+By default, when an object is spawned, `ServerObjectManager` inspects the object's `NetworkSpawnSettings` to create a `SpawnValues` struct containing the object's `transform.localPosition`, `localRotation`, `localScale`, `name`, and active state.
+
+You can customize this behavior by implementing `ISpawnValuesHandler` and assigning it to `ServerObjectManager.SpawnValuesHandler` and `ClientObjectManager.SpawnValuesHandler`.
+
+### Floating Origin & Global Coordinates
+
+In large worlds or space games that use a **floating origin** (or sector system) to prevent floating-point precision jitter, objects in Unity space are positioned relative to a shifting local origin.
+
+Using `ISpawnValuesHandler`:
+- **Server-Side (`CreateSpawnValues`)**: Converts the local Unity position to global/world space coordinates before transmitting the `SpawnMessage` over the network.
+- **Client-Side (`GetPrefabPosition` / `ApplySpawnValues`)**: Receives the global coordinates and transforms them back into the client's current local floating origin space for prefab instantiation and applying spawn values.
+
+### Example
+
+{{{ Path:'Snippets/Spawning/SpawnValuesHandlerSnippets.cs' Name:'floating-origin-spawn-values-handler' }}}
+
+Attach and assign the handler in your setup script:
+
+{{{ Path:'Snippets/Spawning/SpawnValuesHandlerSnippets.cs' Name:'assign-spawn-values-handler' }}}

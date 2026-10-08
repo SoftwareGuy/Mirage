@@ -1,4 +1,5 @@
 using System;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mirage.SocketLayer
@@ -8,16 +9,28 @@ namespace Mirage.SocketLayer
     /// </summary>
     internal sealed class ReliableConnection : Connection, IRawConnection, IDisposable
     {
+        private static readonly ProfilerMarker handleFragmentedMarker = new ProfilerMarker("Mirage.SocketLayer.ReliableConnection.HandleFragmentedMessage");
+        private static readonly ProfilerMarker sendNotifyMarker = new ProfilerMarker("Mirage.SocketLayer.ReliableConnection.SendNotify");
+        private static readonly ProfilerMarker sendReliableMarker = new ProfilerMarker("Mirage.SocketLayer.ReliableConnection.SendReliable");
+        private static readonly ProfilerMarker sendUnreliableMarker = new ProfilerMarker("Mirage.SocketLayer.ReliableConnection.SendUnreliable");
+
         private readonly AckSystem _ackSystem;
         private readonly Batch _unreliableBatch;
         private readonly Pool<ByteBuffer> _bufferPool;
 
-        internal ReliableConnection(Peer peer, IEndPoint endPoint, IDataHandler dataHandler, Config config, int maxPacketSize, Time time, Pool<ByteBuffer> bufferPool, ILogger logger, Metrics metrics)
-            : base(peer, endPoint, dataHandler, config, maxPacketSize, time, logger, metrics)
+        internal RingBuffer<AckSystem.AckablePacket> AckablePackets => _ackSystem.SentAckablePackets;
+        internal RingBuffer<AckSystem.ReliableReceived> ReliableReceive => _ackSystem.ReliableReceive;
+
+        internal ReliableConnection(Peer peer, IConnectionHandle handle, IDataHandler dataHandler, Config config, int maxPacketSize, Time time, Pool<ByteBuffer> bufferPool,
+            Pool<AckSystem.ReliablePacket> reliablePool, RingBuffer<AckSystem.AckablePacket> ackablePacket, RingBuffer<AckSystem.ReliableReceived> reliableReceive,
+            ILogger logger, Metrics metrics)
+            : base(peer, handle, dataHandler, config, maxPacketSize, time, logger, metrics)
         {
             _bufferPool = bufferPool;
             _unreliableBatch = new ArrayBatch(_maxPacketSize, SendBatchInternal, PacketType.Unreliable);
-            _ackSystem = new AckSystem(this, config, maxPacketSize, time, bufferPool, logger, metrics);
+            _ackSystem = new AckSystem(this, config, maxPacketSize, time, bufferPool,
+                reliablePool, ackablePacket, reliableReceive,
+                () => DisconnectInternal(DisconnectReason.InvalidPacket), logger, metrics);
         }
 
         private void SendBatchInternal(byte[] batch, int length)
@@ -40,6 +53,8 @@ namespace Mirage.SocketLayer
         /// </summary>
         public override INotifyToken SendNotify(byte[] packet, int offset, int length)
         {
+            using var _ = sendNotifyMarker.Auto();
+
             ThrowIfNotConnectedOrConnecting();
             var token = _ackSystem.SendNotify(packet, offset, length);
             _metrics?.OnSendMessageNotify(length);
@@ -51,6 +66,8 @@ namespace Mirage.SocketLayer
         /// </summary>
         public override void SendNotify(byte[] packet, int offset, int length, INotifyCallBack callBacks)
         {
+            using var _ = sendNotifyMarker.Auto();
+
             ThrowIfNotConnectedOrConnecting();
             _ackSystem.SendNotify(packet, offset, length, callBacks);
             _metrics?.OnSendMessageNotify(length);
@@ -62,6 +79,8 @@ namespace Mirage.SocketLayer
         /// <param name="message"></param>
         public override void SendReliable(byte[] message, int offset, int length)
         {
+            using var _ = sendReliableMarker.Auto();
+
             ThrowIfNotConnectedOrConnecting();
             _ackSystem.SendReliable(message, offset, length);
             _metrics?.OnSendMessageReliable(length);
@@ -69,11 +88,14 @@ namespace Mirage.SocketLayer
 
         public override void SendUnreliable(byte[] packet, int offset, int length)
         {
+            using var _ = sendUnreliableMarker.Auto();
+
             ThrowIfNotConnectedOrConnecting();
 
-            if (length + 1 > _maxPacketSize)
+            const int batchHeader = 1 + Batch.MESSAGE_LENGTH_SIZE;
+            if (length + batchHeader > _maxPacketSize)
             {
-                throw new MessageSizeException($"Message is bigger than MTU, size:{length} but max Unreliable message size is {_maxPacketSize - 1}");
+                throw new MessageSizeException($"Message is bigger than MTU, size:{length} but max Unreliable message size is {_maxPacketSize - batchHeader}");
             }
 
             _unreliableBatch.AddMessage(packet, offset, length);
@@ -82,25 +104,33 @@ namespace Mirage.SocketLayer
 
         internal override void ReceiveUnreliablePacket(Packet packet)
         {
-            HandleReliableBatched(packet.Buffer.array, 1, packet.Length, PacketType.Unreliable);
+            HandleReliableBatched(packet.Span[1..], PacketType.Unreliable);
         }
 
         internal override void ReceiveReliablePacket(Packet packet)
         {
-            _ackSystem.ReceiveReliable(packet.Buffer.array, packet.Length, false);
+            _ackSystem.ReceiveReliable(packet.Span, false);
 
             HandleQueuedMessages();
         }
 
         internal override void ReceiveReliableFragment(Packet packet)
         {
-            if (_ackSystem.InvalidFragment(packet.Buffer.array))
+            if (_ackSystem.InvalidFragment(packet.Span))
             {
-                Disconnect(DisconnectReason.InvalidPacket);
+                if (_logger.Enabled(LogType.Error))
+                {
+                    if (_peer._fragmentBuffer == null)
+                        _logger.Log(LogType.Error, "Received fragmented message but fragmentation is disabled (MaxReliableFragments is 0 or less).");
+                    else
+                        _logger.Log(LogType.Error, "Received invalid fragment. Disconnecting.");
+                }
+
+                DisconnectInternal(DisconnectReason.InvalidPacket);
                 return;
             }
 
-            _ackSystem.ReceiveReliable(packet.Buffer.array, packet.Length, true);
+            _ackSystem.ReceiveReliable(packet.Span, true);
 
             HandleQueuedMessages();
         }
@@ -123,38 +153,114 @@ namespace Mirage.SocketLayer
 
         private void HandleFragmentedMessage(AckSystem.ReliableReceived received)
         {
+            using var _ = handleFragmentedMarker.Auto();
+
             // get index from first
             var firstArray = received.Buffer.array;
             // length +1 because zero indexed 
             var fragmentLength = firstArray[0] + 1;
+            var requiredSize = fragmentLength * _ackSystem.SizePerFragment;
 
-            // todo find way to remove allocation? (can't use buffers because they will be too small for this bigger message)
-            var message = new byte[fragmentLength * _ackSystem.SizePerFragment];
-
-            // copy first
-            var copyLength = received.Length - 1;
-            _logger?.Assert(copyLength == _ackSystem.SizePerFragment, "First should be max size");
-            Buffer.BlockCopy(firstArray, 1, message, 0, copyLength);
-            received.Buffer.Release();
-
-            var messageLength = copyLength;
-            // start at 1 because first copied above
-            for (var i = 1; i < fragmentLength; i++)
+            // AckSystem.InvalidFragment should have already caught this, 
+            // but we check again here as a safety measure before using the shared buffer.
+            if (requiredSize > _peer._fragmentBuffer?.Length)
             {
-                var next = _ackSystem.GetNextFragment();
-                var nextArray = next.Buffer.array;
+                if (_logger.Enabled(LogType.Error))
+                    _logger.Log(LogType.Error, $"Fragment buffer size ({_peer._fragmentBuffer?.Length ?? 0}) is less than required size ({requiredSize}). This should have been caught by InvalidFragment check.");
 
-                _logger?.Assert(i == (fragmentLength - 1 - nextArray[0]), "fragment index should decrement each time");
-
-                // +1 because first is copied above
-                copyLength = next.Length - 1;
-                Buffer.BlockCopy(nextArray, 1, message, _ackSystem.SizePerFragment * i, copyLength);
-                messageLength += copyLength;
-                next.Buffer.Release();
+                CleanupAndDisconnect(received, nextIndex: 1);
+                return;
             }
 
-            _metrics?.OnReceiveMessageReliable(messageLength);
-            _dataHandler.ReceiveMessage(this, new ArraySegment<byte>(message, 0, messageLength));
+            // If fragmentation is disabled, we shouldn't have received this message
+            // Note: we have checks for this earlier, but also check here to be safe
+            if (_peer._fragmentBuffer == null)
+            {
+                if (_logger.Enabled(LogType.Error))
+                    _logger.Log(LogType.Error, "Received fragmented message but fragmentation is disabled (MaxReliableFragments is 0 or less).");
+                CleanupAndDisconnect(received, nextIndex: 1);
+                return;
+            }
+
+            byte[] message;
+            bool usedShared;
+            // Use shared buffer, 
+            // if it is in use (it shouldn't be), then fallback to creating new buffer
+            // Note: since this is single threaded and `_dataHandler.ReceiveMessage` should NOT hold onto array, 
+            //       we can just reuse the same buffer without issue
+            if (_peer._fragmentBufferInUse)
+            {
+                if (_logger.Enabled(LogType.Error))
+                    _logger.Log(LogType.Error, "Fragment buffer already in use, falling back to allocation. This should only happen during recursion.");
+                message = new byte[requiredSize];
+                usedShared = false;
+            }
+            else
+            {
+                _peer._fragmentBufferInUse = true;
+                usedShared = true;
+                message = _peer._fragmentBuffer;
+            }
+
+            try
+            {
+                // copy first
+                var copyLength = received.Length - 1;
+                if (copyLength > _ackSystem.SizePerFragment)
+                {
+                    if (_logger.Enabled(LogType.Error)) _logger.Error($"First fragment length ({copyLength}) exceeds SizePerFragment ({_ackSystem.SizePerFragment})");
+                    CleanupAndDisconnect(received, nextIndex: 1);
+                    return;
+                }
+                _logger?.Assert(copyLength == _ackSystem.SizePerFragment, "First should be max size");
+                Buffer.BlockCopy(firstArray, 1, message, 0, copyLength);
+                received.Buffer.Release();
+
+                var messageLength = copyLength;
+                // start at 1 because first copied above
+                for (var i = 1; i < fragmentLength; i++)
+                {
+                    var next = _ackSystem.GetNextFragment();
+                    var nextArray = next.Buffer.array;
+
+                    // NOTE: only the index of the first fragment is used by code,
+                    // so we only need to check the length here in debug builds to catch bugs during testing
+                    // Malicious actors can already modify the packet data, changing the fragment index doesn't break anything extra
+                    _logger?.Assert(i == (fragmentLength - 1 - nextArray[0]), "fragment index should decrement each time");
+
+                    // +1 because first is copied above
+                    copyLength = next.Length - 1;
+                    if (copyLength > _ackSystem.SizePerFragment)
+                    {
+                        if (_logger.Enabled(LogType.Error)) _logger.Error($"Fragment length ({copyLength}) exceeds SizePerFragment ({_ackSystem.SizePerFragment})");
+                        CleanupAndDisconnect(next, nextIndex: i + 1);
+                        return;
+                    }
+                    Buffer.BlockCopy(nextArray, 1, message, _ackSystem.SizePerFragment * i, copyLength);
+                    messageLength += copyLength;
+                    next.Buffer.Release();
+                }
+
+                _metrics?.OnReceiveMessageReliable(messageLength);
+                _dataHandler.ReceiveMessage(this, new ArraySegment<byte>(message, 0, messageLength));
+            }
+            finally
+            {
+                if (usedShared)
+                    _peer._fragmentBufferInUse = false;
+            }
+
+            // **Local cleanup function**
+            void CleanupAndDisconnect(AckSystem.ReliableReceived current, int nextIndex)
+            {
+                current.Buffer.Release();
+                for (var j = nextIndex; j < fragmentLength; j++)
+                {
+                    var leftover = _ackSystem.GetNextFragment();
+                    leftover.Buffer.Release();
+                }
+                DisconnectInternal(DisconnectReason.InvalidPacket);
+            }
         }
 
         private void HandleBatchedMessageInPacket(AckSystem.ReliableReceived received)
@@ -170,17 +276,27 @@ namespace Mirage.SocketLayer
 
         internal override void ReceiveNotifyPacket(Packet packet)
         {
-            var segment = _ackSystem.ReceiveNotify(packet.Buffer.array, packet.Length);
-            if (segment != default)
+            var span = _ackSystem.ReceiveNotify(packet.Span);
+            if (span.Length != 0)
             {
                 _metrics?.OnReceiveMessageNotify(packet.Length);
-                _dataHandler.ReceiveMessage(this, segment);
+                using (var buffer = _bufferPool.Take())
+                {
+                    if (span.Length > buffer.array.Length)
+                    {
+                        _logger.Error("Received a packet that is larger than buffer pool");
+                        return;
+                    }
+
+                    span.CopyTo(buffer.array);
+                    _dataHandler.ReceiveMessage(this, new ArraySegment<byte>(buffer.array, 0, span.Length));
+                }
             }
         }
 
         internal override void ReceiveNotifyAck(Packet packet)
         {
-            _ackSystem.ReceiveAck(packet.Buffer.array);
+            _ackSystem.ReceiveAck(packet.Span);
         }
 
         public override void FlushBatch()

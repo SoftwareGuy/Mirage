@@ -1,22 +1,25 @@
 using System;
 using Mirage.SocketLayer.ConnectionTrackers;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mirage.SocketLayer
 {
-    internal abstract class Connection : IConnection
+    internal abstract class Connection : IConnection, ISocketLayerConnection
     {
+        private static readonly ProfilerMarker handleReliableBatchedMarker = new ProfilerMarker("Mirage.SocketLayer.Connection.HandleReliableBatched");
+
         protected readonly ILogger _logger;
         protected readonly int _maxPacketSize;
         protected readonly Peer _peer;
         protected readonly IDataHandler _dataHandler;
 
-        public readonly IEndPoint EndPoint;
+        public readonly IConnectionHandle Handle;
 
         protected readonly ConnectingTracker _connectingTracker;
         protected readonly TimeoutTracker _timeoutTracker;
         protected readonly KeepAliveTracker _keepAliveTracker;
-        protected readonly DisconnectedTracker _disconnectedTracker;
+        protected internal readonly DisconnectedTracker _disconnectedTracker;
 
         protected readonly Metrics _metrics;
 
@@ -46,22 +49,22 @@ namespace Mirage.SocketLayer
                         break;
                 }
 
-                if (_logger.Enabled(LogType.Log)) _logger.Log($"{EndPoint} changed state from {_state} to {value}");
+                if (_logger.Enabled(LogType.Log)) _logger.Log($"{Handle} changed state from {_state} to {value}");
                 _state = value;
             }
         }
 
-        IEndPoint IConnection.EndPoint => EndPoint;
+        IConnectionHandle IConnection.Handle => Handle;
 
         public bool Connected => State == ConnectionState.Connected;
 
-        protected Connection(Peer peer, IEndPoint endPoint, IDataHandler dataHandler, Config config, int maxPacketSize, Time time, ILogger logger, Metrics metrics)
+        protected Connection(Peer peer, IConnectionHandle handle, IDataHandler dataHandler, Config config, int maxPacketSize, Time time, ILogger logger, Metrics metrics)
         {
             _peer = peer;
             _logger = logger;
             _maxPacketSize = maxPacketSize;
 
-            EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
+            Handle = handle ?? throw new ArgumentNullException(nameof(handle));
             _dataHandler = dataHandler ?? throw new ArgumentNullException(nameof(dataHandler));
             State = ConnectionState.Created;
 
@@ -75,7 +78,7 @@ namespace Mirage.SocketLayer
 
         public override string ToString()
         {
-            return $"[{EndPoint}]";
+            return $"[{Handle}]";
         }
 
         /// <summary>
@@ -122,25 +125,37 @@ namespace Mirage.SocketLayer
         /// </summary>
         public void Disconnect()
         {
-            Disconnect(DisconnectReason.RequestedByLocalPeer);
+            DisconnectInternal(DisconnectReason.RequestedByLocalPeer);
         }
-        internal void Disconnect(DisconnectReason reason, bool sendToOther = true)
+        /// <summary>
+        /// starts disconnecting this connection
+        /// </summary>
+        public void Disconnect(DisconnectReason reason)
         {
-            if (_logger.Enabled(LogType.Log)) _logger.Log($"Disconnect with reason: {reason}");
+            DisconnectInternal(reason);
+        }
+        internal void DisconnectInternal(DisconnectReason reason, bool sendToOther = true)
+        {
             switch (State)
             {
+                // ignore if already disconnected
+                default:
+                case ConnectionState.Disconnected:
+                case ConnectionState.Removing:
+                case ConnectionState.Destroyed:
+                    return;
+
+
                 case ConnectionState.Connecting:
+                    if (_logger.Enabled(LogType.Log)) _logger.Log($"Disconnect while connecting, with reason: {reason}");
                     _peer.FailedToConnect(this, RejectReason.ClosedByPeer);
-                    break;
+                    return;
+
 
                 case ConnectionState.Connected:
-                    State = ConnectionState.Disconnected;
-                    _disconnectedTracker.OnDisconnect();
-                    _peer.OnConnectionDisconnected(this, reason, sendToOther);
-                    break;
-
-                default:
-                    break;
+                    if (_logger.Enabled(LogType.Log)) _logger.Log($"Disconnect with reason: {reason}");
+                    _peer.FinishDisconnect(this, reason, sendToOther);
+                    return;
             }
         }
 
@@ -181,10 +196,20 @@ namespace Mirage.SocketLayer
         {
             if (_timeoutTracker.TimeToDisconnect())
             {
-                Disconnect(DisconnectReason.Timeout);
+                DisconnectInternal(DisconnectReason.Timeout);
+                return;
             }
 
-            FlushBatch();
+            try
+            {
+                FlushBatch();
+            }
+            catch (BufferFullException e)
+            {
+                _logger?.LogException(e);
+                DisconnectInternal(DisconnectReason.SendBufferFull);
+                return;
+            }
 
             if (_keepAliveTracker.TimeToSend())
             {
@@ -205,11 +230,48 @@ namespace Mirage.SocketLayer
         internal abstract void ReceiveNotifyAck(Packet packet);
         internal abstract void ReceiveReliableFragment(Packet packet);
 
+        protected void HandleReliableBatched(ReadOnlySpan<byte> span, PacketType packetType)
+        {
+            using var buffer = _peer._bufferPool.Take();
+            if (span.Length > buffer.array.Length)
+            {
+                _logger.Error("Received a packet that is larger than buffer pool");
+                return;
+            }
+            span.CopyTo(buffer.array);
+            HandleReliableBatched(buffer.array, 0, span.Length, packetType);
+        }
         protected void HandleReliableBatched(byte[] array, int offset, int packetLength, PacketType packetType)
         {
+            using var _ = handleReliableBatchedMarker.Auto();
+
             while (offset < packetLength)
             {
+                // Check if connection is still valid before processing next message
+                if (State != ConnectionState.Connected)
+                {
+                    if (_logger.Enabled(LogType.Warning)) _logger.Warn("Connection not connected, stopping message processing");
+                    return;
+                }
+
+                // check if enough bytes are left to read length
+                if (offset + 2 > packetLength)
+                {
+                    if (_logger.Enabled(LogType.Error)) _logger.Error($"Not enough bytes left to read message length. offset:{offset} packetLength:{packetLength}");
+                    DisconnectInternal(DisconnectReason.InvalidPacket);
+                    return;
+                }
+
                 var length = ByteUtils.ReadUShort(array, ref offset);
+
+                // check if length is valid
+                if (offset + length > packetLength)
+                {
+                    if (_logger.Enabled(LogType.Error)) _logger.Error($"Batched message length ({length}) exceeds packet length ({packetLength})");
+                    DisconnectInternal(DisconnectReason.InvalidPacket);
+                    return;
+                }
+
                 var message = new ArraySegment<byte>(array, offset, length);
                 offset += length;
 

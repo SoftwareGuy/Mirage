@@ -5,6 +5,7 @@ using Mirage.Events;
 using Mirage.Logging;
 using Mirage.Serialization;
 using Mirage.SocketLayer;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mirage
@@ -28,6 +29,13 @@ namespace Mirage
     {
         private static readonly ILogger logger = LogFactory.GetLogger(typeof(NetworkClient));
 
+        private static readonly ProfilerMarker startedInvokeMarker = new ProfilerMarker("Mirage.NetworkClient.Started.Invoke");
+        private static readonly ProfilerMarker connectedInvokeMarker = new ProfilerMarker("Mirage.NetworkClient.Connected.Invoke");
+        private static readonly ProfilerMarker authenticatedInvokeMarker = new ProfilerMarker("Mirage.NetworkClient.Authenticated.Invoke");
+        private static readonly ProfilerMarker disconnectedInvokeMarker = new ProfilerMarker("Mirage.NetworkClient.Disconnected.Invoke");
+        private static readonly ProfilerMarker updateReceiveMarker = new ProfilerMarker("Mirage.NetworkClient.UpdateReceive");
+        private static readonly ProfilerMarker updateSentMarker = new ProfilerMarker("Mirage.NetworkClient.UpdateSent");
+
         public bool EnablePeerMetrics;
         [Tooltip("Sequence size of buffer in bits.\n10 => array size 1024 => ~17 seconds at 60hz")]
         public int MetricsSize = 10;
@@ -39,13 +47,16 @@ namespace Mirage
         /// </summary>
         public Config PeerConfig { get; set; }
 
+        [Tooltip("Config profile to use if PeerConfig is null.")]
+        public PeerConfigProfile PeerConfigProfile = PeerConfigProfile.RawUdp;
+
         [Tooltip("Creates Socket for Peer to use")]
         public SocketFactory SocketFactory;
 
         public ClientObjectManager ObjectManager;
 
         public bool DisconnectOnException = true;
-        [Tooltip("Should the message handler rethrow the exception after logging. This should only be used when deubgging as it may stop other Mirage functions from running after messages handling")]
+        [Tooltip("Should the message handler rethrow the exception after logging. This should only be used when debugging as it may stop other Mirage functions from running after messages handling")]
         public bool RethrowException = false;
 
         [Tooltip("If true will set Application.runInBackground")]
@@ -103,7 +114,6 @@ namespace Mirage
 
         public NetworkWorld World { get; private set; }
         public SyncVarSender SyncVarSender { get; private set; }
-        private SyncVarReceiver _syncVarReceiver;
         public MessageHandler MessageHandler { get; private set; }
 
         /// <summary>
@@ -136,7 +146,6 @@ namespace Mirage
 
             World = new NetworkWorld();
             SyncVarSender = new SyncVarSender();
-            _syncVarReceiver = new SyncVarReceiver(this, World);
 
             var endPoint = SocketFactory.GetConnectEndPoint(address, port);
             if (logger.LogEnabled()) logger.Log($"Client connecting to endpoint: {endPoint}");
@@ -145,9 +154,10 @@ namespace Mirage
             var maxPacketSize = SocketFactory.MaxPacketSize;
             MessageHandler = new MessageHandler(World, DisconnectOnException, RethrowException);
             var dataHandler = new DataHandler(this, MessageHandler);
+
             Metrics = EnablePeerMetrics ? new Metrics(MetricsSize) : null;
 
-            var config = PeerConfig ?? new Config();
+            var config = PeerConfig ?? Config.Create(PeerConfigProfile);
 
             NetworkWriterPool.Configure(maxPacketSize);
 
@@ -162,7 +172,7 @@ namespace Mirage
                 Application.runInBackground = RunInBackground;
 
             // setup all the handlers
-            Player = new NetworkPlayer(connection, false);
+            Player = new NetworkPlayer(connection, false, null, null);
             dataHandler.SetConnection(connection, Player);
 
             RegisterMessageHandlers();
@@ -172,7 +182,8 @@ namespace Mirage
             // invoke started event after everything is set up, but before peer has connected
             if (ObjectManager != null)
                 ObjectManager.ClientStarted(this);
-            _started.Invoke();
+            using (startedInvokeMarker.Auto())
+                _started.Invoke();
         }
 
         private void ThrowIfActive()
@@ -194,29 +205,33 @@ namespace Mirage
                 World.Time.PingNow(this);
 
             _connectState = ConnectState.Connected;
-            _connected.Invoke(Player);
+            using (connectedInvokeMarker.Auto())
+                _connected.Invoke(Player);
         }
 
         private void Peer_OnConnectionFailed(IConnection conn, RejectReason reason)
         {
-            if (logger.WarnEnabled()) logger.LogWarning($"Failed to connect to {conn.EndPoint} with reason {reason}");
+            if (logger.WarnEnabled()) logger.LogWarning($"Failed to connect to {conn.Handle} with reason {reason}");
             Player?.MarkAsDisconnected();
-            _disconnected?.Invoke(reason.ToClientStoppedReason());
+            using (disconnectedInvokeMarker.Auto())
+                _disconnected?.Invoke(reason.ToClientStoppedReason());
             Cleanup();
         }
 
         private void Peer_OnDisconnected(IConnection conn, DisconnectReason reason)
         {
-            if (logger.LogEnabled()) logger.Log($"Disconnected from {conn.EndPoint} with reason {reason}");
+            if (logger.LogEnabled()) logger.Log($"Disconnected from {conn.Handle} with reason {reason}");
             Player?.MarkAsDisconnected();
-            _disconnected?.Invoke(reason.ToClientStoppedReason());
+            using (disconnectedInvokeMarker.Auto())
+                _disconnected?.Invoke(reason.ToClientStoppedReason());
             Cleanup();
         }
 
         private void OnHostDisconnected()
         {
             Player?.MarkAsDisconnected();
-            _disconnected?.Invoke(ClientStoppedReason.HostModeStopped);
+            using (disconnectedInvokeMarker.Auto())
+                _disconnected?.Invoke(ClientStoppedReason.HostModeStopped);
         }
 
         internal void ConnectHost(NetworkServer server, IDataHandler serverDataHandler)
@@ -236,13 +251,14 @@ namespace Mirage
 
             // set up client before connecting to server, server could invoke handlers
             IsHost = true;
-            Player = new NetworkPlayer(clientConn, true);
+            Player = new NetworkPlayer(clientConn, true, null, null);
             dataHandler.SetConnection(clientConn, Player);
 
             // invoke started event after everything is set up, but before peer has connected
             if (ObjectManager != null)
                 ObjectManager.ClientStarted(this);
-            _started.Invoke();
+            using (startedInvokeMarker.Auto())
+                _started.Invoke();
 
             // we need add server connection to server's dictionary first
             // then invoke connected event on client (client has to connect first or it will miss message in NetworkScenemanager)
@@ -289,7 +305,8 @@ namespace Mirage
             }
 
             Player.SetAuthentication(new PlayerAuthentication(authenticator, null));
-            _authenticated.Invoke(Player);
+            using (authenticatedInvokeMarker.Auto())
+                _authenticated.Invoke(Player);
         }
 
 
@@ -373,9 +390,17 @@ namespace Mirage
             UpdateSent();
         }
 
-        public void UpdateReceive() => _peer?.UpdateReceive();
+        public void UpdateReceive()
+        {
+            using var _ = updateReceiveMarker.Auto();
+
+            _peer?.UpdateReceive();
+        }
+
         public void UpdateSent()
         {
+            using var _ = updateSentMarker.Auto();
+
             SyncVarSender?.Update();
             _peer?.UpdateSent();
         }
@@ -415,7 +440,6 @@ namespace Mirage
             // Clear references to help GC collect
             World = null;
             SyncVarSender = null;
-            _syncVarReceiver = null;
             MessageHandler = null;
             Metrics = null;
         }
@@ -449,11 +473,27 @@ namespace Mirage
             {
                 if (!_client.Active)
                 {
-                    if (logger.WarnEnabled()) logger.LogWarning("Received message after disconnect");
+                    if (logger.WarnEnabled()) logger.LogWarning("Received message after client stopped");
                     return;
                 }
+
+                if (connection.State != ConnectionState.Connected)
+                {
+                    if (logger.WarnEnabled()) logger.LogWarning($"Received message but connection is not connected");
+                    return;
+                }
+
                 logger.Assert(_connection == connection);
-                _messageHandler.HandleMessage(_player, message);
+
+                // safety try/catch so that SocketLayer is not effected
+                try
+                {
+                    _messageHandler.HandleMessage(_player, message);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
         }
     }

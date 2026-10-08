@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 
 namespace Mirage.SocketLayer.Tests.AckSystemTests
@@ -25,14 +26,14 @@ namespace Mirage.SocketLayer.Tests.AckSystemTests
 
             var sender = new AckTestInstance();
             sender.connection = new SubIRawConnection();
-            sender.ackSystem = new AckSystem(sender.connection, config, MAX_PACKET_SIZE, new Time(), bufferPool);
+            sender.ackSystem = CreateAckSystem(sender.connection, config, new Time(), null);
             sender.ackSystem.SendReliable(message);
             packet1 = sender.packet(0);
             packet2 = sender.packet(1);
 
 
             var connection = new SubIRawConnection();
-            ackSystem = new AckSystem(connection, config, MAX_PACKET_SIZE, new Time(), bufferPool);
+            ackSystem = CreateAckSystem(connection, config, new Time(), null);
         }
 
         private byte[] CreateBigData(int id, int size)
@@ -74,11 +75,11 @@ namespace Mirage.SocketLayer.Tests.AckSystemTests
         [Test]
         public void MessageShouldBeInQueueAfterReceive()
         {
-            ackSystem.ReceiveReliable(packet1, packet1.Length, true);
+            ackSystem.ReceiveReliable(packet1.AsSpan(), true);
 
             Assert.IsFalse(ackSystem.NextReliablePacket(out var _));
 
-            ackSystem.ReceiveReliable(packet2, packet2.Length, true);
+            ackSystem.ReceiveReliable(packet2.AsSpan(), true);
 
             var bytesIn1 = MAX_PACKET_SIZE - AckSystem.MIN_RELIABLE_FRAGMENT_HEADER_SIZE;
             var bytesIn2 = message.Length - bytesIn1;

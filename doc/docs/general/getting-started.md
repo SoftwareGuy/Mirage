@@ -72,55 +72,11 @@ If you require a camera to run on player prefab subscribe to `Identity.OnStartLo
 
 For example, if client authority has been checked and you trust clients. Never trust clients though.
 
-```cs
-using UnityEngine;
-using Mirage;
-
-public class Controls : NetworkBehaviour
-{
-    void Update()
-    {
-        if (!IsLocalPlayer)
-        {
-            // exit from update if this is not the local player
-            return;
-        }
-
-        // handle player input for movement
-    }
-}
-```
+{{{ Path:'Snippets/General/GettingStartedSnippets.cs' Name:'getting-started-client-authority' }}}
 
 For example, if server authority is going to be used.
 
-```cs
-using UnityEngine;
-using Mirage;
-
-public class Controls : NetworkBehaviour
-{
-    void Update()
-    {
-        if (!IsLocalPlayer)
-        {
-            // exit from update if this is not the local player
-            return;
-        }
-
-        // handle player input for movement
-
-       // You would call this command after handling input or you can send inputs directly to
-       // server and let server buffer inputs up and do movements based on the buffered inputs.
-       MovePlayer();
-    }
-
-    [ServerRpc]
-    void MovePlayer()
-    {
-        // We are now firing off some kind of movement all done by server.
-    }
-}
-```
+{{{ Path:'Snippets/General/GettingStartedSnippets.cs' Name:'getting-started-server-authority' }}}
 
 ## Basic Player Game State
 -   Make scripts that contain important data into NetworkBehaviours instead of MonoBehaviours
@@ -150,3 +106,10 @@ Fix non-player prefabs such as enemies:
 ## Spawn positions for players
 -   Add a new game object and place it at the player's start location
 -   Add this GameObject to the `CharacterSpawner`'s `Positions` list.
+
+## AI Coding Assistants
+
+If you use AI coding assistants (such as Gemini CLI, Cursor, Claude Code, GitHub Copilot, or Codex) while developing with Mirage, you can provide your agent with our [Agent Skill & Cheat Sheet](skill.md) or point it directly to:
+- **Skill Cheat Sheet**: `https://miragenet.github.io/Mirage/skill.md`
+- **Documentation Index**: `https://miragenet.github.io/Mirage/llms.txt`
+

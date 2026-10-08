@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Mirage.Logging;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mirage
@@ -19,7 +20,13 @@ namespace Mirage
     /// </summary>
     public class NetworkWorld : IObjectLocator
     {
+        public delegate void UnspawnHandler(uint netId, NetworkIdentity identity);
+
         private static readonly ILogger logger = LogFactory.GetLogger<NetworkWorld>();
+
+        private static readonly ProfilerMarker onSpawnInvokeMarker = new ProfilerMarker("Mirage.NetworkWorld.OnSpawn.Invoke");
+        private static readonly ProfilerMarker onUnspawnInvokeMarker = new ProfilerMarker("Mirage.NetworkWorld.OnUnspawn.Invoke");
+        private static readonly ProfilerMarker onAuthorityChangedInvokeMarker = new ProfilerMarker("Mirage.NetworkWorld.OnAuthorityChanged.Invoke");
 
         /// <summary>
         /// Raised when object is spawned
@@ -28,8 +35,10 @@ namespace Mirage
 
         /// <summary>
         /// Raised when object is unspawned or destroyed
+        /// <para><b>WARNING:</b> onUnspawn might be called after Identity has been destroyed by unity</para>
+        /// <para>NetworkIdentity might be null when this event is called, use the netId argument instead</para>
         /// </summary>
-        public event Action<NetworkIdentity> onUnspawn;
+        public event UnspawnHandler onUnspawn;
 
         /// <summary>
         /// Raised when authority is given or removed from an identity. It is invoked on both server and client
@@ -46,6 +55,30 @@ namespace Mirage
 
         private readonly Dictionary<uint, NetworkIdentity> _spawnedObjects = new Dictionary<uint, NetworkIdentity>();
         public IReadOnlyCollection<NetworkIdentity> SpawnedIdentities => _spawnedObjects.Values;
+
+        private readonly List<NetworkIdentity> _sortedIdentities = new List<NetworkIdentity>();
+        private bool _needsSorting = true;
+
+        /// <summary>
+        /// A list of spawned identities, sorted by netId.
+        /// <para>This list is cached and will only be re-sorted if identities have changed</para>
+        /// </summary>
+        public IReadOnlyList<NetworkIdentity> GetSortedIdentities()
+        {
+            if (_needsSorting)
+            {
+                _needsSorting = false;
+                _sortedIdentities.Clear();
+
+                // increase Capacity first to avoid alloc when adding
+                if (_sortedIdentities.Capacity < _spawnedObjects.Count)
+                    _sortedIdentities.Capacity = _spawnedObjects.Count;
+
+                _sortedIdentities.AddRange(_spawnedObjects.Values);
+                _sortedIdentities.Sort((x, y) => x.NetId.CompareTo(y.NetId));
+            }
+            return _sortedIdentities;
+        }
 
         public bool TryGetIdentity(uint netId, out NetworkIdentity identity)
         {
@@ -69,7 +102,9 @@ namespace Mirage
             // dont use add, netId might already exist but have been destroyed
             // this can happen client side. we check for this case in TryGetValue above
             _spawnedObjects[netId] = identity;
-            onSpawn?.Invoke(identity);
+            _needsSorting = true;
+            using (onSpawnInvokeMarker.Auto())
+                onSpawn?.Invoke(identity);
 
             // owner might be set before World is
             // so we need to invoke authChange now if the object has an owner
@@ -98,8 +133,10 @@ namespace Mirage
             // only invoke event if values was successfully removed
             if (removed)
             {
+                _needsSorting = true;
                 if (logger.LogEnabled()) logger.Log($"Removing [netId={netId}, name={identity?.name}] from World");
-                onUnspawn?.Invoke(identity);
+                using (onUnspawnInvokeMarker.Auto())
+                    onUnspawn?.Invoke(netId, identity);
             }
             else
             {
@@ -107,7 +144,7 @@ namespace Mirage
             }
         }
 
-        internal void RemoveDestroyedObjects()
+        public void RemoveDestroyedObjects()
         {
             if (logger.LogEnabled()) logger.Log($"Removing destroyed objects");
             var removalCollection = new List<NetworkIdentity>(SpawnedIdentities);
@@ -117,7 +154,7 @@ namespace Mirage
                 if (identity == null)
                 {
                     if (logger.LogEnabled()) logger.Log($"Removing destroyed object:[netId={identity.NetId}]");
-                    _spawnedObjects.Remove(identity.NetId);
+                    RemoveIdentity(identity);
                 }
             }
         }
@@ -125,11 +162,13 @@ namespace Mirage
         internal void ClearSpawnedObjects()
         {
             _spawnedObjects.Clear();
+            _needsSorting = true;
         }
 
         internal void InvokeOnAuthorityChanged(NetworkIdentity identity, bool hasAuthority, INetworkPlayer owner)
         {
-            OnAuthorityChanged?.Invoke(identity, hasAuthority, owner);
+            using (onAuthorityChangedInvokeMarker.Auto())
+                OnAuthorityChanged?.Invoke(identity, hasAuthority, owner);
         }
 
         public NetworkWorld()

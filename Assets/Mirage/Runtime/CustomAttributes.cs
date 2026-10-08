@@ -90,6 +90,29 @@ namespace Mirage
         public bool allowServerToCall = false;
     }
 
+    [AttributeUsage(AttributeTargets.Method)]
+    public class RateLimitAttribute : Attribute
+    {
+        public const float DEFAULT_INTERVAL = 1f;
+        public const int DEFAULT_REFILL = 50;
+        public const int DEFAULT_MAX_TOKENS = 200;
+        public const int DEFAULT_PENALTY = 1;
+
+        /// <summary>Seconds</summary>
+        public float Interval = DEFAULT_INTERVAL;
+
+        /// <summary>How many tokens refilled each interval</summary>
+        public int Refill = DEFAULT_REFILL;
+
+        /// <summary>Max number of tokens in bucket. set this number higher than per seconds value to allow bursts of usage</summary>
+        public int MaxTokens = DEFAULT_MAX_TOKENS;
+
+        /// <summary>
+        /// Amount of error cost added to NetworkPlayer's ErrorRateLimit when the player exceeds the allowed rate limit interval.
+        /// </summary>
+        public int Penalty = DEFAULT_PENALTY;
+    }
+
     /// <summary>
     /// Used by ClientRpc to tell mirage who to send remote call to
     /// </summary>
@@ -252,7 +275,7 @@ namespace Mirage
 
     /// <summary>
     /// Makes field readonly in inspector.
-    /// <para>This is useful for fields that are set by code, but are shown iin inpector for debuggiing</para>
+    /// <para>This is useful for fields that are set by code, but are shown in inpector for debuggiing</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
     public sealed class ReadOnlyInspectorAttribute : PropertyAttribute { }
@@ -269,4 +292,20 @@ namespace Mirage
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class ShowSyncSettingsAttribute : Attribute { }
+
+    /// <summary>
+    /// Restricts the serialization and deserialization size of strings, collections (arrays, lists), 
+    /// or any custom type that has read/write overloads accepting an integer limit.
+    /// <para>This will use the Write/Read with length functions and will work on any type that has writers/readers for those.</para>
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field)]
+    public class MaxLengthAttribute : Attribute
+    {
+        public readonly int maxLength;
+
+        public MaxLengthAttribute(int maxLength)
+        {
+            this.maxLength = maxLength;
+        }
+    }
 }

@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using Mirage.Authentication;
 using Mirage.Logging;
+using Mirage.RemoteCalls;
 using Mirage.Serialization;
 using Mirage.SocketLayer;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mirage
@@ -12,29 +14,44 @@ namespace Mirage
     /// A High level network connection. This is used for connections from client-to-server and for connection from server-to-client.
     /// </summary>
     /// <remarks>
-    /// <para>A NetworkConnection corresponds to a specific connection for a host in the transport layer. It has a connectionId that is assigned by the transport layer and passed to the Initialize function.</para>
-    /// <para>A NetworkClient has one NetworkConnection. A NetworkServerSimple manages multiple NetworkConnections. The NetworkServer has multiple "remote" connections and a "local" connection for the local client.</para>
-    /// <para>The NetworkConnection class provides message sending and handling facilities. For sending data over a network, there are methods to send message objects, byte arrays, and NetworkWriter objects. To handle data arriving from the network, handler functions can be registered for message Ids, byte arrays can be processed by HandleBytes(), and NetworkReader object can be processed by HandleReader().</para>
-    /// <para>NetworkConnection objects also act as observers for networked objects. When a connection is an observer of a networked object with a NetworkIdentity, then the object will be visible to corresponding client for the connection, and incremental state changes will be sent to the client.</para>
-    /// <para>There are many virtual functions on NetworkConnection that allow its behaviour to be customized. NetworkClient and NetworkServer can both be made to instantiate custom classes derived from NetworkConnection by setting their networkConnectionClass member variable.</para>
+    /// <para>
+    /// A NetworkClient has one NetworkPlayer.
+    /// A NetworkServer manages multiple NetworkPlayers.
+    /// The NetworkServer has multiple "remote" connections and a "local" connection for the local client.
+    /// </para>
+    /// <para>
+    /// The NetworkPlayer class provides methods to send and handle network messages.
+    /// To send data, you can pass a message object to the <see cref="NetworkPlayer.Send{T}(T, Channel)"/> method, and Mirage will handle the serialization.
+    /// To handle incoming messages, you can register handlers for specific message types using <see cref="MessageHandler"/> found on <see cref="NetworkServer"/> or <see cref="NetworkClient"/>
+    /// </para>
+    /// <para>
+    /// NetworkPlayer objects also act as observers for networked objects.
+    /// When a connection is an observer of a networked object with a NetworkIdentity, then the object will be visible to corresponding client for the connection, and incremental state changes will be sent to the client.
+    /// </para>
     /// </remarks>
     public sealed class NetworkPlayer : INetworkPlayer
     {
         private static readonly ILogger logger = LogFactory.GetLogger(typeof(NetworkPlayer));
+        private static readonly ILogger errorLogger = LogFactory.GetLogger(typeof(PlayerErrorFlags));
+        private static readonly ILogger rateLimitLogger = LogFactory.GetLogger(typeof(RateLimitAttribute));
 
         private readonly HashSet<NetworkIdentity> _visList = new HashSet<NetworkIdentity>();
 
         /// <summary>
         /// Transport level connection
         /// </summary>
-        /// <remarks>
-        /// <para>On a server, this Id is unique for every connection on the server. On a client this Id is local to the client, it is not the same as the Id on the server for this connection.</para>
-        /// <para>Transport layers connections begin at one. So on a client with a single connection to a server, the connectionId of that connection will be one. In NetworkServer, the connectionId of the local connection is zero.</para>
-        /// <para>Clients do not know their connectionId on the server, and do not know the connectionId of other clients on the server.</para>
-        /// </remarks>
         private readonly IConnection _connection;
 
         public bool IsHost { get; }
+
+        private readonly NetworkServer _server;
+        /// <summary>Any flags set from catching errors</summary>
+        public PlayerErrorFlags ErrorFlags { get; private set; }
+        /// <summary>Error rate limiting, will invoke disconnect player (or call <see cref="NetworkServer._errorRateLimitReached"/> if set) when limit is reached</summary>
+        public RateLimitBucket ErrorRateLimit { get; }
+        private bool _invokingErrorRateLimitReached;
+
+        public Dictionary<RpcId, RateLimitBucket> RpcRateLimit;
 
         /// <summary>
         /// Has this player been marked as disconnected
@@ -71,9 +88,22 @@ namespace Mirage
 
         /// <summary>
         /// Flag that tells us if the scene has fully loaded in for player.
-        /// <para>This property is read-only. It is set by the system on the client when the scene has fully loaded, and set by the system on the server when a ready message is received from a client.</para>
-        /// <para>A client that is ready is sent spawned objects by the server and updates to the state of spawned objects. A client that is not ready is not sent spawned objects.</para>
-        /// <para>Starts as true, when a client connects it is assumed that it is already in a ready scene. It will be set to not ready if NetworkSceneManager loads a scene</para>
+        /// <para>
+        /// A client that is ready is sent spawned objects by the server and updates to the state of spawned objects. A client that is not ready is not sent spawned objects.
+        /// </para>
+        /// <para>
+        /// Starts as true, when a client connects it is assumed that it is already in a ready scene.
+        /// </para>
+        /// <para>
+        /// It will be set to not ready when a scene load is started.
+        /// If you are controlling scene loading manually, you need to set this property to true or false before and after loading a scene.
+        /// This is normally done using <see cref="SceneReadyMessage"/> and <see cref="SceneNotReadyMessage"/>
+        /// </para>
+        /// <para>
+        /// On the client, this property is used to keep track of if the local scene is loading or ready.
+        /// On the server, it is used to track if the player's scene is loading or ready.
+        /// When server loads a new scene for everyone, it will normally set this property to false for all players.
+        /// </para>
         /// </summary>
         public bool SceneIsReady { get; set; } = true;
 
@@ -91,7 +121,7 @@ namespace Mirage
         /// Best used to get concrete Endpoint type based on the <see cref="SocketFactory"/> being used
         /// </para>
         /// </summary>
-        public IEndPoint Address => _connection.EndPoint;
+        public IConnectionHandle ConnectionHandle => _connection.Handle;
 
         /// <summary>Connect called on client, but server has not replied yet</summary>
         public bool IsConnecting => _connection.State == ConnectionState.Connecting;
@@ -105,6 +135,13 @@ namespace Mirage
         /// </summary>
         public IReadOnlyCollection<NetworkIdentity> VisList => _visList;
 
+        /// <summary>
+        /// A list of the NetworkIdentity objects owned by this connection. This list is read-only.
+        /// <para>Only valid on server</para>
+        /// <para>This includes the player's character</para>
+        /// <para>This list can be used to validate messages from clients, to ensure that clients are only trying to control objects that they own.</para>
+        /// <para>Objects in the list will also have their <see cref="NetworkIdentity.Owner"/> field set to this NetworkPlayer</para>
+        /// </summary>
         public IReadOnlyCollection<NetworkIdentity> OwnedObjects => _ownedObjects;
 
         /// <summary>
@@ -121,7 +158,24 @@ namespace Mirage
                 return;
 
             _connection.Disconnect();
-            _isDisconnected = true;
+            MarkAsDisconnected();
+        }
+
+        /// <summary>
+        /// Disconnects the player.
+        /// <para>A disconnected player can not send messages</para>
+        /// </summary>
+        /// <remarks>
+        /// This method exists so that users do not need to add reference to SocketLayer asmdef
+        /// </remarks>
+        public void Disconnect(DisconnectReason reason)
+        {
+            // dont need to call disconnect twice, so just return
+            if (_isDisconnected)
+                return;
+
+            _connection.Disconnect(reason);
+            MarkAsDisconnected();
         }
 
         /// <summary>
@@ -131,6 +185,7 @@ namespace Mirage
         public void MarkAsDisconnected()
         {
             _isDisconnected = true;
+            SceneIsReady = false;
         }
 
         /// <summary>
@@ -154,23 +209,26 @@ namespace Mirage
             }
         }
 
-        /// <summary>
-        /// A list of the NetworkIdentity objects owned by this connection. This list is read-only.
-        /// <para>This includes the player object for the connection - if it has localPlayerAuthority set, and any objects spawned with local authority or set with AssignLocalAuthority.</para>
-        /// <para>This list can be used to validate messages from clients, to ensure that clients are only trying to control objects that they own.</para>
-        /// </summary>
-        // IMPORTANT: this needs to be <NetworkIdentity>, not <uint netId>. fixes a bug where DestroyOwnedObjects wouldn't find
-        //            the netId anymore: https://github.com/vis2k/Mirror/issues/1380 . Works fine with NetworkIdentity pointers though.
+        /// <summary>backing field for <see cref="OwnedObjects"/></summary>
         private readonly HashSet<NetworkIdentity> _ownedObjects = new HashSet<NetworkIdentity>();
 
         /// <summary>
-        /// Creates a new NetworkConnection with the specified address and connectionId
+        /// Creates a new NetworkPlayer
         /// </summary>
-        /// <param name="networkConnectionId"></param>
-        public NetworkPlayer(IConnection connection, bool isHost)
+        /// <param name="connection">Transport level connection for this player</param>
+        /// <param name="isHost">True if this player is the host player</param>
+        /// <param name="server">The server that created this player, can be null for client side players</param>
+        public NetworkPlayer(IConnection connection, bool isHost, NetworkServer server, RateLimitBucket.RefillConfig? errorRateLimit)
         {
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
             IsHost = isHost;
+
+            _server = server;
+            if (errorRateLimit != null)
+            {
+                Debug.Assert(_server != null, "Server should be set if using errorRateLimit");
+                ErrorRateLimit = new RateLimitBucket(Time.unscaledTimeAsDouble, errorRateLimit.Value);
+            }
         }
 
         /// <summary>
@@ -179,9 +237,10 @@ namespace Mirage
         /// <typeparam name="T">The message type</typeparam>
         /// <param name="msg">The message to send.</param>
         /// <param name="channelId">The transport layer channel to send on.</param>
-        /// <returns></returns>
         public void Send<T>(T message, Channel channelId = Channel.Reliable)
         {
+            using var _ = MessageIdCache<T>.SendMarker.Auto();
+
             if (_isDisconnected) { return; }
 
             using (var writer = NetworkWriterPool.GetWriter())
@@ -197,7 +256,11 @@ namespace Mirage
 
         /// <summary>
         /// Sends a block of data
-        /// <para>Only use this method if data has message Id already included, otherwise receives wont know how to handle it. Otherwise use <see cref="Send{T}(T, int)"/></para>
+        /// <para>
+        /// This is a low-level method to send a raw bytes.
+        /// Only use this method if you have manually included the message id and serialized the payload.
+        /// Otherwise, receivers will not know how to handle it.
+        /// It is recommended to use <see cref="Send{T}(T, Channel)"/> instead.</para>
         /// </summary>
         /// <param name="segment"></param>
         /// <param name="channelId"></param>
@@ -220,7 +283,7 @@ namespace Mirage
             catch (BufferFullException e)
             {
                 logger.LogError($"Disconnecting player because send buffer was full. {e}");
-                Disconnect();
+                Disconnect(DisconnectReason.SendBufferFull);
             }
             catch (NoConnectionException e)
             {
@@ -235,9 +298,10 @@ namespace Mirage
         /// <typeparam name="T">The message type</typeparam>
         /// <param name="msg">The message to send.</param>
         /// <param name="channelId">The transport layer channel to send on.</param>
-        /// <returns></returns>
         public void Send<T>(T message, INotifyCallBack callBacks)
         {
+            using var _ = MessageIdCache<T>.SendNotifyMarker.Auto();
+
             if (_isDisconnected) { return; }
 
             using (var writer = NetworkWriterPool.GetWriter())
@@ -255,7 +319,7 @@ namespace Mirage
                 catch (BufferFullException e)
                 {
                     logger.LogError($"Disconnecting player because send buffer was full. {e}");
-                    Disconnect();
+                    Disconnect(DisconnectReason.SendBufferFull);
                 }
                 catch (NoConnectionException e)
                 {
@@ -267,18 +331,18 @@ namespace Mirage
 
         public override string ToString()
         {
-            return $"connection({Address})";
+            return $"connection({ConnectionHandle})";
         }
 
         public void AddToVisList(NetworkIdentity identity)
         {
-            if (logger.LogEnabled()) logger.Log($"Adding {identity} to Player[{Address}] VisList");
+            if (logger.LogEnabled()) logger.Log($"Adding {identity} to Player[{ConnectionHandle}] VisList");
             _visList.Add(identity);
         }
 
         public void RemoveFromVisList(NetworkIdentity identity)
         {
-            if (logger.LogEnabled()) logger.Log($"Removing {identity} from Player[{Address}] VisList");
+            if (logger.LogEnabled()) logger.Log($"Removing {identity} from Player[{ConnectionHandle}] VisList");
             _visList.Remove(identity);
         }
 
@@ -286,7 +350,6 @@ namespace Mirage
         /// Checks if player can see NetworkIdentity
         /// </summary>
         /// <param name="identity"></param>
-        /// <returns></returns>
         public bool ContainsInVisList(NetworkIdentity identity)
         {
             return _visList.Contains(identity);
@@ -298,7 +361,7 @@ namespace Mirage
         /// </summary>
         public void RemoveAllVisibleObjects()
         {
-            if (logger.LogEnabled()) logger.Log($"Removing all from Player[{Address}] VisList");
+            if (logger.LogEnabled()) logger.Log($"Removing all from Player[{ConnectionHandle}] VisList");
 
             foreach (var identity in _visList)
             {
@@ -309,14 +372,14 @@ namespace Mirage
 
         public void AddOwnedObject(NetworkIdentity identity)
         {
-            if (logger.LogEnabled()) logger.Log($"Adding {identity} to Player[{Address}] OwnedObjects");
+            if (logger.LogEnabled()) logger.Log($"Adding {identity} to Player[{ConnectionHandle}] OwnedObjects");
 
             _ownedObjects.Add(identity);
         }
 
         public void RemoveOwnedObject(NetworkIdentity identity)
         {
-            if (logger.LogEnabled()) logger.Log($"Removing {identity} from Player[{Address}] OwnedObjects");
+            if (logger.LogEnabled()) logger.Log($"Removing {identity} from Player[{ConnectionHandle}] OwnedObjects");
 
             _ownedObjects.Remove(identity);
 
@@ -329,7 +392,7 @@ namespace Mirage
 
         public void RemoveAllOwnedObject(bool sendAuthorityChangeEvent)
         {
-            if (logger.LogEnabled()) logger.Log($"Removing all Player[{Address}] OwnedObjects");
+            if (logger.LogEnabled()) logger.Log($"Removing all Player[{ConnectionHandle}] OwnedObjects");
 
             // create a copy because the list might be modified when destroying
             var ownedObjects = new HashSet<NetworkIdentity>(_ownedObjects);
@@ -371,7 +434,7 @@ namespace Mirage
         /// </summary>
         public void DestroyOwnedObjects()
         {
-            if (logger.LogEnabled()) logger.Log($"Destroying all Player[{Address}] OwnedObjects");
+            if (logger.LogEnabled()) logger.Log($"Destroying all Player[{ConnectionHandle}] OwnedObjects");
 
             // create a copy because the list might be modified when destroying
             var ownedObjects = new HashSet<NetworkIdentity>(_ownedObjects);
@@ -402,6 +465,95 @@ namespace Mirage
                 // make sure to check sceneObject, we dont want to destory server's copy of a Scene object
                 identity.ServerObjectManager.Destroy(identity, destroyServerObject: !identity.IsSceneObject);
             }
+        }
+
+        /// <summary>
+        /// Call this when player causes an error
+        /// </summary>
+        /// <param name="cost">how bad or costly is the error. higher cost means player will trigger limit faster</param>
+        /// <param name="flags">optional flag for error type</param>
+        public void SetError(int cost, PlayerErrorFlags flags)
+        {
+            // silent return, makes calling this easier, no checking for host/client (ErrorRateLimit==null) in shared code used by server and client
+            if (ErrorRateLimit == null)
+                return;
+
+            if (errorLogger.LogEnabled())
+                errorLogger.Log($"{this} SetError cost={cost}, flags:{flags} tokens:{ErrorRateLimit.Tokens}/{ErrorRateLimit.Config.MaxTokens}");
+
+            ErrorFlags |= flags;
+            var overLimit = ErrorRateLimit.UseTokens(cost);
+            if (overLimit && !_invokingErrorRateLimitReached)
+            {
+                if (errorLogger.WarnEnabled())
+                    errorLogger.LogWarning($"{this} error Limit reached");
+
+                // make sure ErrorRateLimitReached does not cause infinite loop if SetError is called inside it
+                _invokingErrorRateLimitReached = true;
+                try
+                {
+                    _server.ErrorRateLimitReached(this);
+                }
+                finally
+                {
+                    _invokingErrorRateLimitReached = false;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Call this when player causes an error, will set cost to be above maxTokens to ensure that limit is cheated to trigger disconnect.
+        /// <para>If <see cref="ErrorRateLimit"/> is null will call <see cref="Disconnect"/> instead</para>
+        /// </summary>
+        /// <param name="flags">optional flag for error type</param>
+        public void SetErrorAndDisconnect(PlayerErrorFlags flags)
+        {
+            if (errorLogger.WarnEnabled())
+                errorLogger.LogWarning($"{this} SetErrorAndDisconnect flags:{flags}");
+
+            if (ErrorRateLimit != null)
+                // use max+1 tokens to ensure ErrorRateLimitReached is called
+                SetError(ErrorRateLimit.Config.MaxTokens + 1, flags);
+            else
+                Disconnect();
+        }
+
+        /// <summary>Call to reset error flags</summary>
+        public void ResetErrorFlag()
+        {
+            ErrorFlags = 0;
+        }
+
+        /// <summary>
+        /// Checks and enforces rate limiting for an RPC.
+        /// Returns true if the RPC is allowed to execute.
+        /// If false, the RPC should be ignored.
+        /// </summary>
+        public bool CheckRateLimit(RemoteCall remoteCall)
+        {
+            RpcRateLimit ??= new Dictionary<RpcId, RateLimitBucket>();
+            if (!RpcRateLimit.TryGetValue(remoteCall.RpcId, out var bucket))
+            {
+                bucket = new RateLimitBucket(Time.unscaledTimeAsDouble, remoteCall.RateLimit.BucketConfig);
+                RpcRateLimit.Add(remoteCall.RpcId, bucket);
+
+                if (rateLimitLogger.LogEnabled())
+                    rateLimitLogger.Log($"{this} created RPC rate limit bucket for '{remoteCall.Name}' [maxTokens={bucket.Config.MaxTokens}, interval={bucket.Config.Interval}]");
+            }
+
+            var exceeded = bucket.UseTokens(now: Time.unscaledTimeAsDouble, 1);
+            if (rateLimitLogger.LogEnabled())
+                rateLimitLogger.Log($"{this} CheckRateLimit for '{remoteCall.Name}' exceeded:{exceeded} tokens:{bucket.Tokens}/{bucket.Config.MaxTokens}");
+
+            if (exceeded)
+            {
+                if (rateLimitLogger.WarnEnabled())
+                    rateLimitLogger.LogWarning($"{this} RPC rate limit exceeded for '{remoteCall.Name}', dropping call [penalty={remoteCall.RateLimit.Penalty}]");
+
+                SetError(remoteCall.RateLimit.Penalty, PlayerErrorFlags.RateLimit);
+            }
+            return !exceeded;
         }
     }
 }

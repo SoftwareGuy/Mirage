@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using Mirage.Logging;
 using Mirage.Serialization;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mirage.RemoteCalls
@@ -11,13 +12,18 @@ namespace Mirage.RemoteCalls
     public static class ClientRpcSender
     {
         private static readonly ILogger logger = LogFactory.GetLogger(typeof(ClientRpcSender));
+        private static readonly ProfilerMarker sendMarker = new ProfilerMarker("Mirage.ClientRpcSender.Send");
+        private static readonly ProfilerMarker sendTargetMarker = new ProfilerMarker("Mirage.ClientRpcSender.SendTarget");
+        private static readonly ProfilerMarker sendTargetWithReturnMarker = new ProfilerMarker("Mirage.ClientRpcSender.SendTargetWithReturn");
 
         public static void Send(NetworkBehaviour behaviour, int relativeIndex, NetworkWriter writer, Channel channelId, bool excludeOwner)
         {
-            var index = behaviour.Identity.RemoteCallCollection.GetIndexOffset(behaviour) + relativeIndex;
-            Validate(behaviour, index);
+            using var _ = sendMarker.Auto();
 
-            var message = CreateMessage(behaviour, index, writer);
+            var absoluteIndex = behaviour.Identity.RemoteCallCollection.GetIndexOffset(behaviour) + relativeIndex;
+            Validate(behaviour, absoluteIndex);
+
+            var message = CreateMessage(behaviour, absoluteIndex, writer);
 
             // The public facing parameter is excludeOwner in [ClientRpc]
             // so we negate it here to logically align with SendToReady.
@@ -27,33 +33,35 @@ namespace Mirage.RemoteCalls
 
         public static void SendTarget(NetworkBehaviour behaviour, int relativeIndex, NetworkWriter writer, Channel channelId, INetworkPlayer player)
         {
-            var index = behaviour.Identity.RemoteCallCollection.GetIndexOffset(behaviour) + relativeIndex;
-            Validate(behaviour, index);
+            using var _ = sendTargetMarker.Auto();
 
-            var message = CreateMessage(behaviour, index, writer);
+            var absoluteIndex = behaviour.Identity.RemoteCallCollection.GetIndexOffset(behaviour) + relativeIndex;
+            Validate(behaviour, absoluteIndex);
+
+            var message = CreateMessage(behaviour, absoluteIndex, writer);
 
             player = GetTarget(behaviour, player);
-
             player.Send(message, channelId);
         }
 
         public static UniTask<T> SendTargetWithReturn<T>(NetworkBehaviour behaviour, int relativeIndex, NetworkWriter writer, INetworkPlayer player)
         {
-            var collection = behaviour.Identity.RemoteCallCollection;
-            var index = collection.GetIndexOffset(behaviour) + relativeIndex;
-            Validate(behaviour, index);
+            using var _ = sendTargetWithReturnMarker.Auto();
 
-            var callInfo = collection.GetAbsolute(index);
-            (var task, var id) = behaviour.ServerObjectManager._rpcHandler.CreateReplyTask<T>(callInfo);
+            var collection = behaviour.Identity.RemoteCallCollection;
+            var absoluteIndex = collection.GetIndexOffset(behaviour) + relativeIndex;
+            Validate(behaviour, absoluteIndex);
+
+            var callInfo = collection.GetAbsolute(absoluteIndex);
+            player = GetTarget(behaviour, player);
+            (var task, var id) = behaviour.ServerObjectManager._rpcHandler.CreateReplyTask<T>(behaviour, callInfo, player);
             var message = new RpcWithReplyMessage
             {
                 NetId = behaviour.NetId,
-                FunctionIndex = index,
+                FunctionIndex = absoluteIndex,
                 ReplyId = id,
                 Payload = writer.ToArraySegment()
             };
-
-            player = GetTarget(behaviour, player);
 
             // reply rpcs are always reliable
             player.Send(message, Channel.Reliable);
@@ -75,23 +83,23 @@ namespace Mirage.RemoteCalls
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static RpcMessage CreateMessage(NetworkBehaviour behaviour, int index, NetworkWriter writer)
+        private static RpcMessage CreateMessage(NetworkBehaviour behaviour, int absoluteIndex, NetworkWriter writer)
         {
             var message = new RpcMessage
             {
                 NetId = behaviour.NetId,
-                FunctionIndex = index,
+                FunctionIndex = absoluteIndex,
                 Payload = writer.ToArraySegment()
             };
             return message;
         }
 
-        private static void Validate(NetworkBehaviour behaviour, int index)
+        private static void Validate(NetworkBehaviour behaviour, int absoluteIndex)
         {
             var server = behaviour.Server;
             if (server == null || !server.Active)
             {
-                var rpc = behaviour.Identity.RemoteCallCollection.GetRelative(behaviour, index);
+                var rpc = behaviour.Identity.RemoteCallCollection.GetAbsolute(absoluteIndex);
                 throw new InvalidOperationException($"RPC Function {rpc} called when server is not active.");
             }
         }

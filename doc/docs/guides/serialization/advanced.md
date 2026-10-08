@@ -87,14 +87,7 @@ The weaver does not check properties
 Weaver will use the underlying type of an enum to read and write them. By default this is `int`.
 
 For example, `Switch` will use the `byte` read/write functions to be serialized
-```cs
-public enum Switch : byte
-{
-    Left,
-    Middle,
-    Right,
-}
-```
+{{{ Path:'Snippets/Serialization/SwitchEnum.cs' Name:'switch-enum' }}}
 
 
 #### Collections
@@ -105,28 +98,12 @@ be a supported type or have a custom read/write function.
 For example:
 - `float[]` is a supported type because Mirage has a built-in read/write function for `float`.
 - `MyData[]` is a supported type as Weaver is able to generate a read/write function for `MyData` 
-```cs
-public struct MyData
-{
-    public int someValue;
-    public float anotherValue;
-}
-```
+{{{ Path:'Snippets/Serialization/MyDataStruct.cs' Name:'my-data' }}}
 
 ## Adding Custom Read Write functions
 
 Custom read/write functions are static methods like this:
-```cs
-public static void WriteMyType(this NetworkWriter writer, MyType value)
-{
-    // write MyType data here
-}
-
-public static MyType ReadMyType(this NetworkReader reader)
-{
-    // read MyType data here
-}
-```
+{{{ Path:'Snippets/Serialization/CustomReadWrite.cs' Name:'custom-read-write' }}}
 
 It is best practice to make read/write [extension methods](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods) so they can be called like `writer.WriteMyType(value)`.
 
@@ -138,92 +115,65 @@ Weaver won't write properties, but a custom writer can be used to send them over
 
 This can be useful if you want to have `private set` for your properties
 
-```cs
-public struct MyData
-{
-    public int someValue { get; private set; }
-    public float anotherValue { get; private set; }
-
-    public MyData(int someValue, float anotherValue)
-    {
-        this.someValue = someValue;
-        this.anotherValue = anotherValue;
-    }
-}
-
-public static class CustomReadWriteFunctions 
-{
-    public static void WriteMyType(this NetworkWriter writer, MyData value)
-    {
-        writer.WriteInt32(value.someValue);
-        writer.WriteSingle(value.anotherValue);
-    }
-
-    public static MyData ReadMyType(this NetworkReader reader)
-    {
-        return new MyData(reader.ReadInt32(), reader.ReadSingle());
-    }
-}
-```
+{{{ Path:'Snippets/Serialization/PropertiesExample.cs' Name:'properties-example' }}}
 
 #### Unsupported type Example 
 
 Rigidbody is an unsupported type because it inherits from `Component`. But a custom writer can be added so that it is 
 synced using a NetworkIdentity if one is attached.
 
-```cs
-public struct MyCollision
-{
-    public Vector3 force;
-    public Rigidbody rigidbody;
-}
-
-public static class CustomReadWriteFunctions
-{
-    public static void WriteMyCollision(this NetworkWriter writer, MyCollision value)
-    {
-        writer.WriteVector3(value.force);
-
-        NetworkIdentity networkIdentity = value.rigidbody.GetComponent<NetworkIdentity>();
-        writer.WriteNetworkIdentity(networkIdentity);
-    }
-
-    public static MyCollision ReadMyCollision(this NetworkReader reader)
-    {
-        Vector3 force = reader.ReadVector3();
-
-        NetworkIdentity networkIdentity = reader.ReadNetworkIdentity();
-        Rigidbody rigidBody = networkIdentity != null
-            ? networkIdentity.GetComponent<Rigidbody>()
-            : null;
-
-        return new MyCollision
-        {
-            force = force,
-            rigidbody = rigidBody,
-        };
-    }
-}
-```
+{{{ Path:'Snippets/Serialization/UnsupportedTypeExample.cs' Name:'collision-example' }}}
 
 Above are functions for `MyCollision`, but instead, you could add functions for `Rigidbody` and let weaver would generate a writer for `MyCollision`.
-```cs 
+{{{ Path:'Snippets/Serialization/UnsupportedTypeExample.cs' Name:'rigidbody-example' }}}
+
+### Supporting MaxLength in Custom Functions
+
+If you want your custom type to support the `[MaxLength(int)]` attribute (to enforce size limits during deserialization, preventing memory allocation attacks), you can provide overloaded custom functions that accept a `maxLength` parameter. 
+
+When a field or parameter of your custom type is decorated with `[MaxLength(N)]`, the Weaver will automatically detect and bind these overloads.
+
+```cs
+using Mirage.Serialization;
+
 public static class CustomReadWriteFunctions
 {
-    public static void WriteRigidbody(this NetworkWriter writer, Rigidbody rigidbody)
+    // Normal serialization (delegates to length-limited version with max limit)
+    public static void WriteMyCustomList(this NetworkWriter writer, MyCustomList value)
     {
-        NetworkIdentity networkIdentity = rigidbody.GetComponent<NetworkIdentity>();
-        writer.WriteNetworkIdentity(networkIdentity);
+        writer.WriteMyCustomList(value, int.MaxValue);
     }
 
-    public static Rigidbody ReadRigidbody(this NetworkReader reader)
+    // Length-limited serialization
+    public static void WriteMyCustomList(this NetworkWriter writer, MyCustomList value, int maxLength)
     {
-        NetworkIdentity networkIdentity = reader.ReadNetworkIdentity();
-        Rigidbody rigidBody = networkIdentity != null
-            ? networkIdentity.GetComponent<Rigidbody>()
-            : null;
+        if (value.Count > maxLength)
+            throw new SerializationLimitException($"Count {value.Count} exceeds max length {maxLength}.");
 
-        return rigidBody;
+        writer.WriteInt32(value.Count);
+        for (var i = 0; i < value.Count; i++)
+            writer.WriteInt32(value[i]);
+    }
+
+    // Normal deserialization
+    public static MyCustomList ReadMyCustomList(this NetworkReader reader)
+    {
+        return reader.ReadMyCustomList(int.MaxValue);
+    }
+
+    // Length-limited deserialization
+    public static MyCustomList ReadMyCustomList(this NetworkReader reader, int maxLength)
+    {
+        var count = reader.ReadInt32();
+        if (count > maxLength)
+            throw new SerializationLimitException($"Serialized count {count} exceeds limit {maxLength}.");
+
+        // Allocating the collection is now safe
+        var list = new MyCustomList(count);
+        for (var i = 0; i < count; i++)
+            list.Add(reader.ReadInt32());
+
+        return list;
     }
 }
 ```

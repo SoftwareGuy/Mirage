@@ -7,19 +7,45 @@ namespace Mirage.Serialization
     public static class CollectionExtensions
     {
         /// <summary>
+        /// Write method for weaver to use
+        /// </summary>
+        public static void WriteSpanAndSize(this NetworkWriter writer, Span<byte> span)
+        {
+            WriteSpanAndSize(writer, (ReadOnlySpan<byte>)span, int.MaxValue);
+        }
+
+        public static void WriteSpanAndSize(this NetworkWriter writer, Span<byte> span, int maxLength)
+        {
+            WriteSpanAndSize(writer, (ReadOnlySpan<byte>)span, maxLength);
+        }
+
+        /// <summary>
+        /// Write method for weaver to use
+        /// </summary>
+        public static void WriteSpanAndSize(this NetworkWriter writer, ReadOnlySpan<byte> span)
+        {
+            WriteSpanAndSize(writer, span, int.MaxValue);
+        }
+
+        public static void WriteSpanAndSize(this NetworkWriter writer, ReadOnlySpan<byte> span, int maxLength)
+        {
+            if (span.Length > maxLength)
+                throw new SerializationLimitException($"Span length {span.Length} exceeds maximum limit of {maxLength}");
+
+            writer.WritePackedUInt32(checked((uint)span.Length));
+            writer.WriteSpanRaw(span);
+        }
+
+        /// <summary>
         /// For byte arrays with dynamic size, where the reader doesn't know how many will come 
         /// </summary>
         /// <param name="buffer">array or null</param>
         public static void WriteBytesAndSize(this NetworkWriter writer, byte[] buffer, int offset, int count)
         {
-            if (buffer == null)
-            {
-                WriteCountPlusOne(writer, null);
-                return;
-            }
-
-            WriteCountPlusOne(writer, count);
-            writer.WriteBytes(buffer, offset, count);
+            int? length = buffer != null ? count : null;
+            WriteCountPlusOne(writer, length);
+            if (buffer != null)
+                writer.WriteSpanRaw(new ReadOnlySpan<byte>(buffer, offset, count));
         }
 
         /// <summary>
@@ -28,12 +54,15 @@ namespace Mirage.Serialization
         /// <param name="buffer">array or null</param>
         public static void WriteBytesAndSize(this NetworkWriter writer, byte[] buffer)
         {
-            WriteCountPlusOne(writer, buffer?.Length);
+            writer.WriteBytesAndSize(buffer, 0, buffer?.Length ?? 0);
+        }
 
-            if (buffer == null)
-                return;
+        public static void WriteBytesAndSize(this NetworkWriter writer, byte[] buffer, int maxLength)
+        {
+            if (buffer != null && buffer.Length > maxLength)
+                throw new SerializationLimitException($"Byte array length {buffer.Length} exceeds maximum limit of {maxLength}");
 
-            writer.WriteBytes(buffer, 0, buffer.Length);
+            writer.WriteBytesAndSize(buffer, 0, buffer?.Length ?? 0);
         }
 
         public static void WriteBytesAndSizeSegment(this NetworkWriter writer, ArraySegment<byte> buffer)
@@ -41,9 +70,26 @@ namespace Mirage.Serialization
             writer.WriteBytesAndSize(buffer.Array, buffer.Offset, buffer.Count);
         }
 
+        public static void WriteBytesAndSizeSegment(this NetworkWriter writer, ArraySegment<byte> buffer, int maxLength)
+        {
+            if (buffer.Array != null && buffer.Count > maxLength)
+                throw new SerializationLimitException($"Byte segment count {buffer.Count} exceeds maximum limit of {maxLength}");
+
+            writer.WriteBytesAndSize(buffer.Array, buffer.Offset, buffer.Count);
+        }
+
         [WeaverSerializeCollection]
         public static void WriteList<T>(this NetworkWriter writer, List<T> list)
         {
+            WriteList(writer, list, int.MaxValue);
+        }
+
+        [WeaverSerializeCollection]
+        public static void WriteList<T>(this NetworkWriter writer, List<T> list, int maxLength)
+        {
+            if (list != null && list.Count > maxLength)
+                throw new SerializationLimitException($"List length {list.Count} exceeds maximum limit of {maxLength}");
+
             WriteCountPlusOne(writer, list?.Count);
 
             if (list is null)
@@ -56,6 +102,14 @@ namespace Mirage.Serialization
 
         public static void WriteArray<T>(this NetworkWriter writer, T[] array)
         {
+            WriteArray(writer, array, int.MaxValue);
+        }
+
+        public static void WriteArray<T>(this NetworkWriter writer, T[] array, int maxLength)
+        {
+            if (array != null && array.Length > maxLength)
+                throw new SerializationLimitException($"Array length {array.Length} exceeds maximum limit of {maxLength}");
+
             WriteCountPlusOne(writer, array?.Length);
 
             if (array is null)
@@ -69,7 +123,15 @@ namespace Mirage.Serialization
         [WeaverSerializeCollection]
         public static void WriteArraySegment<T>(this NetworkWriter writer, ArraySegment<T> segment)
         {
+            WriteArraySegment(writer, segment, int.MaxValue);
+        }
+
+        [WeaverSerializeCollection]
+        public static void WriteArraySegment<T>(this NetworkWriter writer, ArraySegment<T> segment, int maxLength)
+        {
             var array = segment.Array;
+            if (array != null && segment.Count > maxLength)
+                throw new SerializationLimitException($"ArraySegment length {segment.Count} exceeds maximum limit of {maxLength}");
 
             if (array == null)
             {
@@ -92,6 +154,15 @@ namespace Mirage.Serialization
         [WeaverSerializeCollection]
         public static void WriteDictionary<TKey, TValue>(this NetworkWriter writer, Dictionary<TKey, TValue> dictionary)
         {
+            WriteDictionary(writer, dictionary, int.MaxValue);
+        }
+
+        [WeaverSerializeCollection]
+        public static void WriteDictionary<TKey, TValue>(this NetworkWriter writer, Dictionary<TKey, TValue> dictionary, int maxLength)
+        {
+            if (dictionary != null && dictionary.Count > maxLength)
+                throw new SerializationLimitException($"Dictionary length {dictionary.Count} exceeds maximum limit of {maxLength}");
+
             WriteCountPlusOne(writer, dictionary?.Count);
 
             if (dictionary is null)
@@ -104,42 +175,101 @@ namespace Mirage.Serialization
             }
         }
 
-#if UNITY_2021_3_OR_NEWER
         [WeaverSerializeCollection]
-        public static void WriteSpan<T>(this NetworkWriter writer, Span<T> span) => WriteReadOnlySpan<T>(writer, span);
+        public static void WriteSpan<T>(this NetworkWriter writer, Span<T> span) => WriteReadOnlySpan<T>(writer, span, int.MaxValue);
+
         [WeaverSerializeCollection]
-        public static void WriteReadOnlySpan<T>(this NetworkWriter writer, ReadOnlySpan<T> span)
+        public static void WriteSpan<T>(this NetworkWriter writer, Span<T> span, int maxLength) => WriteReadOnlySpan<T>(writer, span, maxLength);
+
+        [WeaverSerializeCollection]
+        public static void WriteReadOnlySpan<T>(this NetworkWriter writer, ReadOnlySpan<T> span) => WriteReadOnlySpan(writer, span, int.MaxValue);
+
+        [WeaverSerializeCollection]
+        public static void WriteReadOnlySpan<T>(this NetworkWriter writer, ReadOnlySpan<T> span, int maxLength)
         {
             var length = span.Length;
+            if (length > maxLength)
+                throw new SerializationLimitException($"Span length {length} exceeds maximum limit of {maxLength}");
+
             writer.WritePackedUInt32(checked((uint)length));
             for (var i = 0; i < length; i++)
                 writer.Write(span[i]);
         }
-#endif
 
         /// <returns>array or null</returns>
         public static byte[] ReadBytesAndSize(this NetworkReader reader)
         {
-            // dont need to ValidateSize here because ReadBytes does it
+            return ReadBytesAndSize(reader, int.MaxValue);
+        }
 
-            return ReadCountPlusOne(reader, out var count)
-                ? reader.ReadBytes(count)
-                : null;
+        public static byte[] ReadBytesAndSize(this NetworkReader reader, int maxLength)
+        {
+            // dont need to call ValidateSize here because ReadBytes does it
+            // note: ValidateSize checks the element count vs reader bytes, is a deserialization check, not the [MaxLength] attribute check
+            if (!ReadCountPlusOne(reader, out var count))
+                return null;
+
+            if (count > maxLength)
+                throw new SerializationLimitException($"Byte array length {count} exceeds maximum limit of {maxLength}");
+
+            return reader.ReadBytes(count);
         }
 
         public static ArraySegment<byte> ReadBytesAndSizeSegment(this NetworkReader reader)
         {
-            // dont need to ValidateSize here because we dont allocate for segment
-
-            return ReadCountPlusOne(reader, out var count)
-                ? reader.ReadBytesSegment(count)
-                : default;
+            return ReadBytesAndSizeSegment(reader, int.MaxValue);
         }
 
+        public static ArraySegment<byte> ReadBytesAndSizeSegment(this NetworkReader reader, int maxLength)
+        {
+            // dont need to call ValidateSize here because ReadBytes does it
+            // note: ValidateSize checks the element count vs reader bytes, is a deserialization check, not the [MaxLength] attribute check
+            if (!ReadCountPlusOne(reader, out var count))
+                return default;
+
+            if (count > maxLength)
+                throw new SerializationLimitException($"Byte segment length {count} exceeds maximum limit of {maxLength}");
+
+            return reader.ReadBytesSegment(count);
+        }
+
+        /// <summary>
+        /// Read method for weaver to use
+        /// </summary>
+        public static Span<byte> ReadSpanAndSize(this NetworkReader reader)
+        {
+            return ReadSpanAndSize(reader, int.MaxValue);
+        }
+
+        public static Span<byte> ReadSpanAndSize(this NetworkReader reader, int maxLength)
+        {
+            var length = checked((int)reader.ReadPackedUInt32());
+            if (length > maxLength)
+                throw new SerializationLimitException($"Span length {length} exceeds maximum limit of {maxLength}");
+
+            return reader.ReadBytesSegment(length);
+        }
+
+        /// <summary>
+        /// Read method for weaver to use
+        /// </summary>
+        public static ReadOnlySpan<byte> ReadReadOnlySpanAndSize(this NetworkReader reader)
+        {
+            return ReadReadOnlySpanAndSize(reader, int.MaxValue);
+        }
+
+        public static ReadOnlySpan<byte> ReadReadOnlySpanAndSize(this NetworkReader reader, int maxLength)
+        {
+            return ReadSpanAndSize(reader, maxLength);
+        }
+
+        // ignore, this is a manual method to read 'count' bytes
+        // it will collide with [MaxLength] Reader
+        [WeaverIgnore] 
         public static byte[] ReadBytes(this NetworkReader reader, int count)
         {
             // we know each element is 8 bits, so count*8 for max size
-            ValidateSize(reader, count * 8);
+            ValidateSize(reader, checked(count * 8));
 
             var bytes = new byte[count];
             reader.ReadBytes(bytes, 0, count);
@@ -149,9 +279,18 @@ namespace Mirage.Serialization
         [WeaverSerializeCollection]
         public static List<T> ReadList<T>(this NetworkReader reader)
         {
+            return ReadList<T>(reader, int.MaxValue);
+        }
+
+        [WeaverSerializeCollection]
+        public static List<T> ReadList<T>(this NetworkReader reader, int maxLength)
+        {
             var hasValue = ReadCountPlusOne(reader, out var length);
             if (!hasValue)
                 return null;
+
+            if (length > maxLength)
+                throw new SerializationLimitException($"List length {length} exceeds maximum limit of {maxLength}");
 
             ValidateSize(reader, length);
 
@@ -165,9 +304,17 @@ namespace Mirage.Serialization
 
         public static T[] ReadArray<T>(this NetworkReader reader)
         {
+            return ReadArray<T>(reader, int.MaxValue);
+        }
+
+        public static T[] ReadArray<T>(this NetworkReader reader, int maxLength)
+        {
             var hasValue = ReadCountPlusOne(reader, out var length);
             if (!hasValue)
                 return null;
+
+            if (length > maxLength)
+                throw new SerializationLimitException($"Array length {length} exceeds maximum limit of {maxLength}");
 
             ValidateSize(reader, length);
 
@@ -182,16 +329,31 @@ namespace Mirage.Serialization
         [WeaverSerializeCollection]
         public static ArraySegment<T> ReadArraySegment<T>(this NetworkReader reader)
         {
-            var array = reader.ReadArray<T>();
+            return ReadArraySegment<T>(reader, int.MaxValue);
+        }
+
+        [WeaverSerializeCollection]
+        public static ArraySegment<T> ReadArraySegment<T>(this NetworkReader reader, int maxLength)
+        {
+            var array = reader.ReadArray<T>(maxLength);
             return array != null ? new ArraySegment<T>(array) : default;
         }
 
         [WeaverSerializeCollection]
         public static Dictionary<TKey, TValue> ReadDictionary<TKey, TValue>(this NetworkReader reader)
         {
+            return ReadDictionary<TKey, TValue>(reader, int.MaxValue);
+        }
+
+        [WeaverSerializeCollection]
+        public static Dictionary<TKey, TValue> ReadDictionary<TKey, TValue>(this NetworkReader reader, int maxLength)
+        {
             var hasValue = ReadCountPlusOne(reader, out var length);
             if (!hasValue)
                 return null;
+
+            if (length > maxLength)
+                throw new SerializationLimitException($"Dictionary length {length} exceeds maximum limit of {maxLength}");
 
             ValidateSize(reader, length);
 
@@ -205,11 +367,26 @@ namespace Mirage.Serialization
             return result;
         }
 
-#if UNITY_2021_3_OR_NEWER
+        /// <summary>
+        /// Reads a span from the reader.
+        /// <para>NOTE: this method allocates a new array internally to hold the data.</para>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <returns>A span pointing to a new array with the read data.</returns>
         [WeaverSerializeCollection]
         public static Span<T> ReadSpan<T>(this NetworkReader reader)
         {
+            return ReadSpan<T>(reader, int.MaxValue);
+        }
+
+        [WeaverSerializeCollection]
+        public static Span<T> ReadSpan<T>(this NetworkReader reader, int maxLength)
+        {
             var length = checked((int)reader.ReadPackedUInt32());
+            if (length > maxLength)
+                throw new SerializationLimitException($"Span length {length} exceeds maximum limit of {maxLength}");
+
             ValidateSize(reader, length);
 
             var result = new T[length]; // todo remove allocation
@@ -219,13 +396,142 @@ namespace Mirage.Serialization
             }
             return result;
         }
+
         [WeaverSerializeCollection]
-        public static ReadOnlySpan<T> ReadReadOnlySpan<T>(this NetworkReader reader) => ReadSpan<T>(reader);
-#endif
+        public static ReadOnlySpan<T> ReadReadOnlySpan<T>(this NetworkReader reader) => ReadReadOnlySpan<T>(reader, int.MaxValue);
+
+        [WeaverSerializeCollection]
+        public static ReadOnlySpan<T> ReadReadOnlySpan<T>(this NetworkReader reader, int maxLength) => ReadSpan<T>(reader, maxLength);
+
+        /// <summary>
+        /// Reads a list from the reader into a provided list so that no new list is allocated.
+        /// <para>This will clear the list before adding the new items.</para>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <param name="outList">List to be populated with data. Can not be null.</param>
+        /// <param name="wasNull">true if the list was null on the wire</param>
+        public static void ReadListNonAlloc<T>(this NetworkReader reader, List<T> outList, out bool wasNull)
+        {
+            ReadListNonAlloc(reader, outList, out wasNull, int.MaxValue);
+        }
+
+        public static void ReadListNonAlloc<T>(this NetworkReader reader, List<T> outList, out bool wasNull, int maxLength)
+        {
+            if (outList is null)
+                throw new ArgumentNullException(nameof(outList));
+
+            outList.Clear();
+
+            wasNull = !ReadCountPlusOne(reader, out var length);
+            if (wasNull)
+                return;
+
+            if (length > maxLength)
+                throw new SerializationLimitException($"List length {length} exceeds maximum limit of {maxLength}");
+
+            ValidateSize(reader, length);
+            for (var i = 0; i < length; i++)
+                outList.Add(reader.Read<T>());
+        }
+
+        /// <summary>
+        /// Reads a dictionary from the reader into a provided dictionary so that no new dictionary is allocated.
+        /// <para>This will clear the dictionary before adding the new items.</para>
+        /// </summary>
+        public static void ReadDictionaryNonAlloc<TKey, TValue>(this NetworkReader reader, Dictionary<TKey, TValue> outDictionary, out bool wasNull)
+        {
+            ReadDictionaryNonAlloc(reader, outDictionary, out wasNull, int.MaxValue);
+        }
+
+        public static void ReadDictionaryNonAlloc<TKey, TValue>(this NetworkReader reader, Dictionary<TKey, TValue> outDictionary, out bool wasNull, int maxLength)
+        {
+            if (outDictionary is null)
+                throw new ArgumentNullException(nameof(outDictionary));
+
+            outDictionary.Clear();
+
+            wasNull = !ReadCountPlusOne(reader, out var length);
+            if (wasNull)
+                return;
+
+            if (length > maxLength)
+                throw new SerializationLimitException($"Dictionary length {length} exceeds maximum limit of {maxLength}");
+
+            ValidateSize(reader, length);
+            for (var i = 0; i < length; i++)
+            {
+                var key = reader.Read<TKey>();
+                var value = reader.Read<TValue>();
+                outDictionary[key] = value;
+            }
+        }
+
+        /// <summary>
+        /// Reads an array from the reader into a provided array so that no new array is allocated.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <param name="outArray">Array to be populated with data. Must be large enough to hold all elements.</param>
+        /// <returns>The number of elements read, or null if the array was null when sent</returns>
+        public static int? ReadArrayNonAlloc<T>(this NetworkReader reader, T[] outArray)
+        {
+            return ReadArrayNonAlloc(reader, outArray, int.MaxValue);
+        }
+
+        public static int? ReadArrayNonAlloc<T>(this NetworkReader reader, T[] outArray, int maxLength)
+        {
+            if (outArray is null)
+                throw new ArgumentNullException(nameof(outArray));
+
+            var wasNull = !ReadCountPlusOne(reader, out var length);
+            if (wasNull)
+                return null;
+
+            if (length > maxLength)
+                throw new SerializationLimitException($"Array length {length} exceeds maximum limit of {maxLength}");
+
+            ValidateSize(reader, length);
+
+            if (outArray.Length < length)
+                throw new ArgumentException($"Provided array is too small. Need {length}, but has {outArray.Length}", nameof(outArray));
+
+            for (var i = 0; i < length; i++)
+                outArray[i] = reader.Read<T>();
+            return length;
+        }
+
+        /// <summary>
+        /// Reads a span from the reader into a provided span so that no new array is allocated.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <param name="outSpan">Span to be populated with data. Must be large enough to hold all elements.</param>
+        /// <returns>The number of elements read.</returns>
+        public static int ReadSpanNonAlloc<T>(this NetworkReader reader, Span<T> outSpan)
+        {
+            return ReadSpanNonAlloc(reader, outSpan, int.MaxValue);
+        }
+
+        public static int ReadSpanNonAlloc<T>(this NetworkReader reader, Span<T> outSpan, int maxLength)
+        {
+            var length = checked((int)reader.ReadPackedUInt32());
+            if (length > maxLength)
+                throw new SerializationLimitException($"Span length {length} exceeds maximum limit of {maxLength}");
+
+            ValidateSize(reader, length);
+
+            if (outSpan.Length < length)
+                throw new ArgumentException($"Provided array is too small. Need {length}, but has {outSpan.Length}", nameof(outSpan));
+
+            for (var i = 0; i < length; i++)
+                outSpan[i] = reader.Read<T>();
+            return length;
+        }
 
         /// <summary>Writes null as 0, and all over values as +1</summary>
         /// <param name="count">The real count or null if collection is is null</param>
-        internal static void WriteCountPlusOne(NetworkWriter writer, int? count)
+        public static void WriteCountPlusOne(NetworkWriter writer, int? count)
         {
             // null is supported
             // write 0 for null array, increment normal size by 1 to save bandwith
@@ -243,7 +549,7 @@ namespace Mirage.Serialization
         /// <summary>Reads 0 as null, and all over values as -1</summary>
         /// <param name="count">The real count of the </param>
         /// <returns>true if collection has value, false if collection is null</returns>
-        internal static bool ReadCountPlusOne(NetworkReader reader, out int count)
+        public static bool ReadCountPlusOne(NetworkReader reader, out int count)
         {
             // count = 0 means the array was null
             // otherwise count -1 is the length of the array
@@ -260,7 +566,7 @@ namespace Mirage.Serialization
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="lengthInBits"></param>
-        internal static void ValidateSize(NetworkReader reader, int lengthInBits)
+        public static void ValidateSize(NetworkReader reader, int lengthInBits)
         {
             // T might be only 1 bit long, so we have to check vs bit length
             // todo have weaver calculate minimum size for T, so we can use it here instead of 1 bit

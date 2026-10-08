@@ -9,7 +9,7 @@ namespace Mirage
     /// <remarks>
     /// Use different enums than SocketLayer so that:
     ///   User doesn't need to add reference to socket layer to use event;
-    ///   Give high level reason so that they are easierto understand by the end user.
+    ///   Give high level reason so that they are easier to understand by the end user.
     /// </remarks>
     [Serializable]
     public enum ClientStoppedReason
@@ -28,6 +28,8 @@ namespace Mirage
         RemoteConnectionClosed = 3,
         /// <summary>Server disconnected because sent packet was not allowed by server config</summary>
         InvalidPacket = 8,
+        /// <summary>Server disconnected because send buffer was full</summary>
+        SendBufferFull = 10,
 
         /// <summary>Server rejected connecting because it was full</summary>
         ServerFull = 4,
@@ -37,6 +39,10 @@ namespace Mirage
         ConnectingCancel = 6,
         /// <summary>Key given with first message did not match the value on the server, See SocketLayer Config</summary>
         KeyInvalid = 9,
+        /// <summary>
+        /// Send if <see cref="Config.SendRejectIfUnconnectedPacketIsInvalid"/> is true
+        /// </summary>
+        InvalidUnconnectedPacket = 11,
 
         /// <summary>Disconnect called when server was stopped in host mode</summary>
         HostModeStopped = 7,
@@ -49,12 +55,16 @@ namespace Mirage
         {
             switch (reason)
             {
-                default:
                 case DisconnectReason.None: return ClientStoppedReason.None;
                 case DisconnectReason.Timeout: return ClientStoppedReason.Timeout;
                 case DisconnectReason.RequestedByRemotePeer: return ClientStoppedReason.RemoteConnectionClosed;
                 case DisconnectReason.RequestedByLocalPeer: return ClientStoppedReason.LocalConnectionClosed;
                 case DisconnectReason.InvalidPacket: return ClientStoppedReason.InvalidPacket;
+                case DisconnectReason.SendBufferFull: return ClientStoppedReason.SendBufferFull;
+
+                default:
+                    // just hard cast, it could be custom number from transport
+                    return (ClientStoppedReason)reason;
             }
         }
 
@@ -62,12 +72,16 @@ namespace Mirage
         {
             switch (reason)
             {
-                default:
                 case RejectReason.None: return ClientStoppedReason.None;
                 case RejectReason.Timeout: return ClientStoppedReason.ConnectingTimeout;
                 case RejectReason.ServerFull: return ClientStoppedReason.ServerFull;
                 case RejectReason.KeyInvalid: return ClientStoppedReason.KeyInvalid;
                 case RejectReason.ClosedByPeer: return ClientStoppedReason.ConnectingCancel;
+                case RejectReason.InvalidUnconnectedPacket: return ClientStoppedReason.InvalidUnconnectedPacket;
+
+                default:
+                    // just hard cast, it could be custom number from transport
+                    return (ClientStoppedReason)reason;
             }
         }
     }

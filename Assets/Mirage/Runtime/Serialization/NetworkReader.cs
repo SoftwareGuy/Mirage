@@ -35,6 +35,7 @@ namespace Mirage.Serialization
     /// </summary>
     public unsafe class NetworkReader : IDisposable
     {
+        public StringStore StringStore;
         private byte[] _managedBuffer;
         private GCHandle _handle;
         private ulong* _longPtr;
@@ -134,9 +135,12 @@ namespace Mirage.Serialization
             // reset disposed bool, as it can be disposed again after reset
             _needsDisposing = true;
 
-            _bitPosition = position * 8;
-            _bitOffset = position * 8;
-            _bitLength = _bitPosition + (length * 8);
+            checked
+            {
+                _bitPosition = position * 8;
+                _bitOffset = position * 8;
+                _bitLength = _bitPosition + (length * 8);
+            }
             _managedBuffer = array;
             _handle = GCHandle.Alloc(_managedBuffer, GCHandleType.Pinned);
             _longPtr = (ulong*)_handle.AddrOfPinnedObject();
@@ -157,7 +161,8 @@ namespace Mirage.Serialization
         /// <returns></returns>
         public bool CanReadBits(int readCount)
         {
-            return (_bitPosition + readCount) <= _bitLength;
+            if (readCount < 0) throw new EndOfStreamException("readCount can't be negative");
+            return checked(_bitPosition + readCount) <= _bitLength;
         }
 
         /// <summary>
@@ -167,13 +172,14 @@ namespace Mirage.Serialization
         /// <returns></returns>
         public bool CanReadBytes(int readCount)
         {
-            return (_bitPosition + (readCount * 8)) <= _bitLength;
+            if (readCount < 0) throw new EndOfStreamException("readCount can't be negative");
+            return checked(_bitPosition + (readCount * 8)) <= _bitLength;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void CheckNewLength(int newPosition)
         {
-            if (newPosition > _bitLength)
+            if (newPosition < 0 || newPosition > _bitLength)
             {
                 ThrowPositionOverLength(newPosition);
             }
@@ -346,7 +352,7 @@ namespace Mirage.Serialization
 
         public void Skip(int bits)
         {
-            MoveBitPosition(_bitPosition + bits);
+            MoveBitPosition(checked(_bitPosition + bits));
         }
 
         /// <summary>
@@ -386,29 +392,37 @@ namespace Mirage.Serialization
             _bitPosition = newPosition;
         }
 
-        /// <summary>
-        /// <para>
-        ///    Moves position to nearest byte then copies bytes from that position
-        /// </para>
-        /// </summary>
-        /// <param name="array"></param>
-        /// <param name="offset"></param>
-        /// <param name="length"></param>
         public void ReadBytes(byte[] array, int offset, int length)
         {
+            ReadSpanRaw(new Span<byte>(array, offset, length));
+        }
+
+        /// <summary>
+        /// Moves position to nearest byte then copies bytes from that position into the span
+        /// </summary>
+        /// <param name="span"></param>
+        public void ReadSpanRaw(Span<byte> span)
+        {
             PadToByte();
-            var newPosition = _bitPosition + (8 * length);
+            var length = span.Length;
+            var newPosition = checked(_bitPosition + (8 * length));
             CheckNewLength(newPosition);
 
-            // todo benchmark this vs Marshal.Copy or for loop
-            Buffer.BlockCopy(_managedBuffer, BytePosition, array, offset, length);
+            var startPtr = ((byte*)_longPtr) + BytePosition;
+            var sourceSpan = new Span<byte>(startPtr, length);
+            sourceSpan.CopyTo(span);
             _bitPosition = newPosition;
         }
 
+        public ReadOnlySpan<byte> ReadSpanRaw(int count)
+        {
+            return ReadBytesSegment(count);
+        }
         public ArraySegment<byte> ReadBytesSegment(int count)
         {
             PadToByte();
-            var newPosition = _bitPosition + (8 * count);
+            if (count < 0) throw new EndOfStreamException("count can't be negative");
+            var newPosition = checked(_bitPosition + (8 * count));
             CheckNewLength(newPosition);
 
             var result = new ArraySegment<byte>(_managedBuffer, BytePosition, count);

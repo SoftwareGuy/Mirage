@@ -75,7 +75,14 @@ namespace Mirage.Events
             // invoke handler if event has been invoked atleast once
             if (HasInvoked)
             {
-                handler.Invoke();
+                try
+                {
+                    handler.Invoke();
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
             }
 
             // add handler to inner event so that it can be invoked again
@@ -90,7 +97,14 @@ namespace Mirage.Events
         public override void Invoke()
         {
             base.Invoke();
-            _event.Invoke();
+            try
+            {
+                _event.Invoke();
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogException(e);
+            }
         }
 
         /// <summary>
@@ -120,7 +134,14 @@ namespace Mirage.Events
             // invoke handler if event has been invoked atleast once
             if (HasInvoked)
             {
-                handler.Invoke(_arg0);
+                try
+                {
+                    handler.Invoke(_arg0);
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
             }
 
             // add handler to inner event so that it can be invoked again
@@ -135,7 +156,14 @@ namespace Mirage.Events
         public override void Invoke(T0 arg0)
         {
             base.Invoke(arg0);
-            _event.Invoke(arg0);
+            try
+            {
+                _event.Invoke(arg0);
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogException(e);
+            }
         }
 
         /// <summary>
@@ -165,7 +193,14 @@ namespace Mirage.Events
             // invoke handler if event has been invoked atleast once
             if (HasInvoked)
             {
-                handler.Invoke(_arg0, _arg1);
+                try
+                {
+                    handler.Invoke(_arg0, _arg1);
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
             }
 
             // add handler to inner event so that it can be invoked again
@@ -180,7 +215,14 @@ namespace Mirage.Events
         public override void Invoke(T0 arg0, T1 arg1)
         {
             base.Invoke(arg0, arg1);
-            _event.Invoke(arg0, arg1);
+            try
+            {
+                _event.Invoke(arg0, arg1);
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogException(e);
+            }
         }
 
         /// <summary>

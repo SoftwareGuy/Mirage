@@ -1,3 +1,632 @@
+# [159.0.0](https://github.com/MirageNet/Mirage/compare/v158.5.1...v159.0.0) (2026-09-23)
+
+
+* feat!: add ISpawnValuesHandler to customize spawn values on server and client ([#1227](https://github.com/MirageNet/Mirage/issues/1227)) ([9d82984](https://github.com/MirageNet/Mirage/commit/9d82984732aa4f6984df3433e12cacf84510f7d8))
+
+
+### BREAKING CHANGES
+
+* Spawn values are now applied to the spawned object via ISpawnValuesHandler.ApplySpawnValues during ApplySpawnPayload instead of inside NetworkIdentity.SetClientValues.
+
+## [158.5.1](https://github.com/MirageNet/Mirage/compare/v158.5.0...v158.5.1) (2026-09-22)
+
+
+### Bug Fixes
+
+* updating send marker name to include Message name ([3dfe234](https://github.com/MirageNet/Mirage/commit/3dfe234a0faa8c7d881ea8f3a75ab26e267ad468))
+
+# [158.5.0](https://github.com/MirageNet/Mirage/compare/v158.4.0...v158.5.0) (2026-09-21)
+
+
+### Bug Fixes
+
+* fixing error using profile marker ([5278c5f](https://github.com/MirageNet/Mirage/commit/5278c5f005cbe4d6ded2cf5e322cacc0a583ba4f))
+
+
+### Features
+
+* add profiler markers for high-level and connection send methods ([f03532f](https://github.com/MirageNet/Mirage/commit/f03532fb82477d87f6c5486be4fe596372184b09)), closes [hi#level](https://github.com/hi/issues/level)
+* add profiler markers for ISocket calls in Peer (Tick, Receive, Send, SendUnconnected, Flush) ([eefec18](https://github.com/MirageNet/Mirage/commit/eefec18edf2f4b27a9a9433f37933968284883b2))
+* add profiler markers to MessageHandler, RpcHandler, and RemoteCalls ([ebf8b55](https://github.com/MirageNet/Mirage/commit/ebf8b5505fbe1d5722dcb5b993f4c537a25ae1e1))
+* add profiler markers to NetworkServer and NetworkClient UpdateReceive and UpdateSent ([19558d2](https://github.com/MirageNet/Mirage/commit/19558d2cd72788f6b9f692e6883c65aacccd46f7))
+* add profiler markers to SocketLayer (Peer, Connection, ReliableConnection, AckSystem) ([031bda4](https://github.com/MirageNet/Mirage/commit/031bda4726d63579d3368e7e2a9c3c3a32f41398))
+
+# [158.4.0](https://github.com/MirageNet/Mirage/compare/v158.3.9...v158.4.0) (2026-09-20)
+
+
+### Features
+
+* add profiler markers for event and callback invocations in NetworkServer, NetworkClient, NetworkIdentity, and NetworkWorld ([59a73e2](https://github.com/MirageNet/Mirage/commit/59a73e23bf3e78532a446955e7d177e116b2bba5))
+* add profiler markers to NetworkIdentity.RebuildObservers and NetworkVisibility.OnVisibilityChanged ([d17a164](https://github.com/MirageNet/Mirage/commit/d17a164ff5f31ab37ffc635a167f75754541b6ae))
+* add profiler markers to ServerObjectManager and ClientObjectManager ([47a443b](https://github.com/MirageNet/Mirage/commit/47a443b9328c641c190b0a110c05fde724b579a2))
+* add profiler markers to SyncVarSender, SyncVarReceiver, and NetworkIdentity serialization ([a9fd7e2](https://github.com/MirageNet/Mirage/commit/a9fd7e2e667029eb8607561f5a22d3613f258747))
+
+## [158.3.9](https://github.com/MirageNet/Mirage/compare/v158.3.8...v158.3.9) (2026-09-20)
+
+
+### Performance Improvements
+
+* **rpc:** cache RemoteCallCollection per component type layout ([6697908](https://github.com/MirageNet/Mirage/commit/66979088420678fd4167cc88fe07fabd16033756))
+* **rpc:** eliminate closure allocations in request RPC registration ([0f5025a](https://github.com/MirageNet/Mirage/commit/0f5025af90fe8b2e19d8292061085ee57d17e892))
+
+## [158.3.8](https://github.com/MirageNet/Mirage/compare/v158.3.7...v158.3.8) (2026-09-16)
+
+
+### Bug Fixes
+
+* **license:** sync package license with root file ([a2f1756](https://github.com/MirageNet/Mirage/commit/a2f1756e4fe343cf68afacfb5ff0c278ca564bf6))
+
+## [158.3.7](https://github.com/MirageNet/Mirage/compare/v158.3.6...v158.3.7) (2026-08-21)
+
+
+### Bug Fixes
+
+* **NetworkSceneLoader:** adding HelpBox to inspector ([8d80334](https://github.com/MirageNet/Mirage/commit/8d803349db74a90e7c1476ecf84826c1fe703af4))
+* **NetworkSceneLoader:** adding scene attribute to TargetScene ([8a32d62](https://github.com/MirageNet/Mirage/commit/8a32d628804d1e2a8b1efa1f661af980b349e877))
+* **NetworkSceneLoader:** fixing character not spawning on OnServerAuthenticated if scene is never set ([2f008ba](https://github.com/MirageNet/Mirage/commit/2f008ba59678e5ffa784466755c2223d2468e188))
+* **NetworkSceneLoader:** making ServerLoading readonly in inspector, and ensuring it starts false ([9a0b0db](https://github.com/MirageNet/Mirage/commit/9a0b0db714655787bdb4703f71e7c1954eb60302))
+* **NetworkSceneLoader:** setting mirage icon on NetworkSceneLoader ([4d32f60](https://github.com/MirageNet/Mirage/commit/4d32f605b60f7cb591283e66f0221215a03f04ea))
+
+## [158.3.6](https://github.com/MirageNet/Mirage/compare/v158.3.5...v158.3.6) (2026-08-21)
+
+
+### Bug Fixes
+
+* simplify BasicPlayerSpawner for Basic example ([03ae136](https://github.com/MirageNet/Mirage/commit/03ae136fa55bc3f0a7fb7ab7675ba146df6c0b25))
+
+## [158.3.5](https://github.com/MirageNet/Mirage/compare/v158.3.4...v158.3.5) (2026-07-21)
+
+
+### Bug Fixes
+
+* fixing release ([de8ff93](https://github.com/MirageNet/Mirage/commit/de8ff933c355c1a9fcce707c1764fc227888ec57))
+* Pool.Put now return false if pool is full ([79be850](https://github.com/MirageNet/Mirage/commit/79be850f913fa2adea30916b094aad14e27a5868))
+
+## [158.3.4](https://github.com/MirageNet/Mirage/compare/v158.3.3...v158.3.4) (2026-07-19)
+
+
+### Bug Fixes
+
+* fixing IL error from short jump  when inserting new instructions ([75dd2b5](https://github.com/MirageNet/Mirage/commit/75dd2b5f5fe2b16e066943ba308b754712654d28))
+
+## [158.3.3](https://github.com/MirageNet/Mirage/compare/v158.3.2...v158.3.3) (2026-07-19)
+
+
+### Bug Fixes
+
+* fixing syncvar IL when set right before an if statement ([63b5463](https://github.com/MirageNet/Mirage/commit/63b5463e3e74597f9388a972c83ce419c0700045))
+
+## [158.3.2](https://github.com/MirageNet/Mirage/compare/v158.3.1...v158.3.2) (2026-06-29)
+
+
+### Bug Fixes
+
+* changing NetworkSceneLoader to use `AuthenticatedPlayers` instead of AllPlayers ([1264d03](https://github.com/MirageNet/Mirage/commit/1264d03454bd0e023ef47908f5a25e35dc995a6f))
+
+## [158.3.1](https://github.com/MirageNet/Mirage/compare/v158.3.0...v158.3.1) (2026-06-27)
+
+
+### Bug Fixes
+
+* adding missing try/catch for AddLateEventUnity ([76088bd](https://github.com/MirageNet/Mirage/commit/76088bdbd4329d1cc13d8ff3cf994b0301f39846))
+* adding try/catch around event invoke ([ac43382](https://github.com/MirageNet/Mirage/commit/ac43382d24585a679c1130430bccded527f90d79))
+
+# [158.3.0](https://github.com/MirageNet/Mirage/compare/v158.2.1...v158.3.0) (2026-06-11)
+
+
+### Features
+
+* client-side checks for ServerRpc rate limiting ([43edfd5](https://github.com/MirageNet/Mirage/commit/43edfd57f9ce5588b1d61b80e5b3bfd30eef619c))
+
+## [158.2.1](https://github.com/MirageNet/Mirage/compare/v158.2.0...v158.2.1) (2026-06-07)
+
+
+### Bug Fixes
+
+* improving logs from HandleRpc without authority ([d0add3c](https://github.com/MirageNet/Mirage/commit/d0add3ca04d6a8cdc47e91db50ec6c197aea0b95))
+* increasing no authority grace period to 5 seconds instead of 1 second ([b5da980](https://github.com/MirageNet/Mirage/commit/b5da980b38a54f77dd2fe23a6d294cd285ec6919))
+
+# [158.2.0](https://github.com/MirageNet/Mirage/compare/v158.1.0...v158.2.0) (2026-06-05)
+
+
+### Features
+
+* adding [MaxLength] for string and collection serializing ([f4a3a81](https://github.com/MirageNet/Mirage/commit/f4a3a81fb43431ec78cba633d457f282714e12f4))
+
+# [158.1.0](https://github.com/MirageNet/Mirage/compare/v158.0.0...v158.1.0) (2026-06-02)
+
+
+### Bug Fixes
+
+* disconnecting stateful connections if rejected ([3b2470f](https://github.com/MirageNet/Mirage/commit/3b2470f447b1878eea57d58555abb82bb46f89cc))
+* fixing Config.Create switch ([5c9f470](https://github.com/MirageNet/Mirage/commit/5c9f470d9cda82684f18e5332af7408ed0575360))
+* fixing OnDisconnectEvent if called before connection is made ([31aed24](https://github.com/MirageNet/Mirage/commit/31aed242fdb3fb4e34d774f3d7e8478e220f386e))
+
+
+### Features
+
+* adding PeerConfigProfile to help pre-configure Peer.Config based on target Socket ([839a568](https://github.com/MirageNet/Mirage/commit/839a5680a32006cbb148716790d2811436930801))
+
+# [158.0.0](https://github.com/MirageNet/Mirage/compare/v157.4.4...v158.0.0) (2026-05-24)
+
+
+* feat!: new NetworkSceneLoader as simple example for how to load scene and spawn characters ([e90bf7e](https://github.com/MirageNet/Mirage/commit/e90bf7efb9b89073687992c93c7886ea7c977e36))
+* refactor!: moving CharacterSpawner and NetworkSceneManager to samples folder ([0c03a49](https://github.com/MirageNet/Mirage/commit/0c03a496b8fb4031151ea3779850f212a898cc0b))
+* refactor!: moving NetworkAnimator to samples folder ([f9fde9b](https://github.com/MirageNet/Mirage/commit/f9fde9b44ea5c6e123cf19e57ddbe483f969acf8))
+* refactor!: moving scene events to legacy NetworkSceneManager ([4ac7d3f](https://github.com/MirageNet/Mirage/commit/4ac7d3f5a985708b07840c882fccec76df25749c))
+
+
+### Bug Fixes
+
+* adding checked for reader lengths ([293e4f2](https://github.com/MirageNet/Mirage/commit/293e4f2ad9e857ec0a373e24d974d19749432414))
+* fixing edge case where developer calls disconnected from server.connected ([0711f28](https://github.com/MirageNet/Mirage/commit/0711f286973243cc54dcf4a976bee80ee427d4fd))
+* fixing LoadSceneAsync await for unity 6 ([d51999f](https://github.com/MirageNet/Mirage/commit/d51999fac0240bd808043babe338cd91287dcab1))
+* fixing LoadSceneAsync await for unity 6 ([c93cf00](https://github.com/MirageNet/Mirage/commit/c93cf0031ac33280c464a00de64c9d7023450a29))
+* validating sender for return RPC ([7265e08](https://github.com/MirageNet/Mirage/commit/7265e088f2300830b14e3b77e2ef2ee9554c887f))
+
+
+### Features
+
+* adding PlayerErrorFlags.InvalidState for when state is incorrect and message can't be handled ([839b4e5](https://github.com/MirageNet/Mirage/commit/839b4e5566b71b18a045cee6fdf84ce14fccd8f1))
+
+
+### Performance Improvements
+
+* removing allocation when receiving fragmented packets ([b4db627](https://github.com/MirageNet/Mirage/commit/b4db627565d83378a827ef4266d6d52b97e02160))
+* reusing allocations from ackSystem ([8d983c5](https://github.com/MirageNet/Mirage/commit/8d983c53e348908e88c0fc34df1b75bdf68b00b8))
+
+
+### BREAKING CHANGES
+
+* - SceneChangeFinishedEvent moved to LegacySceneLoading Sample
+- SceneChangeStartedEvent moved to LegacySceneLoading Sample
+- PlayerSceneChangeEvent moved to LegacySceneLoading Sample
+* - NetworkSceneLoader is now added to NetworkManager instead of NetworkSceneManger
+- SceneMessage now only has ScenePath field
+* - CharacterSpawner is no longer in Components, and must be manually imported from Samples
+- NetworkSceneManager is no longer in Components, and must be manually imported from Samples
+* - NetworkAnimator is no longer in Components, and must be manually imported from Samples
+
+## [157.4.4](https://github.com/MirageNet/Mirage/compare/v157.4.3...v157.4.4) (2026-04-13)
+
+
+### Bug Fixes
+
+* **SocketLayer:** improving disconnect flow ([6e6c210](https://github.com/MirageNet/Mirage/commit/6e6c210f2563fe98ad50f201d590423b7cbc4417))
+
+## [157.4.3](https://github.com/MirageNet/Mirage/compare/v157.4.2...v157.4.3) (2026-04-12)
+
+
+### Bug Fixes
+
+* **SocketLayer:** adding checks for data packets to avoid exceptions from acksystem ([06ac6d5](https://github.com/MirageNet/Mirage/commit/06ac6d52684385893c32020f3e1a952433077247))
+* **SocketLayer:** adding safety try/catch so 1 connection can't stop update loop with bad packet ([e4f3089](https://github.com/MirageNet/Mirage/commit/e4f3089a40f715789f1c3ddf74f50319a5b55227))
+
+## [157.4.2](https://github.com/MirageNet/Mirage/compare/v157.4.1...v157.4.2) (2026-04-07)
+
+
+### Bug Fixes
+
+* changing errorFlags and rateLimit to use different loggers ([3d0497b](https://github.com/MirageNet/Mirage/commit/3d0497bac304a77d9ca7682a4642395bfa415fe5))
+
+## [157.4.1](https://github.com/MirageNet/Mirage/compare/v157.4.0...v157.4.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* fixing reply RPC never returning if rpc call is rejected ([86c5134](https://github.com/MirageNet/Mirage/commit/86c5134f64c526583ae679beb82525196c98bcdb))
+
+# [157.4.0](https://github.com/MirageNet/Mirage/compare/v157.3.0...v157.4.0) (2026-03-21)
+
+
+### Features
+
+* RateLimit attribute for ServerRpc ([46f9415](https://github.com/MirageNet/Mirage/commit/46f941511103c605b10e98144740da360aa4959e))
+
+# [157.3.0](https://github.com/MirageNet/Mirage/compare/v157.2.0...v157.3.0) (2026-03-11)
+
+
+### Bug Fixes
+
+* adding try/catch for Time.unscaledTime if called on side thread ([90df0ab](https://github.com/MirageNet/Mirage/commit/90df0ab95501a5f1338243d791f08d2968d1cbdb))
+
+
+### Features
+
+* adding Custom time prefix for MirageLogHandler ([ab54bfe](https://github.com/MirageNet/Mirage/commit/ab54bfee5048aebbadc452c7fc75bbc86699cd62))
+* adding StringStoreBrotliEncoder.GetByteLength ([fb857a4](https://github.com/MirageNet/Mirage/commit/fb857a4a9768d656e1066968d2153fba1775db2d))
+
+# [157.2.0](https://github.com/MirageNet/Mirage/compare/v157.1.0...v157.2.0) (2026-03-10)
+
+
+### Features
+
+* adding StringStore class to send indexes instead of strings ([f046a5c](https://github.com/MirageNet/Mirage/commit/f046a5c7f5cda45858d71dd3c3f7b98291ddd6f0))
+* better span support for NetworkWriter/Reader ([ee9cc28](https://github.com/MirageNet/Mirage/commit/ee9cc2812c6548fd67707c942075278f33258585))
+
+# [157.1.0](https://github.com/MirageNet/Mirage/compare/v157.0.0...v157.1.0) (2026-03-10)
+
+
+### Features
+
+* WeaverIgnore now ignores fields when creating Serialize functions ([68c0b06](https://github.com/MirageNet/Mirage/commit/68c0b06925f51e1961ab137caaf6897ed1c34433))
+
+# [157.0.0](https://github.com/MirageNet/Mirage/compare/v156.2.4...v157.0.0) (2026-02-10)
+
+
+* fix!: adding netid to world.Unspawn event ([5270646](https://github.com/MirageNet/Mirage/commit/5270646d111cc82f6f459956881a4377bfe181a1))
+
+
+### BREAKING CHANGES
+
+* NetworkWorld.Unspawn event now requires NetId argument
+
+## [156.2.4](https://github.com/MirageNet/Mirage/compare/v156.2.3...v156.2.4) (2026-01-14)
+
+
+### Bug Fixes
+
+* changing not found log back to warning for client side ([dcf7da1](https://github.com/MirageNet/Mirage/commit/dcf7da1f29e5fdc61184911c61cf007002f84d77))
+
+## [156.2.3](https://github.com/MirageNet/Mirage/compare/v156.2.2...v156.2.3) (2026-01-14)
+
+
+### Bug Fixes
+
+* checking destroy and remove authority times before adding error tokens ([4aa27cd](https://github.com/MirageNet/Mirage/commit/4aa27cdc11762901b9bd98d9de8df2b9e600282f))
+
+## [156.2.2](https://github.com/MirageNet/Mirage/compare/v156.2.1...v156.2.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* fixing EXCLUDE_NANOSOCKETS code for new IConnectionHandle ([6e65199](https://github.com/MirageNet/Mirage/commit/6e6519999c091638bbd90b1cb3473022759021eb))
+
+## [156.2.1](https://github.com/MirageNet/Mirage/compare/v156.2.0...v156.2.1) (2026-01-08)
+
+
+### Bug Fixes
+
+* saving AssetDatabase after log settings are changed ([9fcd0eb](https://github.com/MirageNet/Mirage/commit/9fcd0eb5ed7658c1f5a57a2203147581656be7d8))
+
+# [156.2.0](https://github.com/MirageNet/Mirage/compare/v156.1.0...v156.2.0) (2026-01-04)
+
+
+### Features
+
+* adding ISocket.Flush ([ac1ae64](https://github.com/MirageNet/Mirage/commit/ac1ae6426447af695c03a1e788f555be96f5a9e9))
+
+# [156.1.0](https://github.com/MirageNet/Mirage/compare/v156.0.0...v156.1.0) (2026-01-04)
+
+
+### Features
+
+* adding IsSupported to SocketFactory to be checked instead of CreateClientSocket ([893c210](https://github.com/MirageNet/Mirage/commit/893c2100ca87db01b8683030d3060b8e75994dbf))
+
+# [156.0.0](https://github.com/MirageNet/Mirage/compare/v155.3.0...v156.0.0) (2026-01-04)
+
+
+* refactor!: Updating INetworkPlayer to use new IConnectionHandle ([d04f7c5](https://github.com/MirageNet/Mirage/commit/d04f7c53894d7a5a2786c53bfdd53a1909b6ce39))
+* feat(SocketLayer)!: adding support for stateful connections ([0dc36d7](https://github.com/MirageNet/Mirage/commit/0dc36d7060ec7678ad42273905d8ba222f6157cc))
+
+
+### BREAKING CHANGES
+
+* IEndPoint Address is now IConnectionHandle ConnectionHandle
+* Low-level transports will now need to use the new the new ISocket, IConnectionHandle, IBindEndPoint, and IConnectEndPoint interfaces
+- ISocket.Bind now requires IBindEndPoint.
+- ISocket.Connect now requires IConnectEndPoint and returns IConnectionHandle.
+- ISocket implementation must now include SetTickEvents() and Tick() methods.
+- ISocket.Send/Receive signatures updated from byte[] to Span/ReadOnlySpan.
+- All Send/Receive methods now use IConnectionHandle instead of IEndPoint.
+- Custom Handles must implement IConnectionHandle, including IsStateful
+  and SocketLayerConnection properties.
+
+# [155.3.0](https://github.com/MirageNet/Mirage/compare/v155.2.1...v155.3.0) (2025-12-21)
+
+
+### Bug Fixes
+
+* using DeserializationException for null rpc payload ([92ff7fe](https://github.com/MirageNet/Mirage/commit/92ff7fee2ba57331c495386ee7e079bbccbb17bf))
+
+
+### Features
+
+* adding logger for PlayerErrorFlags ([eebf2a0](https://github.com/MirageNet/Mirage/commit/eebf2a0c99ac456b5ab2ff004ab99c44bc3a32fc))
+
+## [155.2.1](https://github.com/MirageNet/Mirage/compare/v155.2.0...v155.2.1) (2025-12-21)
+
+
+### Bug Fixes
+
+* detecting EndOfStreamException from reader and using higher cost DeserializationException ([17395e3](https://github.com/MirageNet/Mirage/commit/17395e3e8626c32063edcf2280c3f6be8673d97c))
+* fixing OnReply not removing correct ID ([caa78e6](https://github.com/MirageNet/Mirage/commit/caa78e6c93a8e64e576e918c0090e861d4b5c717))
+* SetError for RpcReply if id is not found ([0b666bb](https://github.com/MirageNet/Mirage/commit/0b666bb655c2178d2e086c755e7f5de3b3da662b))
+
+# [155.2.0](https://github.com/MirageNet/Mirage/compare/v155.1.0...v155.2.0) (2025-12-20)
+
+
+### Bug Fixes
+
+* adding PlayerErrorFlags.Unauthenticated to use along side Unauthorized ([b56d341](https://github.com/MirageNet/Mirage/commit/b56d34133f75f50f87503f43e2aa68ba7fe13fd9))
+* adding safety check for calling SetError inside ErrorRateLimitReached ([fe1a0ca](https://github.com/MirageNet/Mirage/commit/fe1a0cae1c8a84e152df794efb6f27739717db97))
+* fixing RPC.GetAbsolute bounds check ([6df3a4a](https://github.com/MirageNet/Mirage/commit/6df3a4a5e26f68edb383f86fb90417a3f508b4f5))
+
+
+### Features
+
+* adding player.SetErrorAndDisconnect for errors that should always kick ([96c96e9](https://github.com/MirageNet/Mirage/commit/96c96e9e82ef3957a4a1665975bdad0de20a71f4))
+* using new error handling for MessageHandler ([a1528f6](https://github.com/MirageNet/Mirage/commit/a1528f652050ad0a06122b624542a1096b9f8b46))
+* using new error handling for RpcHandler ([88cba12](https://github.com/MirageNet/Mirage/commit/88cba12e39c104609315a1298f9068875671095f))
+* using senderPlayer.SetError for async rpcs ([8de21ca](https://github.com/MirageNet/Mirage/commit/8de21ca12136bc14fc72e4c4cf5179bde6ff8b25))
+
+# [155.1.0](https://github.com/MirageNet/Mirage/compare/v155.0.0...v155.1.0) (2025-12-19)
+
+
+### Bug Fixes
+
+* avoiding logs from new player.SetError ([d92f42b](https://github.com/MirageNet/Mirage/commit/d92f42b9f6b5b29652d7436d3ecf5e1c2f3ee475))
+
+
+### Features
+
+* adding PlayerErrorFlags.LikelyCheater flag ([70bc6a1](https://github.com/MirageNet/Mirage/commit/70bc6a1d27a4605b72c324c5b0be5c1383eb81e7))
+
+# [155.0.0](https://github.com/MirageNet/Mirage/compare/v154.3.0...v155.0.0) (2025-12-19)
+
+
+* feat!: better error handling for NetworkPlayers ([bac64ae](https://github.com/MirageNet/Mirage/commit/bac64aeb27b8e1e5c70a5a6892c102ac705afbdd))
+
+
+### BREAKING CHANGES
+
+* NetworkServer.DisconnectOnException is no longer used. ErrorRateLimitEnabled and ErrorRateLimitConfig should be used instead
+
+# [154.3.0](https://github.com/MirageNet/Mirage/compare/v154.2.0...v154.3.0) (2025-12-19)
+
+
+### Bug Fixes
+
+* adding safety checks when releasing buffers from _sentAckablePackets ([68328fe](https://github.com/MirageNet/Mirage/commit/68328feecc0695b46717313fc2f61af711d81271))
+* improving ring buffer and stopping cleanup errors ([49367e9](https://github.com/MirageNet/Mirage/commit/49367e92647f03476997227af8486152d4ae2ff4))
+* try catch for connection dispose to ensure list is cleared ([7f6f09d](https://github.com/MirageNet/Mirage/commit/7f6f09d6b86f534ec6b3116a5ee23f4b2663a5fb))
+
+
+### Features
+
+* allowing custom ClientStoppedReason codes ([46b21be](https://github.com/MirageNet/Mirage/commit/46b21bed675d3abea1ed93b20345e52181221bf3))
+
+# [154.2.0](https://github.com/MirageNet/Mirage/compare/v154.1.3...v154.2.0) (2025-12-18)
+
+
+### Features
+
+* adding option for Peer to always send reject reason, allowing stateful sockets to close a connection ([d3c2a5d](https://github.com/MirageNet/Mirage/commit/d3c2a5debf429aaaf301187ca9f370d6d20fb106))
+
+## [154.1.3](https://github.com/MirageNet/Mirage/compare/v154.1.2...v154.1.3) (2025-12-17)
+
+
+### Bug Fixes
+
+* fixing Exception from reader ([bae71ef](https://github.com/MirageNet/Mirage/commit/bae71efabbfc8ae9441baf12fc1075873de1b2ce))
+
+## [154.1.2](https://github.com/MirageNet/Mirage/compare/v154.1.1...v154.1.2) (2025-12-16)
+
+
+### Bug Fixes
+
+* fixing null ref in NetworkInformationPreview from EditorStyles ([7755343](https://github.com/MirageNet/Mirage/commit/7755343543dfac40ba7ec6b640515f32ca4bde1d))
+
+## [154.1.1](https://github.com/MirageNet/Mirage/compare/v154.1.0...v154.1.1) (2025-12-10)
+
+
+### Bug Fixes
+
+* adding check to SendSpawnMessage to avoid server sending invalid SpawnMessage ([eb794e4](https://github.com/MirageNet/Mirage/commit/eb794e4f4a79e0b3839cb26889d913371b03b86f))
+
+# [154.1.0](https://github.com/MirageNet/Mirage/compare/v154.0.0...v154.1.0) (2025-12-04)
+
+
+### Bug Fixes
+
+* using pools instead of static cache incase function is called 2nd time ([0fa39d9](https://github.com/MirageNet/Mirage/commit/0fa39d9897fe95dd349ae04660cf283604e92ac5))
+
+
+### Features
+
+* **ObjectManager:** adding optional filter for scene objects ([bb8294a](https://github.com/MirageNet/Mirage/commit/bb8294a2c66c0b1e227d1412600f8ba36e0564d9))
+
+# [154.0.0](https://github.com/MirageNet/Mirage/compare/v153.3.2...v154.0.0) (2025-11-13)
+
+
+* fix!: stopping _networkBehavioursCache from being automatically cleared on destroy ([9cd8c94](https://github.com/MirageNet/Mirage/commit/9cd8c94a9790fd7cd61eac09d84e72d2a425f23c))
+
+
+### BREAKING CHANGES
+
+* NetworkBehaviour list no longer cleared in OnDestroy or NetworkReset
+
+## [153.3.2](https://github.com/MirageNet/Mirage/compare/v153.3.1...v153.3.2) (2025-10-26)
+
+
+### Bug Fixes
+
+* **Examples:** fixing UI in basic example ([7cd9ccb](https://github.com/MirageNet/Mirage/commit/7cd9ccb221c4f851d3f43808205f2cd1eaa5c542))
+
+## [153.3.1](https://github.com/MirageNet/Mirage/compare/v153.3.0...v153.3.1) (2025-09-25)
+
+
+### Bug Fixes
+
+* swapping AttachExternalCancellation order ([7dfe8f7](https://github.com/MirageNet/Mirage/commit/7dfe8f7b9fdafaf847eac31175f1817a829580cb))
+
+# [153.3.0](https://github.com/MirageNet/Mirage/compare/v153.2.6...v153.3.0) (2025-09-11)
+
+
+### Bug Fixes
+
+* adding check to SocketLayer config for MaxReliableFragments ([8b4a6ea](https://github.com/MirageNet/Mirage/commit/8b4a6ea7df515e5063578b2b4a87fd870e9e6a18))
+* fixing max length check SendUnreliable ([5aa89c0](https://github.com/MirageNet/Mirage/commit/5aa89c0074a2aef29701a8184d88432591b0c476))
+
+
+### Features
+
+* adding helper methods to get max message size for each channel ([8d623fb](https://github.com/MirageNet/Mirage/commit/8d623fb4b24da0e21bf4157fa8ffea5a87ec119b))
+
+## [153.2.6](https://github.com/MirageNet/Mirage/compare/v153.2.5...v153.2.6) (2025-09-11)
+
+
+### Bug Fixes
+
+* adding byte count to HandleMessage log ([6627d74](https://github.com/MirageNet/Mirage/commit/6627d74591ce3f243cb9f200bc68bb9b31f2604a))
+
+## [153.2.5](https://github.com/MirageNet/Mirage/compare/v153.2.4...v153.2.5) (2025-08-31)
+
+
+### Bug Fixes
+
+* adding compile error when [NetworkMessage] is incorrectly added to generic class ([e9b3a39](https://github.com/MirageNet/Mirage/commit/e9b3a39220d37b31d40967dc9632eb2e8ba6c141))
+
+## [153.2.4](https://github.com/MirageNet/Mirage/compare/v153.2.3...v153.2.4) (2025-08-27)
+
+
+### Bug Fixes
+
+* ensuring that SpawnVisibleObjects spawns NetworkIdentity in netId order ([de7a657](https://github.com/MirageNet/Mirage/commit/de7a657e0a65f34e785343201ada72a8aa651edb))
+
+## [153.2.3](https://github.com/MirageNet/Mirage/compare/v153.2.2...v153.2.3) (2025-08-27)
+
+
+### Bug Fixes
+
+* improving logs of prefabHash to always be hex ([a6fdb94](https://github.com/MirageNet/Mirage/commit/a6fdb942e66b87208d702d163767fbc9cdf6d60d))
+
+## [153.2.2](https://github.com/MirageNet/Mirage/compare/v153.2.1...v153.2.2) (2025-08-24)
+
+
+### Bug Fixes
+
+* fixing throw in NetworkIdentity.ToString ([585ae30](https://github.com/MirageNet/Mirage/commit/585ae305e68cd68a8881909a72beebe9166a490c))
+
+## [153.2.1](https://github.com/MirageNet/Mirage/compare/v153.2.0...v153.2.1) (2025-08-24)
+
+
+### Bug Fixes
+
+* calling RemoveDestroyedObjects when PrepareToSpawnSceneObjects is called ([8750260](https://github.com/MirageNet/Mirage/commit/875026072ca023a50af0e1c7d34fbd979d2dc271))
+* checking world is empty after ObjectManagers unspawn all identities ([73e0153](https://github.com/MirageNet/Mirage/commit/73e015378eec9ca7fc15794cdea476c98c7a78c8))
+* fixing onUnspawn not called if client object was destroyed ([637c6d0](https://github.com/MirageNet/Mirage/commit/637c6d0e31f46f70b84a8d179f32f34257acc8ae))
+
+# [153.2.0](https://github.com/MirageNet/Mirage/compare/v153.1.0...v153.2.0) (2025-08-24)
+
+
+### Features
+
+* making NetworkWorld.RemoveDestroyedObjects public ([a1beda3](https://github.com/MirageNet/Mirage/commit/a1beda3cf375d84d196ce00fcedc0fb70a2a10df))
+
+# [153.1.0](https://github.com/MirageNet/Mirage/compare/v153.0.0...v153.1.0) (2025-08-22)
+
+
+### Features
+
+* adding NonAlloc read methods for collections ([535b347](https://github.com/MirageNet/Mirage/commit/535b3472325b5c1f16f73c9a135519b57d35b058))
+
+# [153.0.0](https://github.com/MirageNet/Mirage/compare/v152.0.0...v153.0.0) (2025-08-01)
+
+
+### Bug Fixes
+
+* changing back to UniTaskCompletionSource so task completes same a frame earlier ([3669a6d](https://github.com/MirageNet/Mirage/commit/3669a6d783d1b614407f37099d31197b8b8da587))
+* fixing pending dictionary changed in ServerStopped ([86df5ef](https://github.com/MirageNet/Mirage/commit/86df5ef1a0a897954a5c9b895e02bf2bf7f50d9a))
+
+
+* feat!: improving NetworkAuthenticator to include CancellationToken for AuthenticateAsync ([98ed8f1](https://github.com/MirageNet/Mirage/commit/98ed8f129389dc7a19d0a6bb613704e3b81f647a))
+
+
+### BREAKING CHANGES
+
+* AuthenticateAsync override now needs CancellationToken cancellationToken argument
+
+# [152.0.0](https://github.com/MirageNet/Mirage/compare/v151.3.3...v152.0.0) (2025-07-04)
+
+
+* build!: Drop Unity 2020.3 LTS support ([989a784](https://github.com/MirageNet/Mirage/commit/989a7842bced580d059345d389613bc56787d68a))
+
+
+### BREAKING CHANGES
+
+* Unity 2020.3 LTS is no longer supported due to end-of-life and incompatibility with recent fixes. The minimum supported version is now 2021.3 LTS.
+
+## [151.3.3](https://github.com/MirageNet/Mirage/compare/v151.3.2...v151.3.3) (2025-06-30)
+
+
+### Bug Fixes
+
+* fixing desync issue caused by `ClearShouldSyncDirtyOnly` using wrong time ([321badc](https://github.com/MirageNet/Mirage/commit/321badc845b5e0f5035028930513e651631eec70))
+* fixing NetworkTime Ping not using unscaled time to check ([0dd327a](https://github.com/MirageNet/Mirage/commit/0dd327add09d133524a5b41d429f85c63dc9b5da))
+* fixing SocketLayer not using unscaled time ([137fd79](https://github.com/MirageNet/Mirage/commit/137fd798217a017919113ab4d2728ac82e99421f))
+
+## [151.3.2](https://github.com/MirageNet/Mirage/compare/v151.3.1...v151.3.2) (2025-06-08)
+
+
+### Bug Fixes
+
+* fixing syncvar not sending while timescale is zero ([869e756](https://github.com/MirageNet/Mirage/commit/869e756ee48167730fa48063257e263792c7cf8f))
+
+## [151.3.1](https://github.com/MirageNet/Mirage/compare/v151.3.0...v151.3.1) (2025-05-28)
+
+
+### Bug Fixes
+
+* removing SpawnOrActivate and fixing StartHostClientObjects setup for objects spawned before host client is connected ([a5e1eb7](https://github.com/MirageNet/Mirage/commit/a5e1eb791aaf480125a53439ba5bf5f2964ed56c))
+
+# [151.3.0](https://github.com/MirageNet/Mirage/compare/v151.2.11...v151.3.0) (2025-05-17)
+
+
+### Features
+
+* storing message for Async spawning and applying them after ([23c6fa8](https://github.com/MirageNet/Mirage/commit/23c6fa8363e16cf9711d31743556fd7b1e333318))
+
+## [151.2.11](https://github.com/MirageNet/Mirage/compare/v151.2.10...v151.2.11) (2025-04-13)
+
+
+### Bug Fixes
+
+* fixing compile error from use of logger ([c98e5b0](https://github.com/MirageNet/Mirage/commit/c98e5b076a8822cabe32748c6ed1b8598159f2c7))
+* fixing connection state in test setup ([750cb26](https://github.com/MirageNet/Mirage/commit/750cb263f43ef731bb71b50b9bdc1b424d1f7a88))
+* making sure messageHandler isn't given message after disconnect ([f0376e1](https://github.com/MirageNet/Mirage/commit/f0376e1afc3dac29b01ca55f8ae95e3aeee7b198))
+* making sure that AuthMessage can't be received twice ([c07a662](https://github.com/MirageNet/Mirage/commit/c07a662d5549ed5e0138c8cbf40f0884120950c7))
+
+## [151.2.10](https://github.com/MirageNet/Mirage/compare/v151.2.9...v151.2.10) (2025-04-12)
+
+
+### Bug Fixes
+
+* **AuthenticatorSettings:** Fix missing semicolon ([f3cac70](https://github.com/MirageNet/Mirage/commit/f3cac702fb8dfd7b883caae64e2e450a350f0737))
+* **AuthenticatorSettings:** fix NullReferenceException ([0073c27](https://github.com/MirageNet/Mirage/commit/0073c2755f85f0754e3039f72c838147b1ad2c14))
+
+## [151.2.9](https://github.com/MirageNet/Mirage/compare/v151.2.8...v151.2.9) (2025-04-09)
+
+
+### Bug Fixes
+
+* fixing not supported version of NanoSocket to accept int bufferSize ([a067a70](https://github.com/MirageNet/Mirage/commit/a067a701b230a61381e36d71dcaa051c929d67e4)), closes [#1185](https://github.com/MirageNet/Mirage/issues/1185)
+
+## [151.2.8](https://github.com/MirageNet/Mirage/compare/v151.2.7...v151.2.8) (2025-03-20)
+
+
+### Bug Fixes
+
+* catching BufferFullException from flush ([5dd80ea](https://github.com/MirageNet/Mirage/commit/5dd80ea3d7572839b40ba209086f68e92c9dcec8))
+* using SendBufferFull from NetworkPlayer when disconnecting ([b6c98f9](https://github.com/MirageNet/Mirage/commit/b6c98f90ae894a1407296e0a8c2937e606744069))
+
+## [151.2.7](https://github.com/MirageNet/Mirage/compare/v151.2.6...v151.2.7) (2025-03-17)
+
+
+### Bug Fixes
+
+* Auth success message wording in NetworkClient ([#1183](https://github.com/MirageNet/Mirage/issues/1183)) ([ff4873d](https://github.com/MirageNet/Mirage/commit/ff4873db57ad6bfab96c605f0020109f2638afda))
+
 ## [151.2.6](https://github.com/MirageNet/Mirage/compare/v151.2.5...v151.2.6) (2025-02-16)
 
 

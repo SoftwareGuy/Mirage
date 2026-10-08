@@ -4,6 +4,7 @@ using Mirage.Events;
 using Mirage.Logging;
 using Mirage.RemoteCalls;
 using Mirage.Serialization;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -105,6 +106,18 @@ namespace Mirage
     {
         private static readonly ILogger logger = LogFactory.GetLogger<NetworkIdentity>();
 
+        private static readonly ProfilerMarker onStartServerInvokeMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnStartServer.Invoke");
+        private static readonly ProfilerMarker onStartClientInvokeMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnStartClient.Invoke");
+        private static readonly ProfilerMarker onStartLocalPlayerInvokeMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnStartLocalPlayer.Invoke");
+        private static readonly ProfilerMarker onAuthorityChangedInvokeMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnAuthorityChanged.Invoke");
+        private static readonly ProfilerMarker onOwnerChangedInvokeMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnOwnerChanged.Invoke");
+        private static readonly ProfilerMarker onStopClientInvokeMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnStopClient.Invoke");
+        private static readonly ProfilerMarker onStopServerInvokeMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnStopServer.Invoke");
+        private static readonly ProfilerMarker onSerializeDeltaMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnSerializeDelta");
+        private static readonly ProfilerMarker onSerializeInitialMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnSerializeInitial");
+        private static readonly ProfilerMarker onDeserializeAllMarker = new ProfilerMarker("Mirage.NetworkIdentity.OnDeserializeAll");
+        private static readonly ProfilerMarker rebuildObserversMarker = new ProfilerMarker("Mirage.NetworkIdentity.RebuildObservers");
+
         public NetworkSpawnSettings SpawnSettings = NetworkSpawnSettings.Default;
 
         [NonSerialized]
@@ -142,6 +155,12 @@ namespace Mirage
         /// <para>For objects that had their authority set by AssignClientAuthority on the server, this will be true on the client that owns the object. NOT on other clients.</para>
         /// </summary>
         public bool HasAuthority { get; internal set; }
+
+        /// <summary>
+        /// Time on server when authority was removed, and who it was removed from. Can be used to ignore RPCs that were sent before client knew about authority change
+        /// <para>Value is 0 if authority has not been removed. Only valid on server</para>
+        /// </summary>
+        public AuthorityTime AuthorityRemovedTime;
 
         /// <summary>
         /// The set of network connections (players) that can see this object.
@@ -250,6 +269,11 @@ namespace Mirage
 
             if (_owner != null)
             {
+                // set the time we removed authority
+                // it is rare/unadvised to change owner multiple times quickly,
+                // so we can just store the most recent previous owner
+                AuthorityRemovedTime = new AuthorityTime(_owner, Time.unscaledTimeAsDouble);
+
                 // invoke OnAuthority for remove owner and then again if there is new owner
                 // world can be null if owner is set before object is spawned
                 World?.InvokeOnAuthorityChanged(this, false, _owner);
@@ -263,7 +287,8 @@ namespace Mirage
             foreach (var comp in NetworkBehaviours)
                 comp.UpdateSyncObjectShouldSync();
 
-            _onOwnerChanged.Invoke(_owner);
+            using (onOwnerChangedInvokeMarker.Auto())
+                _onOwnerChanged.Invoke(_owner);
 
             // only invoke again if new owner is not null
             if (_owner != null)
@@ -553,7 +578,6 @@ namespace Mirage
 
             // Clear references to help GC collect
             observers.Clear();
-            _networkBehavioursCache = null;
             Server = null;
             World = null;
             SyncVarSender = null;
@@ -574,19 +598,21 @@ namespace Mirage
 
         internal void StartServer()
         {
-            if (logger.LogEnabled()) logger.Log($"OnStartServer invoked on '{this}' (NetId: {NetId}, SceneId: {SceneId:X})");
+            if (logger.LogEnabled()) logger.Log($"OnStartServer invoked on '{this}' (NetId: {NetId}, SceneId: {SceneId})");
 
             // update sync direction before invoking start callback
             // need to do this because IsServer might now be set when it previosuly wasn't
             foreach (var comp in NetworkBehaviours)
                 comp.UpdateSyncObjectShouldSync();
 
-            _onStartServer.Invoke();
+            using (onStartServerInvokeMarker.Auto())
+                _onStartServer.Invoke();
         }
 
         internal void StopServer()
         {
-            _onStopServer.Invoke();
+            using (onStopServerInvokeMarker.Auto())
+                _onStopServer.Invoke();
         }
 
         internal void StartClient()
@@ -600,7 +626,8 @@ namespace Mirage
                 comp.UpdateSyncObjectShouldSync();
 
             _clientStarted = true;
-            _onStartClient.Invoke();
+            using (onStartClientInvokeMarker.Auto())
+                _onStartClient.Invoke();
         }
 
         internal void StartLocalPlayer()
@@ -609,7 +636,8 @@ namespace Mirage
                 return;
             _localPlayerStarted = true;
 
-            _onStartLocalPlayer.Invoke();
+            using (onStartLocalPlayerInvokeMarker.Auto())
+                _onStartLocalPlayer.Invoke();
         }
 
         internal void NotifyAuthority()
@@ -627,7 +655,8 @@ namespace Mirage
 
         internal void CallStartAuthority()
         {
-            _onAuthorityChanged.Invoke(true);
+            using (onAuthorityChangedInvokeMarker.Auto())
+                _onAuthorityChanged.Invoke(true);
 
             // dont invoke in host mode, server will invoke it when owner is changed
             if (!IsServer)
@@ -636,7 +665,8 @@ namespace Mirage
 
         internal void CallStopAuthority()
         {
-            _onAuthorityChanged.Invoke(false);
+            using (onAuthorityChangedInvokeMarker.Auto())
+                _onAuthorityChanged.Invoke(false);
 
             // dont invoke in host mode, server will invoke it when owner is changed
             if (!IsServer)
@@ -653,75 +683,51 @@ namespace Mirage
 
         internal void StopClient()
         {
-            _onStopClient.Invoke();
+            using (onStopClientInvokeMarker.Auto())
+                _onStopClient.Invoke();
         }
 
         // random number that is unlikely to appear in a regular data stream
         private const byte BARRIER = 171;
 
-        // paul: readstring bug prevention: https://issuetracker.unity3d.com/issues/unet-networkwriter-dot-write-causing-readstring-slash-readbytes-out-of-range-errors-in-clients
-        // -> OnSerialize writes componentData, barrier, componentData, barrier,componentData,...
-        // -> OnDeserialize carefully extracts each data, then deserializes the barrier and check it
-        //    -> If we read too many or too few bytes,  the barrier is very unlikely to match
-        //    -> we can properly track down errors
         /// <summary>
-        /// Serializes component and its lengths
+        /// Serialize all components for spawn message, ignores dirty bits or sync time
         /// </summary>
-        /// <param name="comp"></param>
-        /// <param name="writer"></param>
-        /// <param name="initialState"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// paul: readstring bug prevention
-        /// <see cref="https://issuetracker.unity3d.com/issues/unet-networkwriter-dot-write-causing-readstring-slash-readbytes-out-of-range-errors-in-clients"/>
-        /// <list type="bullet">
-        ///     <item><description>
-        ///         OnSerialize writes componentData, barrier, componentData, barrier,componentData,...
-        ///     </description></item>
-        ///     <item><description>
-        ///         OnDeserialize carefully extracts each data, then deserializes the barrier and check it
-        ///     </description></item>
-        ///     <item><description>
-        ///         If we read too many or too few bytes,  the barrier is very unlikely to match
-        ///     </description></item>
-        ///     <item><description>
-        ///         We can properly track down errors
-        ///     </description></item>
-        /// </list>
-        /// </remarks>
-        private void OnSerialize(int i, NetworkBehaviour comp, NetworkWriter writer, bool initialState)
+        /// <param name="ownerWriter"></param>
+        /// <param name="observersWriter"></param>
+        internal (int ownerWritten, int observersWritten) OnSerializeInitial(NetworkWriter ownerWriter, NetworkWriter observersWriter)
         {
-            // write index as byte [0..255]
-            writer.WriteByte((byte)i);
-
-            comp.OnSerialize(writer, initialState);
-            if (logger.LogEnabled()) logger.Log($"OnSerializeSafely written for '{comp.name}', Component '{comp.GetType()}', SceneId {SceneId:X}");
-
-            // serialize a barrier to be checked by the deserializer
-            writer.WriteByte(BARRIER);
+            using var _ = onSerializeInitialMarker.Auto();
+            return OnSerialize(true, default, ownerWriter, observersWriter);
         }
 
         /// <summary>
-        /// serialize all components using dirtyComponentsMask
-        /// <para>check ownerWritten/observersWritten to know if anything was written</para>
-        /// <para>We pass dirtyComponentsMask into this function so that we can check if any Components are dirty before creating writers</para>
+        /// Serialize all components, checking dirty bits and time to sync
         /// </summary>
-        /// <param name="initialState"></param>
+        /// <param name="now"></param>
         /// <param name="ownerWriter"></param>
         /// <param name="observersWriter"></param>
-        internal (int ownerWritten, int observersWritten) OnSerializeAll(bool initialState, NetworkWriter ownerWriter, NetworkWriter observersWriter)
+        internal (int ownerWritten, int observersWritten) OnSerializeDelta(double now, NetworkWriter ownerWriter, NetworkWriter observersWriter)
+        {
+            using var _ = onSerializeDeltaMarker.Auto();
+            return OnSerialize(false, now, ownerWriter, observersWriter);
+        }
+
+        private (int ownerWritten, int observersWritten) OnSerialize(bool initialState, double now, NetworkWriter ownerWriter, NetworkWriter observersWriter)
         {
             // how many times it written to (NOT BYTES)
             var ownerWritten = 0;
             var observersWritten = 0;
-
-
             var components = NetworkBehaviours;
-            // store time as variable so we dont have to call property for each component
-            var now = Time.timeAsDouble;
+            var componentCount = components.Length;
+
+            // Use a stack-allocated array to track the components that were serialized.
+            Span<bool> syncedComponents = stackalloc bool[componentCount];
+            // stackalloc doesn't guarantee that memory is zeroed, so we clear it first
+            syncedComponents.Clear();
 
             // serialize all components
-            for (var i = 0; i < components.Length; ++i)
+            for (var i = 0; i < componentCount; ++i)
             {
                 var comp = components[i];
 
@@ -747,6 +753,7 @@ namespace Mirage
 
                 if (logger.LogEnabled()) logger.Log($"OnSerializeAllSafely: '{name}', component '{comp.GetType()}', initial state: '{initialState}'");
 
+                syncedComponents[i] = true;
 
                 // if only observers, then just write directly to observersWriter
                 if (comp.SyncSettings.ToObserverWriterOnly(this))
@@ -784,8 +791,63 @@ namespace Mirage
                 }
             }
 
+            // clear dirty bits only for the components that we serialized
+            if (!initialState)
+            {
+                for (var i = 0; i < componentCount; i++)
+                {
+                    if (syncedComponents[i])
+                    {
+                        components[i].ClearShouldSync(now);
+                    }
+                }
+            }
+
             return (ownerWritten, observersWritten);
         }
+
+        // paul: readstring bug prevention: https://issuetracker.unity3d.com/issues/unet-networkwriter-dot-write-causing-readstring-slash-readbytes-out-of-range-errors-in-clients
+        // -> OnSerialize writes componentData, barrier, componentData, barrier,componentData,...
+        // -> OnDeserialize carefully extracts each data, then deserializes the barrier and check it
+        //    -> If we read too many or too few bytes,  the barrier is very unlikely to match
+        //    -> we can properly track down errors
+        /// <summary>
+        /// Serializes component and its lengths
+        /// </summary>
+        /// <param name="comp"></param>
+        /// <param name="writer"></param>
+        /// <param name="initialState"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// paul: readstring bug prevention
+        /// <see cref="https://issuetracker.unity3d.com/issues/unet-networkwriter-dot-write-causing-readstring-slash-readbytes-out-of-range-errors-in-clients"/>
+        /// <list type="bullet">
+        ///     <item><description>
+        ///         OnSerialize writes componentData, barrier, componentData, barrier,componentData,...
+        ///     </description></item>
+        ///     <item><description>
+        ///         OnDeserialize carefully extracts each data, then deserializes the barrier and check it
+        ///     </description></item>
+        ///     <item><description>
+        ///         If we read too many or too few bytes,  the barrier is very unlikely to match
+        ///     </description></item>
+        ///     <item><description>
+        ///         We can properly track down errors
+        ///     </description></item>
+        /// </list>
+        /// </remarks>
+        private void OnSerialize(int i, NetworkBehaviour comp, NetworkWriter writer, bool initialState)
+        {
+            // write index as byte [0..255]
+            writer.WriteByte((byte)i);
+
+            comp.OnSerialize(writer, initialState);
+            if (logger.LogEnabled()) logger.Log($"OnSerializeSafely written for '{comp.name}', Component '{comp.GetType()}', SceneId {SceneId}");
+
+            // serialize a barrier to be checked by the deserializer
+            writer.WriteByte(BARRIER);
+        }
+
 
         // Determines if there are changes in any component that have not
         // been synchronized yet. Probably due to not meeting the syncInterval
@@ -801,6 +863,8 @@ namespace Mirage
 
         internal void OnDeserializeAll(NetworkReader reader, bool initialState)
         {
+            using var _ = onDeserializeAllMarker.Auto();
+
             // set InitialState before deserializing so that syncvar hooks and other methods can check it
             InitialState = initialState;
 
@@ -862,7 +926,7 @@ namespace Mirage
         {
             if (index >= components.Length)
             {
-                throw new DeserializeFailedException($"Deserialization failure component index out of range on networked object '{name}' (NetId {NetId}, SceneId {SceneId:X})." +
+                throw new DeserializeFailedException($"Deserialization failure component index out of range on networked object '{name}' (NetId {NetId}, SceneId {SceneId})." +
                     $" Possible Reasons:\n" +
                     $"  * Component added at runtime causing behaviour array to be mismatched\n" +
                     $"  * out dated version of prefab on either server or client, Try rebuilding both.\n\n");
@@ -876,7 +940,7 @@ namespace Mirage
             var notToServer = (comp.SyncSettings.To & SyncTo.Server) == 0;
             if (notToServer && IsServer)
             {
-                throw new DeserializeFailedException($"Invalid sync settings on '{comp.GetType()}' on networked object '{name}' (NetId {NetId}, SceneId {SceneId:X})." +
+                throw new DeserializeFailedException($"Invalid sync settings on '{comp.GetType()}' on networked object '{name}' (NetId {NetId}, SceneId {SceneId})." +
                    $" Possible Reason: SyncSettings was changed to SyncTo.Server at runtime, but not udpated on server.\n" +
                    $"Ensure SyncSettings is same on both Server and Client, this may rebuilding both.");
             }
@@ -885,7 +949,7 @@ namespace Mirage
         {
             if (barrierData != BARRIER)
             {
-                throw new DeserializeFailedException($"Deserialization failure for component '{comp.GetType()}' on networked object '{name}' (NetId {NetId}, SceneId {SceneId:X})." +
+                throw new DeserializeFailedException($"Deserialization failure for component '{comp.GetType()}' on networked object '{name}' (NetId {NetId}, SceneId {SceneId})." +
                     $" Possible Reasons:\n" +
                     $"  * Do {comp.GetType()}'s OnSerialize and OnDeserialize calls write the same amount of data?\n" +
                     $"  * Did something fail in {comp.GetType()}'s OnSerialize/OnDeserialize code?\n" +
@@ -943,13 +1007,6 @@ namespace Mirage
 
         internal void SetClientValues(ClientObjectManager clientObjectManager, SpawnMessage msg)
         {
-            var spawnValues = msg.SpawnValues;
-            if (spawnValues.Position.HasValue) transform.localPosition = spawnValues.Position.Value;
-            if (spawnValues.Rotation.HasValue) transform.localRotation = spawnValues.Rotation.Value;
-            if (spawnValues.Scale.HasValue) transform.localScale = spawnValues.Scale.Value;
-            if (!string.IsNullOrEmpty(spawnValues.Name)) gameObject.name = spawnValues.Name;
-            if (spawnValues.SelfActive.HasValue) gameObject.SetActive(spawnValues.SelfActive.Value);
-
             NetId = msg.NetId;
             HasAuthority = msg.IsOwner;
             ClientObjectManager = clientObjectManager;
@@ -1015,6 +1072,8 @@ namespace Mirage
         /// <param name="initialize">True if this is the first time.</param>
         public void RebuildObservers(bool initialize)
         {
+            using var _ = rebuildObserversMarker.Auto();
+
             // call OnRebuildObservers function
             GetNewObservers(newObservers, initialize);
 
@@ -1175,11 +1234,20 @@ namespace Mirage
             _owner = null;
             World = null;
             SyncVarSender = null;
-            _networkBehavioursCache = null;
             _visibility = null;
 
             ClearObservers();
             ResetEvents();
+        }
+
+        /// <summary>
+        /// Can be used to clear the Cache for <see cref="NetworkBehaviours"/>.
+        /// Use this if you need to change what behaviours are part of this identity.
+        /// <para>WARNING: changing behaviour at runtime could lead to desync, use at your own risk</para>
+        /// </summary>
+        public void ClearNetworkBehaviourCache()
+        {
+            _networkBehavioursCache = null;
         }
 
         private void ResetEvents()
@@ -1196,37 +1264,15 @@ namespace Mirage
         /// <summary>
         /// Clears dirty bits and sets the next sync time on each Component 
         /// </summary>
-        internal void ClearShouldSync()
+        internal void ClearShouldSync(double now)
         {
-            // store time as variable so we dont have to call property for each component
-            var now = Time.timeAsDouble;
-
             foreach (var comp in NetworkBehaviours)
             {
                 comp.ClearShouldSync(now);
             }
         }
 
-        /// <summary>
-        /// Clear dirty bits of Component only if it is after syncInterval
-        /// <para>
-        /// Note: generally this is called after syncing to clear dirty bits of components we just synced
-        /// </para>
-        /// </summary>
-        internal void ClearShouldSyncDirtyOnly()
-        {
-            // store time as variable so we dont have to call property for each component
-            var now = Time.timeAsDouble;
 
-            foreach (var comp in NetworkBehaviours)
-            {
-                // todo this seems weird, should we be clearing this somewhere else?
-                if (comp.TimeToSync(now))
-                {
-                    comp.ClearShouldSync(now);
-                }
-            }
-        }
 
         private void ResetSyncObjects()
         {
@@ -1238,15 +1284,16 @@ namespace Mirage
 
         public override string ToString()
         {
-            return $"Identity[{NetId}, {name}]";
+            if (this != null) // unity null
+                return $"Identity[{NetId}, {name}]";
+            else
+                return $"Identity[{NetId}, \"NULL\"]";
         }
 
 
-        // todo update comment
         /// <summary>
-        /// Collection that holds information about all RPC in this networkbehaviour (including derived classes)
-        /// <para>Can be used to get RPC name from its index</para>
-        /// <para>NOTE: Weaver uses this collection to add rpcs, If adding your own rpc do at your own risk</para>
+        /// Collection that holds immutable RPC metadata and delegate invokers for all NetworkBehaviours on this identity.
+        /// <para>Shared across identities with matching NetworkBehaviour type compositions to eliminate spawn allocations.</para>
         /// </summary>
         [NonSerialized]
         private RemoteCallCollection _remoteCallCollection;
@@ -1255,15 +1302,22 @@ namespace Mirage
             get
             {
                 if (_remoteCallCollection == null)
-                {
-                    // we should be save to lazy init
-                    // we only need to register RPCs when we receive them
-                    // when sending the index is baked in by weaver
-                    _remoteCallCollection = new RemoteCallCollection();
-                    _remoteCallCollection.RegisterAll(NetworkBehaviours);
-                }
+                    _remoteCallCollection = RemoteCallCollectionCache.GetOrCreate(NetworkBehaviours);
+
                 return _remoteCallCollection;
             }
+        }
+    }
+
+    public readonly struct AuthorityTime
+    {
+        public readonly INetworkPlayer Owner;
+        public readonly double Time;
+
+        public AuthorityTime(INetworkPlayer owner, double time)
+        {
+            Owner = owner;
+            Time = time;
         }
     }
 }

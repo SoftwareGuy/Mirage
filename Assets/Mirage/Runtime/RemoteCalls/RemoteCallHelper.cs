@@ -1,25 +1,36 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using Mirage.Logging;
 using Mirage.Serialization;
+using Mirage.SocketLayer;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mirage.RemoteCalls
 {
     public class RemoteCallCollection
     {
+        public static readonly RemoteCallCollection Empty = new RemoteCallCollection(Array.Empty<Type>(), Array.Empty<int>(), Array.Empty<RemoteCall>());
+
         private static readonly ILogger logger = LogFactory.GetLogger(typeof(RemoteCallCollection));
 
-        /// <summary>
-        /// This is set by NetworkIdentity when we register each NetworkBehaviour so that they can pass their own idnex in
-        /// </summary>
-        public int[] IndexOffset;
-        public RemoteCall[] RemoteCalls;
+        private readonly Type[] _types;
 
-        public unsafe void RegisterAll(NetworkBehaviour[] behaviours)
+        /// <summary>
+        /// This is set by NetworkIdentity when we register each NetworkBehaviour so that they can pass their own index in
+        /// </summary>
+        public readonly int[] IndexOffset;
+        public readonly RemoteCall[] RemoteCalls;
+
+        public unsafe RemoteCallCollection(NetworkBehaviour[] behaviours)
         {
             var behaviourCount = behaviours.Length;
+            _types = new Type[behaviourCount];
+            for (var i = 0; i < behaviourCount; i++)
+                _types[i] = behaviours[i].GetType();
+
             var totalCount = 0;
             var counts = stackalloc int[behaviourCount];
             IndexOffset = new int[behaviourCount];
@@ -34,20 +45,42 @@ namespace Mirage.RemoteCalls
 
             RemoteCalls = new RemoteCall[totalCount];
             for (var i = 0; i < behaviourCount; i++)
-            {
                 behaviours[i].RegisterRpc(this);
-            }
         }
 
-        public void Register(int index, string name, bool cmdRequireAuthority, RpcInvokeType invokerType, NetworkBehaviour behaviour, RpcDelegate func)
+        private RemoteCallCollection(Type[] types, int[] indexOffset, RemoteCall[] remoteCalls)
+        {
+            _types = types;
+            IndexOffset = indexOffset;
+            RemoteCalls = remoteCalls;
+        }
+
+        /// <summary>
+        /// RPC signatures and offsets are static per component type composition.
+        /// Objects with the exact same component sequence can safely share a single collection layout.
+        /// </summary>
+        internal bool Matches(NetworkBehaviour[] behaviours)
+        {
+            if (_types.Length != behaviours.Length)
+                return false;
+
+            for (var i = 0; i < behaviours.Length; i++)
+            {
+                if (_types[i] != behaviours[i].GetType())
+                    return false;
+            }
+            return true;
+        }
+
+        public void Register(int relativeIndex, string name, bool cmdRequireAuthority, RpcInvokeType invokerType, NetworkBehaviour behaviour, RpcDelegate func, RpcRateLimitConfig rateLimit)
         {
             var indexOffset = GetIndexOffset(behaviour);
             // weaver gives index, so should never give 2 indexes that are the same
-            if (RemoteCalls[indexOffset + index] != null)
+            if (RemoteCalls[indexOffset + relativeIndex] != null)
                 throw new InvalidOperationException("2 Rpc has same index");
 
-            var call = new RemoteCall(behaviour, invokerType, func, cmdRequireAuthority, name);
-            RemoteCalls[indexOffset + index] = call;
+            var call = new RemoteCall(behaviour.GetType(), behaviour.ComponentIndex, relativeIndex, invokerType, func, cmdRequireAuthority, name, rateLimit);
+            RemoteCalls[indexOffset + relativeIndex] = call;
 
             if (logger.LogEnabled())
             {
@@ -56,53 +89,9 @@ namespace Mirage.RemoteCalls
             }
         }
 
-        public void RegisterRequest<T>(int index, string name, bool cmdRequireAuthority, RpcInvokeType invokerType, NetworkBehaviour behaviour, RequestDelegate<T> func)
+        public void RegisterRequest<T>(int relativeIndex, string name, bool cmdRequireAuthority, RpcInvokeType invokerType, NetworkBehaviour behaviour, RequestDelegate<T> func, RpcRateLimitConfig rateLimit)
         {
-            async UniTaskVoid Wrapper(NetworkBehaviour obj, NetworkReader reader, INetworkPlayer senderPlayer, int replyId)
-            {
-                /// invoke the serverRpc and send a reply message
-                bool success;
-                T result = default;
-                try
-                {
-                    result = await func(obj, reader, senderPlayer, replyId);
-                    success = true;
-                }
-                catch (Exception e)
-                {
-                    success = false;
-                    logger.LogError($"Return RPC threw an Exception: {e}");
-                }
-
-
-                var serverRpcReply = new RpcReply
-                {
-                    ReplyId = replyId,
-                    Success = success,
-                };
-                if (success)
-                {
-                    // if success, write payload and send
-                    // else just send it without payload (since there is no result)
-                    using (var writer = NetworkWriterPool.GetWriter())
-                    {
-                        writer.Write(result);
-                        serverRpcReply.Payload = writer.ToArraySegment();
-                        senderPlayer.Send(serverRpcReply);
-                    }
-                }
-                else
-                {
-                    senderPlayer.Send(serverRpcReply);
-                }
-            }
-
-            void CmdWrapper(NetworkBehaviour obj, NetworkReader reader, INetworkPlayer senderPlayer, int replyId)
-            {
-                Wrapper(obj, reader, senderPlayer, replyId).Forget();
-            }
-
-            Register(index, name, cmdRequireAuthority, invokerType, behaviour, CmdWrapper);
+            Register(relativeIndex, name, cmdRequireAuthority, invokerType, behaviour, RequestRpcInvoker<T>.CreateWrapper(func), rateLimit);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -112,17 +101,21 @@ namespace Mirage.RemoteCalls
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RemoteCall GetRelative(NetworkBehaviour behaviour, int index)
+        public RemoteCall GetRelative(NetworkBehaviour behaviour, int relativeIndex)
         {
-            return RemoteCalls[GetIndexOffset(behaviour) + index];
+            return RemoteCalls[GetIndexOffset(behaviour) + relativeIndex];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RemoteCall GetAbsolute(int index)
+        public RemoteCall GetAbsolute(int absoluteIndex)
         {
-            return RemoteCalls[index];
+            if (0 <= absoluteIndex && absoluteIndex < RemoteCalls.Length)
+                return RemoteCalls[absoluteIndex];
+            else
+                return null;
         }
     }
+
     /// <summary>
     /// Delegate for ServerRpc functions.
     /// </summary>
@@ -139,6 +132,87 @@ namespace Mirage.RemoteCalls
     }
 
     /// <summary>
+    /// Rate limit configuration for an RPC method.
+    /// Use <see cref="Disabled"/> for no rate limiting, or <see cref="Enabled"/> to configure a token bucket.
+    /// </summary>
+    public readonly struct RpcRateLimitConfig
+    {
+        public readonly bool IsEnabled;
+        public readonly RateLimitBucket.RefillConfig BucketConfig;
+        public readonly int Penalty;
+
+        private RpcRateLimitConfig(float interval, int refill, int maxTokens, int penalty)
+        {
+            IsEnabled = true;
+            BucketConfig = new RateLimitBucket.RefillConfig
+            {
+                Interval = interval,
+                Refill = refill,
+                MaxTokens = maxTokens,
+            };
+            Penalty = penalty;
+        }
+
+        /// <summary>
+        /// No rate limiting for this RPC
+        /// </summary>
+        public static RpcRateLimitConfig Disabled()
+        {
+            return default;
+        }
+
+        /// <summary>
+        /// Enables rate limiting with the specified token bucket configuration
+        /// </summary>
+        /// <param name="interval">Seconds between refills</param>
+        /// <param name="refill">How many tokens refilled each interval</param>
+        /// <param name="maxTokens">Max number of tokens in bucket</param>
+        /// <param name="penalty">Error cost applied to NetworkPlayer's ErrorRateLimit when limit is exceeded</param>
+        public static RpcRateLimitConfig Enabled(float interval, int refill, int maxTokens, int penalty)
+        {
+            return new RpcRateLimitConfig(interval, refill, maxTokens, penalty);
+        }
+    }
+
+    public readonly struct RpcId : IEquatable<RpcId>
+    {
+        public readonly int Hash;
+        public readonly Type DeclaringType;
+        public readonly int DeclaringIndex;
+
+        public RpcId(Type declaringType, int index) : this()
+        {
+            DeclaringType = declaringType;
+            DeclaringIndex = index;
+            var hash1 = declaringType.FullName.GetStableHashCode();
+            var hash2 = index;
+            unchecked
+            {
+                var hash = 17;
+                hash = (hash * 23) + hash1;
+                hash = (hash * 23) + hash2;
+                Hash = hash;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return Hash;
+        }
+        public override bool Equals(object obj)
+        {
+            return obj is RpcId other && Equals(other);
+        }
+        public bool Equals(RpcId other)
+        {
+            return Hash == other.Hash &&
+                DeclaringType == other.DeclaringType &&
+                DeclaringIndex == other.DeclaringIndex;
+        }
+    }
+
+
+    /// <summary>
     /// Used for invoking a RPC methods
     /// </summary>
     public class RemoteCall
@@ -147,6 +221,14 @@ namespace Mirage.RemoteCalls
         /// Type that rpc was declared in
         /// </summary>
         public readonly Type DeclaringType;
+        /// <summary>
+        /// Component index within NetworkIdentity.NetworkBehaviours
+        /// </summary>
+        public readonly int ComponentIndex;
+        /// <summary>
+        /// Relative index of this RPC within its declaring component
+        /// </summary>
+        public readonly int RelativeIndex;
         /// <summary>
         /// Server rpc or client rpc
         /// </summary>
@@ -164,21 +246,44 @@ namespace Mirage.RemoteCalls
         /// </summary>
         public readonly string Name;
 
-        public readonly NetworkBehaviour Behaviour;
+        /// <summary>
+        /// Rate limit configuration for this RPC
+        /// </summary>
+        public readonly RpcRateLimitConfig RateLimit;
 
-        public RemoteCall(NetworkBehaviour behaviour, RpcInvokeType invokeType, RpcDelegate function, bool requireAuthority, string name)
+        /// <summary>
+        /// Stable Id for an RPC inside a type
+        /// </summary>
+        public readonly RpcId RpcId;
+
+        public readonly ProfilerMarker InvokeMarker;
+
+        public RemoteCall(
+            Type declaringType,
+            int componentIndex,
+            int indexInType,
+            RpcInvokeType invokeType,
+            RpcDelegate function,
+            bool requireAuthority,
+            string name,
+            RpcRateLimitConfig rateLimit)
         {
-            Behaviour = behaviour;
-            DeclaringType = behaviour.GetType();
+            DeclaringType = declaringType;
+            ComponentIndex = componentIndex;
+            RelativeIndex = indexInType;
             InvokeType = invokeType;
             Function = function;
             RequireAuthority = requireAuthority;
             Name = name;
+            RpcId = new RpcId(declaringType, indexInType);
+            RateLimit = rateLimit;
+            InvokeMarker = new ProfilerMarker($"Mirage.Rpc.{name}.Invoke");
         }
 
-        internal void Invoke(NetworkReader reader, INetworkPlayer senderPlayer = null, int replyId = 0)
+        internal void Invoke(NetworkBehaviour behaviour, NetworkReader reader, INetworkPlayer senderPlayer = null, int replyId = 0)
         {
-            Function(Behaviour, reader, senderPlayer, replyId);
+            using var _ = InvokeMarker.Auto();
+            Function(behaviour, reader, senderPlayer, replyId);
         }
 
         /// <summary>
@@ -190,5 +295,131 @@ namespace Mirage.RemoteCalls
             return Name;
         }
     }
-}
 
+    internal static class RequestRpcInvoker<T>
+    {
+        private static readonly ILogger logger = LogFactory.GetLogger(typeof(RequestRpcInvoker<T>));
+
+        public static RpcDelegate CreateWrapper(RequestDelegate<T> func)
+        {
+            return (NetworkBehaviour obj, NetworkReader reader, INetworkPlayer senderPlayer, int replyId) =>
+            {
+                Invoke(func, obj, reader, senderPlayer, replyId).Forget();
+            };
+        }
+
+        private static async UniTaskVoid Invoke(RequestDelegate<T> func, NetworkBehaviour obj, NetworkReader reader, INetworkPlayer senderPlayer, int replyId)
+        {
+            // invoke the serverRpc and send a reply message
+            bool success;
+            T result = default;
+            try
+            {
+                result = await func(obj, reader, senderPlayer, replyId);
+                success = true;
+            }
+            catch (System.IO.EndOfStreamException e)
+            {
+                success = false;
+                logger.LogError($"Return RPC threw EndOfStreamException: {e}");
+
+                // cost=50 because NetworkReader throwing means serialization mismatch, hard to recover from, likely need to kick player if it happens often.
+                senderPlayer.SetError(50, PlayerErrorFlags.DeserializationException);
+            }
+            catch (Exception e)
+            {
+                success = false;
+                logger.LogError($"Return RPC threw an Exception: {e}");
+
+                // Common errors caused by developer mistake
+                if (e is NullReferenceException || e is UnityEngine.MissingReferenceException || e is UnityEngine.UnassignedReferenceException)
+                    senderPlayer.SetError(1, PlayerErrorFlags.RpcNullException);
+                else
+                    senderPlayer.SetError(2, PlayerErrorFlags.RpcException);
+            }
+
+            var serverRpcReply = new RpcReply
+            {
+                ReplyId = replyId,
+                Success = success,
+            };
+            if (success)
+            {
+                // if success, write payload and send
+                // else just send it without payload (since there is no result)
+                using (var writer = NetworkWriterPool.GetWriter())
+                {
+                    writer.Write(result);
+                    serverRpcReply.Payload = writer.ToArraySegment();
+                    senderPlayer.Send(serverRpcReply);
+                }
+            }
+            else
+            {
+                senderPlayer.Send(serverRpcReply);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Caches immutable RPC collection layouts to avoid re-allocating delegate wrappers and array buffers per spawned identity
+    /// </summary>
+    public static class RemoteCallCollectionCache
+    {
+        public static RemoteCallCollection Empty => RemoteCallCollection.Empty;
+
+        private static readonly Dictionary<int, List<RemoteCallCollection>> _cachedLayouts = new Dictionary<int, List<RemoteCallCollection>>();
+
+        private static int CalculateHash(NetworkBehaviour[] behaviours)
+        {
+            unchecked
+            {
+                var hash = 17;
+                for (var i = 0; i < behaviours.Length; i++)
+                    hash = (hash * 31) + behaviours[i].GetType().GetHashCode();
+
+                return hash;
+            }
+        }
+
+        public static RemoteCallCollection GetOrCreate(NetworkBehaviour[] behaviours)
+        {
+            if (behaviours == null)
+                throw new ArgumentNullException(nameof(behaviours));
+
+            if (behaviours.Length == 0)
+                return RemoteCallCollection.Empty;
+
+            var hash = CalculateHash(behaviours);
+            // List handles potential hash collisions between different component layouts
+            if (_cachedLayouts.TryGetValue(hash, out var list))
+            {
+                // in most case, first item will be a match,
+                // but need to check incase hash collisions
+                for (var i = 0; i < list.Count; i++)
+                {
+                    var layout = list[i];
+                    if (layout.Matches(behaviours))
+                        // found matching layout, so we can stop here and return
+                        return layout;
+                }
+            }
+            else
+            {
+                list = new List<RemoteCallCollection>(1);
+                _cachedLayouts[hash] = list;
+            }
+
+            // no matching layouts, create new out
+            var collection = new RemoteCallCollection(behaviours);
+            list.Add(collection);
+            return collection;
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        public static void Clear()
+        {
+            _cachedLayouts.Clear();
+        }
+    }
+}

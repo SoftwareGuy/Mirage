@@ -192,6 +192,12 @@ namespace Mirage.Weaver
         {
             if (klass.HasCustomAttribute<NetworkMessageAttribute>())
             {
+                if (klass.HasGenericParameters)
+                {
+                    logger.Error($"The [NetworkMessage] attribute cannot be applied to open generic types like '{klass.Name}'. Network messages must be concrete types.");
+                    return;
+                }
+
                 Log($"Loading message: {klass.FullName}");
                 readers.TryGetFunction(klass, null);
                 writers.TryGetFunction(klass, null);
@@ -308,7 +314,9 @@ namespace Mirage.Weaver
         {
             return
                 method.Is(typeof(GenericTypesSerializationExtensions), nameof(GenericTypesSerializationExtensions.Write)) ||
-                method.Is(typeof(GenericTypesSerializationExtensions), nameof(GenericTypesSerializationExtensions.Read));
+                method.Is(typeof(GenericTypesSerializationExtensions), nameof(GenericTypesSerializationExtensions.WriteWithLength)) ||
+                method.Is(typeof(GenericTypesSerializationExtensions), nameof(GenericTypesSerializationExtensions.Read)) ||
+                method.Is(typeof(GenericTypesSerializationExtensions), nameof(GenericTypesSerializationExtensions.ReadWithLength));
         }
 
 
@@ -409,11 +417,21 @@ namespace Mirage.Weaver
                     var dataType = GetWriterDataType(method);
                     writers.Register(module.ImportReference(dataType), module.ImportReference(method));
                 }
+                else if (IsWriterWithLengthMethod(method))
+                {
+                    var dataType = GetWriterDataType(method);
+                    writers.RegisterWithLength(module.ImportReference(dataType), module.ImportReference(method));
+                }
 
                 if (IsReaderMethod(method))
                 {
                     var dataType = GetReaderDataType(method);
                     readers.Register(module.ImportReference(dataType), module.ImportReference(method));
+                }
+                else if (IsReaderWithLengthMethod(method))
+                {
+                    var dataType = GetReaderDataType(method);
+                    readers.RegisterWithLength(module.ImportReference(dataType), module.ImportReference(method));
                 }
             }
 
@@ -424,11 +442,21 @@ namespace Mirage.Weaver
                     var dataType = GetWriterDataType(method);
                     writers.RegisterCollectionMethod(dataType.Resolve(), module.ImportReference(method));
                 }
+                else if (IsWriterWithLengthMethod(method))
+                {
+                    var dataType = GetWriterDataType(method);
+                    writers.RegisterCollectionMethodWithLength(dataType.Resolve(), module.ImportReference(method));
+                }
 
                 if (IsReaderMethod(method))
                 {
                     var dataType = GetReaderDataType(method);
                     readers.RegisterCollectionMethod(dataType.Resolve(), module.ImportReference(method));
+                }
+                else if (IsReaderWithLengthMethod(method))
+                {
+                    var dataType = GetReaderDataType(method);
+                    readers.RegisterCollectionMethodWithLength(dataType.Resolve(), module.ImportReference(method));
                 }
             }
         }
@@ -452,11 +480,21 @@ namespace Mirage.Weaver
                     var dataType = GetWriterDataType(method);
                     writers.Register(module.ImportReference(dataType), module.ImportReference(method));
                 }
+                else if (IsWriterWithLengthMethod(method))
+                {
+                    var dataType = GetWriterDataType(method);
+                    writers.RegisterWithLength(module.ImportReference(dataType), module.ImportReference(method));
+                }
 
                 if (IsReaderMethod(method))
                 {
                     var dataType = GetReaderDataType(method);
                     readers.Register(module.ImportReference(dataType), module.ImportReference(method));
+                }
+                else if (IsReaderWithLengthMethod(method))
+                {
+                    var dataType = GetReaderDataType(method);
+                    readers.RegisterWithLength(module.ImportReference(dataType), module.ImportReference(method));
                 }
             }
 
@@ -467,11 +505,21 @@ namespace Mirage.Weaver
                     var dataType = GetWriterDataType(method);
                     writers.RegisterCollectionMethod(dataType.Resolve(), module.ImportReference(method));
                 }
+                else if (IsWriterWithLengthMethod(method))
+                {
+                    var dataType = GetWriterDataType(method);
+                    writers.RegisterCollectionMethodWithLength(dataType.Resolve(), module.ImportReference(method));
+                }
 
                 if (IsReaderMethod(method))
                 {
                     var dataType = GetReaderDataType(method);
                     readers.RegisterCollectionMethod(dataType.Resolve(), module.ImportReference(method));
+                }
+                else if (IsReaderWithLengthMethod(method))
+                {
+                    var dataType = GetReaderDataType(method);
+                    readers.RegisterCollectionMethodWithLength(dataType.Resolve(), module.ImportReference(method));
                 }
             }
         }
@@ -520,6 +568,39 @@ namespace Mirage.Weaver
             return true;
         }
 
+        private static bool IsWriterWithLengthMethod(MethodInfo method)
+        {
+            if (method.GetParameters().Length != 3)
+                return false;
+
+            if (method.GetParameters()[0].ParameterType.FullName != typeof(NetworkWriter).FullName)
+                return false;
+
+            if (method.GetParameters()[2].ParameterType != typeof(int))
+                return false;
+
+            if (method.ReturnType != typeof(void))
+                return false;
+
+            return true;
+        }
+        private bool IsWriterWithLengthMethod(MethodDefinition method)
+        {
+            if (method.Parameters.Count != 3)
+                return false;
+
+            if (method.Parameters[0].ParameterType.FullName != typeof(NetworkWriter).FullName)
+                return false;
+
+            if (!method.Parameters[2].ParameterType.Is(typeof(int)))
+                return false;
+
+            if (!method.ReturnType.Is(typeof(void)))
+                return false;
+
+            return true;
+        }
+
         private static bool IsReaderMethod(MethodInfo method)
         {
             if (method.GetParameters().Length != 1)
@@ -539,6 +620,39 @@ namespace Mirage.Weaver
                 return false;
 
             if (method.Parameters[0].ParameterType.FullName != typeof(NetworkReader).FullName)
+                return false;
+
+            if (method.ReturnType.Is(typeof(void)))
+                return false;
+
+            return true;
+        }
+
+        private static bool IsReaderWithLengthMethod(MethodInfo method)
+        {
+            if (method.GetParameters().Length != 2)
+                return false;
+
+            if (method.GetParameters()[0].ParameterType.FullName != typeof(NetworkReader).FullName)
+                return false;
+
+            if (method.GetParameters()[1].ParameterType != typeof(int))
+                return false;
+
+            if (method.ReturnType == typeof(void))
+                return false;
+
+            return true;
+        }
+        private bool IsReaderWithLengthMethod(MethodDefinition method)
+        {
+            if (method.Parameters.Count != 2)
+                return false;
+
+            if (method.Parameters[0].ParameterType.FullName != typeof(NetworkReader).FullName)
+                return false;
+
+            if (!method.Parameters[1].ParameterType.Is(typeof(int)))
                 return false;
 
             if (method.ReturnType.Is(typeof(void)))

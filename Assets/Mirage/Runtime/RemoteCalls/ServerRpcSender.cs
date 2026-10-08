@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Mirage.Serialization;
+using Unity.Profiling;
 
 namespace Mirage.RemoteCalls
 {
@@ -9,15 +10,20 @@ namespace Mirage.RemoteCalls
     /// </summary>
     public static class ServerRpcSender
     {
+        private static readonly ProfilerMarker sendMarker = new ProfilerMarker("Mirage.ServerRpcSender.Send");
+        private static readonly ProfilerMarker sendWithReturnMarker = new ProfilerMarker("Mirage.ServerRpcSender.SendWithReturn");
+
         public static void Send(NetworkBehaviour behaviour, int relativeIndex, NetworkWriter writer, Channel channelId, bool requireAuthority)
         {
-            var index = behaviour.Identity.RemoteCallCollection.GetIndexOffset(behaviour) + relativeIndex;
-            Validate(behaviour, index, requireAuthority);
+            using var _ = sendMarker.Auto();
+
+            var absoluteIndex = behaviour.Identity.RemoteCallCollection.GetIndexOffset(behaviour) + relativeIndex;
+            Validate(behaviour, absoluteIndex, requireAuthority);
 
             var message = new RpcMessage
             {
                 NetId = behaviour.NetId,
-                FunctionIndex = index,
+                FunctionIndex = absoluteIndex,
                 Payload = writer.ToArraySegment()
             };
 
@@ -26,18 +32,21 @@ namespace Mirage.RemoteCalls
 
         public static UniTask<T> SendWithReturn<T>(NetworkBehaviour behaviour, int relativeIndex, NetworkWriter writer, bool requireAuthority)
         {
+            using var _ = sendWithReturnMarker.Auto();
+
             var collection = behaviour.Identity.RemoteCallCollection;
-            var index = collection.GetIndexOffset(behaviour) + relativeIndex;
-            Validate(behaviour, index, requireAuthority);
+            var absoluteIndex = collection.GetIndexOffset(behaviour) + relativeIndex;
+            Validate(behaviour, absoluteIndex, requireAuthority);
+
             var message = new RpcWithReplyMessage
             {
                 NetId = behaviour.NetId,
-                FunctionIndex = index,
+                FunctionIndex = absoluteIndex,
                 Payload = writer.ToArraySegment()
             };
 
-            var callInfo = collection.GetAbsolute(index);
-            (var task, var id) = behaviour.ClientObjectManager._rpcHandler.CreateReplyTask<T>(callInfo);
+            var callInfo = collection.GetAbsolute(absoluteIndex);
+            (var task, var id) = behaviour.ClientObjectManager._rpcHandler.CreateReplyTask<T>(behaviour, callInfo, behaviour.Client.Player);
 
             message.ReplyId = id;
 
@@ -47,26 +56,36 @@ namespace Mirage.RemoteCalls
             return task;
         }
 
-        private static void Validate(NetworkBehaviour behaviour, int index, bool requireAuthority)
+        private static void Validate(NetworkBehaviour behaviour, int absoluteIndex, bool requireAuthority)
         {
             var client = behaviour.Client;
+            var collection = behaviour.Identity.RemoteCallCollection;
+            var callInfo = collection.GetAbsolute(absoluteIndex);
 
             if (client == null || !client.Active)
             {
-                var rpc = behaviour.Identity.RemoteCallCollection.GetRelative(behaviour, index);
-                throw new InvalidOperationException($"ServerRpc Function {rpc} called on server without an active client.");
+                throw new InvalidOperationException($"ServerRpc Function {callInfo} called on server without an active client.");
             }
 
             // if authority is required, then client must have authority to send
             if (requireAuthority && !behaviour.HasAuthority)
             {
-                var rpc = behaviour.Identity.RemoteCallCollection.GetRelative(behaviour, index);
-                throw new InvalidOperationException($"Trying to send ServerRpc for object without authority. {rpc}");
+                throw new InvalidOperationException($"Trying to send ServerRpc for object without authority. {callInfo}");
             }
 
             if (client.Player == null)
             {
                 throw new InvalidOperationException("Send ServerRpc attempted with no client connection.");
+            }
+
+            if (callInfo.RateLimit.IsEnabled)
+            {
+                var allowed = client.Player.CheckRateLimit(callInfo);
+                if (!allowed)
+                {
+                    var errorMsg = $"ServerRpc '{callInfo.Name}' was rate limited on the client and not sent.";
+                    throw new ReturnRpcException(errorMsg);
+                }
             }
         }
 

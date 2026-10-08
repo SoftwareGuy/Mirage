@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Mirage.Logging;
 using Mirage.RemoteCalls;
 using Mirage.Serialization;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mirage
@@ -17,7 +18,15 @@ namespace Mirage
     {
         private static readonly ILogger logger = LogFactory.GetLogger(typeof(ClientObjectManager));
 
+        private static readonly ProfilerMarker onSpawnMarker = new ProfilerMarker("Mirage.ClientObjectManager.OnSpawn");
+        private static readonly ProfilerMarker spawnPrefabMarker = new ProfilerMarker("Mirage.ClientObjectManager.SpawnPrefab");
+        private static readonly ProfilerMarker spawnSceneObjectMarker = new ProfilerMarker("Mirage.ClientObjectManager.SpawnSceneObject");
+        private static readonly ProfilerMarker applySpawnPayloadMarker = new ProfilerMarker("Mirage.ClientObjectManager.ApplySpawnPayload");
+        private static readonly ProfilerMarker unSpawnMarker = new ProfilerMarker("Mirage.ClientObjectManager.UnSpawn");
+        private static readonly ProfilerMarker prepareSceneObjectsMarker = new ProfilerMarker("Mirage.ClientObjectManager.PrepareSceneObjects");
+
         internal RpcHandler _rpcHandler;
+        internal SyncVarReceiver _syncVarReceiver;
 
         private NetworkClient _client;
         public NetworkClient Client => _client;
@@ -36,7 +45,16 @@ namespace Mirage
         public NetworkPrefabs NetworkPrefabs;
 
         /// <summary>
-        /// This is a dictionary of the prefabs and deligates that are registered on the client with ClientScene.RegisterPrefab().
+        /// A filter to only include certain scene objects when spawning.
+        /// <para>Used by <see cref="PrepareToSpawnSceneObjects"/> when finding scene objects.</para>
+        /// <para>If the filter is null, all valid scene objects will be included.</para>
+        /// </summary>
+        public Func<NetworkIdentity, bool> SceneObjectFilter { get; set; }
+
+        public ISpawnValuesHandler SpawnValuesHandler = DefaultSpawnValuesHandler.Instance;
+
+        /// <summary>
+        /// This is a dictionary of the prefabs and delegates that are registered on the client with RegisterPrefab().
         /// <para>The key to the dictionary is the prefab asset Id.</para>
         /// </summary>
         internal readonly Dictionary<int, SpawnHandler> _handlers = new Dictionary<int, SpawnHandler>();
@@ -52,6 +70,8 @@ namespace Mirage
         /// </summary>
         public readonly Dictionary<ulong, NetworkIdentity> spawnableObjects = new Dictionary<ulong, NetworkIdentity>();
 
+        internal readonly Dictionary<uint, PendingAsyncSpawn> pendingSpawn = new Dictionary<uint, PendingAsyncSpawn>();
+
         internal void ClientStarted(NetworkClient client)
         {
             if (_client != null && _client != client)
@@ -64,7 +84,7 @@ namespace Mirage
             RegisterPrefabs(NetworkPrefabs?.Prefabs, true);
 
             // prepare objects right away so objects in first scene can be spawned
-            // if user changes scenes without NetworkSceneManager then they will need to manually call it again
+            // if user changes scenes manually then they will need to call it again
             PrepareToSpawnSceneObjects();
 
             if (_client.IsHost)
@@ -85,6 +105,12 @@ namespace Mirage
             // reset for next run
             _client.Disconnected.RemoveListener(OnClientDisconnected);
             _client = null;
+            _rpcHandler = null;
+            _syncVarReceiver = null;
+
+            foreach (var pending in pendingSpawn.Values)
+                pending.Dispose();
+            pendingSpawn.Clear();
         }
 
         internal void RegisterHostHandlers()
@@ -103,8 +129,50 @@ namespace Mirage
             _client.MessageHandler.RegisterHandler<SpawnMessage>(OnSpawn);
             _client.MessageHandler.RegisterHandler<RemoveAuthorityMessage>(OnRemoveAuthority);
             _client.MessageHandler.RegisterHandler<RemoveCharacterMessage>(OnRemoveCharacter);
-            _rpcHandler = new RpcHandler(_client.MessageHandler, _client.World, RpcInvokeType.ClientRpc);
+
+            _rpcHandler = new RpcHandler(_client.World, RpcInvokeType.ClientRpc);
+            _client.MessageHandler.RegisterHandler<RpcReply>(_rpcHandler.OnReply); // no pending, but we still need to register it
+            _client.MessageHandler.RegisterHandler<RpcMessage>(OnRpcMessage);
+            _client.MessageHandler.RegisterHandler<RpcWithReplyMessage>(OnRpcWithReplyMessage);
+
+            _syncVarReceiver = new SyncVarReceiver(_client.World);
+            _client.MessageHandler.RegisterHandler<UpdateVarsMessage>(OnUpdateVarsMessage);
         }
+
+        internal void OnRpcMessage(INetworkPlayer player, RpcMessage msg)
+        {
+            if (pendingSpawn.Count > 0 && pendingSpawn.TryGetValue(msg.NetId, out var pending)) // async spawning
+            {
+                if (logger.LogEnabled()) logger.Log($"Pending spawn for {msg.NetId}, storing new RpcMessage for later");
+                pending.AddMessage(msg);
+                return;
+            }
+
+            _rpcHandler.OnRpcMessage(player, msg);
+        }
+        internal void OnRpcWithReplyMessage(INetworkPlayer player, RpcWithReplyMessage msg)
+        {
+            if (pendingSpawn.Count > 0 && pendingSpawn.TryGetValue(msg.NetId, out var pending)) // async spawning
+            {
+                if (logger.LogEnabled()) logger.Log($"Pending spawn for {msg.NetId}, storing new RpcWithReplyMessage for later");
+                pending.AddMessage(msg);
+                return;
+            }
+
+            _rpcHandler.OnRpcWithReplyMessage(player, msg);
+        }
+        internal void OnUpdateVarsMessage(INetworkPlayer player, UpdateVarsMessage msg)
+        {
+            if (pendingSpawn.Count > 0 && pendingSpawn.TryGetValue(msg.NetId, out var pending)) // async spawning
+            {
+                if (logger.LogEnabled()) logger.Log($"Pending spawn for {msg.NetId}, storing new UpdateVarsMessage for later");
+                pending.AddMessage(msg);
+                return;
+            }
+
+            _syncVarReceiver.OnUpdateVarsMessage(player, msg);
+        }
+
 
         private bool ConsiderForSpawning(NetworkIdentity identity)
         {
@@ -131,15 +199,22 @@ namespace Mirage
         /// </summary>
         public void PrepareToSpawnSceneObjects()
         {
+            using var _ = prepareSceneObjectsMarker.Auto();
+
+            // clear up old scene,
+            // we can just assume PrepareToSpawnSceneObjects is called after loading scene and call remove here
+            Client.World?.RemoveDestroyedObjects();
+
             // add all unspawned NetworkIdentities to spawnable objects
             spawnableObjects.Clear();
-            var sceneObjects =
-                Resources.FindObjectsOfTypeAll<NetworkIdentity>()
-                               .Where(ConsiderForSpawning);
-
-            foreach (var obj in sceneObjects)
+            foreach (var identity in Resources.FindObjectsOfTypeAll<NetworkIdentity>())
             {
-                spawnableObjects.Add(obj.SceneId, obj);
+                if (!ConsiderForSpawning(identity))
+                    continue;
+                if (SceneObjectFilter != null && !SceneObjectFilter.Invoke(identity))
+                    continue;
+
+                spawnableObjects.Add(identity.SceneId, identity);
             }
         }
 
@@ -212,8 +287,8 @@ namespace Mirage
         /// the server will send a spawn message to the client with the PrefabHash.
         /// the client then finds the prefab registered with RegisterPrefab() to instantiate the client object.
         /// </para>
-        /// <para>The ClientObjectManager has a list of spawnable prefabs, it uses this function to register those prefabs with the ClientScene.</para>
-        /// <para>The set of current spawnable object is available in the ClientScene static member variable ClientScene.prefabs, which is a dictionary of PrefabHash and prefab references.</para>
+        /// <para>The ClientObjectManager has a list of spawnable prefabs, it uses this function to register them.</para>
+        /// <para>The set of current spawnable object is available in the <see cref="spawnableObjects"/> dictionary.</para>
         /// </summary>
         /// <param name="identity">A Prefab that will be spawned.</param>
         /// <param name="newPrefabHash">A hash to be assigned to this prefab. This allows a dynamically created game object to be registered for an already known asset Id.</param>
@@ -230,8 +305,8 @@ namespace Mirage
         /// the server will send a spawn message to the client with the PrefabHash.
         /// the client then finds the prefab registered with RegisterPrefab() to instantiate the client object.
         /// </para>
-        /// <para>The ClientObjectManager has a list of spawnable prefabs, it uses this function to register those prefabs with the ClientScene.</para>
-        /// <para>The set of current spawnable object is available in the ClientScene static member variable ClientScene.prefabs, which is a dictionary of PrefabHash and prefab references.</para>
+        /// <para>The ClientObjectManager has a list of spawnable prefabs, it uses this function to register them.</para>
+        /// <para>The set of current spawnable object is available in the <see cref="spawnableObjects"/> dictionary.</para>
         /// </summary>
         /// <param name="identity">A Prefab that will be spawned.</param>
         // todo does inheritdoc here? instead of having duplicate doc comments for each RegisterPrefab
@@ -242,7 +317,7 @@ namespace Mirage
             var prefabHash = identity.PrefabHash;
             ThrowIfExists(prefabHash, identity);
 
-            if (logger.LogEnabled()) logger.Log($"Registering prefab '{identity.name}' as asset:{prefabHash:X}");
+            if (logger.LogEnabled()) logger.Log($"Registering prefab '{identity.name}' as asset:{prefabHash}");
             _handlers[prefabHash] = new SpawnHandler(identity);
         }
 
@@ -261,21 +336,21 @@ namespace Mirage
             var prefabHash = identity.PrefabHash;
             if (!_handlers.ContainsKey(prefabHash))
             {
-                throw new InvalidOperationException($"No prefab with hash {prefabHash:X}. Prefab must be registered before adding unspawn handler");
+                throw new InvalidOperationException($"No prefab with hash {prefabHash}. Prefab must be registered before adding unspawn handler");
             }
 
             if (_handlers[prefabHash].Prefab == null)
             {
-                throw new InvalidOperationException($"Existing handler for {prefabHash:X} was not a prefab. Prefab must be registered before adding unspawn handler");
+                throw new InvalidOperationException($"Existing handler for {prefabHash} was not a prefab. Prefab must be registered before adding unspawn handler");
             }
 
-            if (logger.LogEnabled()) logger.Log($"Registering custom prefab '{identity.name}' as asset:{prefabHash:X} {unspawnHandler.Method.Name}");
+            if (logger.LogEnabled()) logger.Log($"Registering custom prefab '{identity.name}' as asset:{prefabHash} {unspawnHandler.Method.Name}");
 
             _handlers[prefabHash].AddUnspawnHandler(unspawnHandler);
         }
 
         /// <summary>
-        /// Removes a registered spawn prefab that was setup with ClientScene.RegisterPrefab.
+        /// Removes a registered spawn prefab that was setup with RegisterPrefab.
         /// </summary>
         /// <param name="identity">The prefab to be removed from registration.</param>
         public void UnregisterPrefab(NetworkIdentity identity)
@@ -292,8 +367,8 @@ namespace Mirage
         /// the server will send a spawn message to the client with the PrefabHash.
         /// the client then finds the prefab registered with RegisterPrefab() to instantiate the client object.
         /// </para>
-        /// <para>The ClientObjectManager has a list of spawnable prefabs, it uses this function to register those prefabs with the ClientScene.</para>
-        /// <para>The set of current spawnable object is available in the ClientScene static member variable ClientScene.prefabs, which is a dictionary of PrefabHash and prefab references.</para>
+        /// <para>The ClientObjectManager has a list of spawnable prefabs, it uses this function to register them.</para>
+        /// <para>The set of current spawnable object is available in the <see cref="spawnableObjects"/> dictionary.</para>
         /// </summary>
         /// <seealso cref="RegisterUnspawnHandler"/>
         /// <param name="identity">A Prefab that will be spawned.</param>
@@ -352,12 +427,12 @@ namespace Mirage
             {
                 var spawnName = spawnHandler?.Method.Name ?? "<NULL>";
                 var unspawnName = unspawnHandler?.Method.Name ?? "<NULL>";
-                logger.Log($"RegisterSpawnHandler PrefabHash:'{prefabHash:X}' Spawn:{spawnName} UnSpawn:{unspawnName}");
+                logger.Log($"RegisterSpawnHandler PrefabHash:'{prefabHash}' Spawn:{spawnName} UnSpawn:{unspawnName}");
             }
         }
 
         /// <summary>
-        /// Removes a registered spawn handler function that was registered with ClientScene.RegisterHandler().
+        /// Removes a registered spawn handler function that was registered with RegisterSpawnHandler().
         /// </summary>
         /// <param name="prefabHash">The prefabHash for the handler to be removed for.</param>
         public void UnregisterSpawnHandler(int prefabHash)
@@ -395,7 +470,7 @@ namespace Mirage
         }
         private static void ThrowMissingHandler(int prefabHash)
         {
-            throw new SpawnObjectException($"No prefab for {prefabHash:X}. did you forget to add it to the ClientObjectManager?");
+            throw new SpawnObjectException($"No prefab for {prefabHash}. did you forget to add it to the ClientObjectManager?");
         }
         private void ThrowIfExists(int prefabHash, NetworkIdentity newPrefab = null)
         {
@@ -410,7 +485,7 @@ namespace Mirage
                     ? "Prefab"
                     : "Handlers";
 
-                throw new InvalidOperationException($"{typeString} with hash {prefabHash:X} already registered. " +
+                throw new InvalidOperationException($"{typeString} with hash {prefabHash} already registered. " +
                     $"Unregister before adding new or prefabshandlers. Too add Unspawn handler to prefab use RegisterUnspawnHandler instead");
             }
         }
@@ -419,6 +494,8 @@ namespace Mirage
 
         private void UnSpawn(NetworkIdentity identity)
         {
+            using var _ = unSpawnMarker.Auto();
+
             // have to store netid, so we can remove it from world, this is because NetworkReset will clear it
             var netId = identity.NetId;
 
@@ -471,20 +548,32 @@ namespace Mirage
 
             foreach (var identity in all)
             {
+                // check if destroyed
                 if (identity != null && identity.gameObject != null)
                 {
+                    // if not destoryed, do null unspawn with callbacks
                     UnSpawn(identity);
                 }
+                else
+                {
+                    // if destroyed, we just want to remove it from the dictionary
+                    _client.World.RemoveIdentity(identity);
+                }
             }
+
+            Debug.Assert(_client.World.SpawnedIdentities.Count == 0, "All Identities should have been removed by UnSpawn above");
             _client.World.ClearSpawnedObjects();
         }
 
         private void ApplySpawnPayload(NetworkIdentity identity, SpawnMessage msg)
         {
+            using var _ = applySpawnPayloadMarker.Auto();
+
             if (msg.PrefabHash.HasValue)
                 identity.PrefabHash = msg.PrefabHash.Value;
 
             identity.SetClientValues(this, msg);
+            SpawnValuesHandler.ApplySpawnValues(identity, msg.SpawnValues);
 
             if (msg.IsLocalPlayer)
                 InternalAddCharacter(identity);
@@ -507,6 +596,16 @@ namespace Mirage
 
         internal void OnSpawn(SpawnMessage msg)
         {
+            using var _ = onSpawnMarker.Auto();
+
+            // pendingSpawn.Count check to skip dictionary lookup if empty
+            if (pendingSpawn.Count > 0 && pendingSpawn.TryGetValue(msg.NetId, out var pending)) // async spawning
+            {
+                if (logger.LogEnabled()) logger.Log($"Pending spawn for {msg.NetId}, storing new SpawnMessage for later");
+                pending.AddMessage(msg);
+                return;
+            }
+
             if (msg.PrefabHash == null && msg.SceneId == null)
                 throw new SpawnObjectException($"Empty prefabHash and sceneId for netId: {msg.NetId}");
 
@@ -574,11 +673,27 @@ namespace Mirage
                     using (var reader = NetworkReaderPool.GetReader(writer.ToArraySegment(), null))
                     {
                         msg.Payload = reader.Read<ArraySegment<byte>>();
+                        var pending = new PendingAsyncSpawn(msg.NetId);
+                        pendingSpawn.Add(msg.NetId, pending);
 
-                        var identity = await spawnHandler.Invoke(msg);
-                        if (identity == null)
-                            throw new SpawnObjectException($"Async Spawn handler for prefabHash={msg.PrefabHash:X} returned null");
-                        AfterSpawn(msg, false, identity);
+                        try
+                        {
+                            var identity = await spawnHandler.Invoke(msg);
+                            if (identity == null)
+                                throw new SpawnObjectException($"Async Spawn handler for prefabHash={msg.PrefabHash} returned null");
+                            AfterSpawn(msg, false, identity);
+
+                            // IMPORTANT: remove from pendingSpawn first, so that methods will be invoked instead of adding to pending a 2nd time
+                            pendingSpawn.Remove(msg.NetId);
+                            pending.ApplyAll(this);
+                        }
+                        finally
+                        {
+                            // ensure we always clean up, even if spawn fails
+                            pending.Dispose();
+                            // double check it is removed, incase we throw while spawning
+                            pendingSpawn.Remove(msg.NetId);
+                        }
                     }
                 }
             }
@@ -586,12 +701,14 @@ namespace Mirage
             // this async is called from message handler, so we want to catch and maybe disconnect
             catch (Exception e)
             {
-                _client.MessageHandler.LogAndCheckDisconnect(_client.Player, e);
+                _client.MessageHandler.HandleExceptionInMessage(_client.Player, e);
             }
         }
 
         private NetworkIdentity SpawnPrefab(SpawnMessage msg, SpawnHandler handler)
         {
+            using var _ = spawnPrefabMarker.Auto();
+
             var spawnHandler = handler.Handler;
             if (spawnHandler != null)
             {
@@ -599,7 +716,7 @@ namespace Mirage
 
                 var obj = spawnHandler.Invoke(msg);
                 if (obj == null)
-                    throw new SpawnObjectException($"Spawn handler for prefabHash={msg.PrefabHash:X} returned null");
+                    throw new SpawnObjectException($"Spawn handler for prefabHash={msg.PrefabHash} returned null");
                 return obj;
             }
 
@@ -611,13 +728,14 @@ namespace Mirage
             if (logger.LogEnabled()) logger.Log($"[ClientObjectManager] Instantiate Prefab for netid:{msg.NetId}, hash:{msg.PrefabHash.Value}, prefab:{prefab.name}");
 
             // we need to set position and rotation here incase that their values are used from awake/onenable
-            var pos = msg.SpawnValues.Position ?? prefab.transform.position;
-            var rot = msg.SpawnValues.Rotation ?? prefab.transform.rotation;
+            var (pos, rot) = SpawnValuesHandler.GetPrefabPosition(prefab, msg.SpawnValues);
             return Instantiate(prefab, pos, rot);
         }
 
         internal NetworkIdentity SpawnSceneObject(SpawnMessage msg)
         {
+            using var _ = spawnSceneObjectMarker.Auto();
+
             var sceneId = msg.SceneId.Value;
 
             if (spawnableObjects.TryGetValue(sceneId, out var foundSceneObject))
@@ -625,14 +743,14 @@ namespace Mirage
                 spawnableObjects.Remove(sceneId);
 
                 if (foundSceneObject == null)
-                    throw new SpawnObjectException($"Scene object is null, sceneId={msg.SceneId:X}, NetId={msg.NetId}");
+                    throw new SpawnObjectException($"Scene object is null, sceneId={msg.SceneId}, NetId={msg.NetId}");
 
-                if (logger.LogEnabled()) logger.Log($"[ClientObjectManager] Found scene object for netid:{msg.NetId}, sceneId:{msg.SceneId.Value:X}, obj:{foundSceneObject}");
+                if (logger.LogEnabled()) logger.Log($"[ClientObjectManager] Found scene object for netid:{msg.NetId}, sceneId:{msg.SceneId.Value}, obj:{foundSceneObject}");
                 return foundSceneObject;
             }
 
             // failed to spawn
-            var errorMsg = $"Could not find scene object with sceneId={msg.SceneId:X}, NetId={msg.NetId}. Enable full logs in project settings to see current list of SpawnableObjects in the scene";
+            var errorMsg = $"Could not find scene object with sceneId={msg.SceneId}, NetId={msg.NetId}. Enable full logs in project settings to see current list of SpawnableObjects in the scene";
             // dump the whole spawnable objects dict for easier debugging
             if (logger.LogEnabled())
             {
@@ -650,7 +768,12 @@ namespace Mirage
 
         internal void OnRemoveAuthority(RemoveAuthorityMessage msg)
         {
-            if (logger.LogEnabled()) logger.Log($"Client remove auth handler");
+            if (pendingSpawn.Count > 0 && pendingSpawn.TryGetValue(msg.NetId, out var pending)) // async spawning
+            {
+                if (logger.LogEnabled()) logger.Log($"Pending spawn for {msg.NetId}, storing new RemoveAuthorityMessage for later");
+                pending.AddMessage(msg);
+                return;
+            }
 
             // was the object already spawned?
             var existing = _client.World.TryGetIdentity(msg.NetId, out var identity);
@@ -660,6 +783,9 @@ namespace Mirage
                 logger.LogWarning($"Could not find object with id {msg.NetId}");
                 return;
             }
+
+            if (logger.LogEnabled())
+                logger.Log($"Client remove auth handler for {identity}");
 
             identity.HasAuthority = false;
 
@@ -687,17 +813,31 @@ namespace Mirage
 
         internal void OnObjectHide(ObjectHideMessage msg)
         {
+            if (pendingSpawn.Count > 0 && pendingSpawn.TryGetValue(msg.NetId, out var pending)) // async spawning
+            {
+                if (logger.LogEnabled()) logger.Log($"Pending spawn for {msg.NetId}, storing new ObjectHideMessage for later");
+                pending.AddMessage(msg);
+                return;
+            }
+
             DestroyObject(msg.NetId);
         }
 
         internal void OnObjectDestroy(ObjectDestroyMessage msg)
         {
+            if (pendingSpawn.Count > 0 && pendingSpawn.TryGetValue(msg.NetId, out var pending)) // async spawning
+            {
+                if (logger.LogEnabled()) logger.Log($"Pending spawn for {msg.NetId}, storing new ObjectDestroyMessage for later");
+                pending.AddMessage(msg);
+                return;
+            }
+
             DestroyObject(msg.NetId);
         }
 
         private void DestroyObject(uint netId)
         {
-            if (logger.LogEnabled()) logger.Log("ClientScene.OnObjDestroy netId:" + netId);
+            if (logger.LogEnabled()) logger.Log($"OnObjectDestroy netId:{netId}");
 
             if (_client.World.TryGetIdentity(netId, out var localObject))
             {
@@ -731,7 +871,7 @@ namespace Mirage
                 // Set isLocalPlayer to true on this NetworkIdentity and trigger OnStartLocalPlayer in all scripts on the same GO
                 identity.StartLocalPlayer();
 
-                if (logger.LogEnabled()) logger.Log("ClientScene.OnOwnerMessage - player=" + identity.name);
+                if (logger.LogEnabled()) logger.Log($"OnOwnerMessage player={identity.name}");
             }
         }
 
@@ -837,6 +977,145 @@ namespace Mirage
         public bool IsAsyncSpawn()
         {
             return HandlerAsync != null;
+        }
+    }
+
+    public class PendingAsyncSpawn : IDisposable
+    {
+        private static readonly ILogger logger = LogFactory.GetLogger(typeof(ClientObjectManager));
+
+        public readonly uint NetId;
+
+        /// <summary>
+        /// extra messages to apply in order after spawning is complete
+        /// </summary>
+        private List<MessageType> _messageTypes;
+        private PooledNetworkWriter _messageBytes;
+
+        public int PendingCount => _messageTypes?.Count ?? 0;
+
+        public PendingAsyncSpawn(uint netid)
+        {
+            NetId = netid;
+        }
+
+        public void AddMessage(ObjectDestroyMessage message) => AddMessageInternal(MessageType.ObjectDestroyMessage, message);
+        public void AddMessage(ObjectHideMessage message) => AddMessageInternal(MessageType.ObjectHideMessage, message);
+        public void AddMessage(SpawnMessage message) => AddMessageInternal(MessageType.SpawnMessage, message);
+        public void AddMessage(RemoveAuthorityMessage message) => AddMessageInternal(MessageType.RemoveAuthorityMessage, message);
+        public void AddMessage(RpcMessage message) => AddMessageInternal(MessageType.RpcMessage, message);
+        public void AddMessage(RpcWithReplyMessage message) => AddMessageInternal(MessageType.RpcWithReplyMessage, message);
+        public void AddMessage(UpdateVarsMessage message) => AddMessageInternal(MessageType.UpdateVarsMessage, message);
+
+        private void AddMessageInternal<T>(MessageType messageType, T message) where T : struct
+        {
+            _messageTypes ??= new List<MessageType>();
+            _messageBytes ??= NetworkWriterPool.GetWriter();
+
+            _messageTypes.Add(messageType);
+            _messageBytes.Write(message);
+
+            // log warning for every 20, we dont want to be storing too many message here
+            // it also indicates that spawning failed or is taking too long
+            if (_messageTypes.Count % 20 == 0)
+            {
+                if (logger.WarnEnabled())
+                    logger.LogWarning($"Pending message count for {NetId} is {_messageTypes.Count}. Make sure async spawned object isn't being sent too many message before it is spawned");
+            }
+        }
+
+        public void ApplyAll(ClientObjectManager clientObjectManager)
+        {
+            if (_messageTypes == null)
+                return;
+
+            // use read and write so that payload will look the same as original
+            var world = clientObjectManager.Client.World;
+            var player = clientObjectManager.Client.Player;
+            using (var reader = NetworkReaderPool.GetReader(_messageBytes.ToArraySegment(), world))
+            {
+                foreach (var messageType in _messageTypes)
+                {
+                    switch (messageType)
+                    {
+                        case MessageType.ObjectDestroyMessage:
+                            {
+                                var msg = reader.Read<ObjectDestroyMessage>();
+                                clientObjectManager.OnObjectDestroy(msg);
+
+                                break;
+                            }
+                        case MessageType.ObjectHideMessage:
+                            {
+                                var msg = reader.Read<ObjectHideMessage>();
+                                clientObjectManager.OnObjectHide(msg);
+
+                                break;
+                            }
+                        case MessageType.SpawnMessage:
+                            {
+                                var msg = reader.Read<SpawnMessage>();
+                                clientObjectManager.OnSpawn(msg);
+
+                                break;
+                            }
+                        case MessageType.RemoveAuthorityMessage:
+                            {
+                                var msg = reader.Read<RemoveAuthorityMessage>();
+                                clientObjectManager.OnRemoveAuthority(msg);
+
+                                break;
+                            }
+
+                        case MessageType.RpcMessage:
+                            {
+                                var msg = reader.Read<RpcMessage>();
+                                clientObjectManager.OnRpcMessage(player, msg);
+                                break;
+                            }
+                        case MessageType.RpcWithReplyMessage:
+                            {
+                                var msg = reader.Read<RpcWithReplyMessage>();
+                                clientObjectManager.OnRpcWithReplyMessage(player, msg);
+                                break;
+                            }
+
+                        case MessageType.UpdateVarsMessage:
+                            {
+                                var msg = reader.Read<UpdateVarsMessage>();
+                                clientObjectManager.OnUpdateVarsMessage(player, msg);
+                                break;
+                            }
+
+                        default:
+                            {
+                                // should never happen, but log just incase we dont add case here
+                                logger.LogError($"Unhandled MessageType {messageType} in PendingAsyncSpawn.ApplyAll");
+                                break;
+                            }
+                    }
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            _messageTypes = null;
+            _messageBytes?.Release();
+            _messageBytes = null;
+        }
+
+        public enum MessageType
+        {
+            ObjectDestroyMessage,
+            ObjectHideMessage,
+            SpawnMessage,
+            RemoveAuthorityMessage,
+
+            RpcMessage,
+            RpcWithReplyMessage,
+
+            UpdateVarsMessage,
         }
     }
 }

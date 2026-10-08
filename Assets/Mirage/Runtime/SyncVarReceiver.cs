@@ -1,5 +1,6 @@
 using Mirage.Logging;
 using Mirage.Serialization;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mirage
@@ -11,41 +12,25 @@ namespace Mirage
     {
         private static readonly ILogger logger = LogFactory.GetLogger(typeof(SyncVarReceiver));
 
+        private static readonly ProfilerMarker onUpdateVarsMarker = new ProfilerMarker("Mirage.SyncVarReceiver.OnUpdateVars");
+
         private readonly IObjectLocator _objectLocator;
 
-        public SyncVarReceiver(NetworkClient client, IObjectLocator objectLocator)
+        public SyncVarReceiver(IObjectLocator objectLocator)
         {
             _objectLocator = objectLocator;
-            if (client.IsConnected)
-            {
-                AddHandlers(client);
-            }
-            else
-            {
-                // todo replace this with RunOnceEvent
-                client.Connected.AddListener(_ => AddHandlers(client));
-            }
         }
 
-        private void AddHandlers(NetworkClient client)
+        // note: client handles message in ClientObjectManager
+        public void ServerRegisterHandlers(MessageHandler messageHandler)
         {
-            // dont add if host player
-            // server should never sent to host
-            if (!client.IsHost)
-            {
-                client.MessageHandler.RegisterHandler<UpdateVarsMessage>(OnUpdateVarsMessage);
-            }
+            messageHandler.RegisterHandler<UpdateVarsMessage>(OnUpdateVarsMessage);
         }
 
-        public SyncVarReceiver(NetworkServer server, IObjectLocator objectLocator)
+        internal void OnUpdateVarsMessage(INetworkPlayer sender, UpdateVarsMessage msg)
         {
-            _objectLocator = objectLocator;
-            server.MessageHandler.RegisterHandler<UpdateVarsMessage>(OnUpdateVarsMessage);
-        }
+            using var _ = onUpdateVarsMarker.Auto();
 
-
-        private void OnUpdateVarsMessage(INetworkPlayer sender, UpdateVarsMessage msg)
-        {
             if (logger.LogEnabled()) logger.Log("SyncVarReceiver.OnUpdateVarsMessage " + msg.NetId);
 
             if (_objectLocator.TryGetIdentity(msg.NetId, out var localObject))

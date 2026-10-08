@@ -26,13 +26,13 @@ namespace Mirage.SocketLayer.Tests.AckSystemTests
 
             instance1 = new AckTestInstance();
             instance1.connection = new SubIRawConnection();
-            instance1.ackSystem = new AckSystem(instance1.connection, config, MAX_PACKET_SIZE, new Time(), bufferPool);
-            received1 = new List<ArraySegment<byte>>();
+            instance1.ackSystem = CreateAckSystem(instance1.connection, config, new Time(), null);
 
 
             instance2 = new AckTestInstance();
             instance2.connection = new SubIRawConnection();
-            instance2.ackSystem = new AckSystem(instance2.connection, config, MAX_PACKET_SIZE, new Time(), bufferPool);
+            instance2.ackSystem = CreateAckSystem(instance2.connection, config, new Time(), null);
+            received1 = new List<ArraySegment<byte>>();
             received2 = new List<ArraySegment<byte>>();
 
             // create and send n messages
@@ -48,14 +48,14 @@ namespace Mirage.SocketLayer.Tests.AckSystemTests
                 // send to conn1
                 instance1.ackSystem.SendNotify(instance1.messages[i]);
                 // give to instance2 from conn1
-                var segment2 = instance2.ackSystem.ReceiveNotify(instance1.connection.packets[i], instance1.connection.packets[i].Length);
-                received2.Add(segment2);
+                var segment2 = instance2.ackSystem.ReceiveNotify(instance1.connection.packets[i].AsSpan());
+                received2.Add(new ArraySegment<byte>(segment2.ToArray()));
 
                 // send to conn2
                 instance2.ackSystem.SendNotify(instance2.messages[i]);
                 // give to instance1 from conn2
-                var segment1 = instance1.ackSystem.ReceiveNotify(instance2.connection.packets[i], instance2.connection.packets[i].Length);
-                received1.Add(segment1);
+                var segment1 = instance1.ackSystem.ReceiveNotify(instance2.connection.packets[i].AsSpan());
+                received1.Add(new ArraySegment<byte>(segment1.ToArray()));
             }
 
             // should have got 1 packet

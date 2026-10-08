@@ -1,5 +1,13 @@
 namespace Mirage.SocketLayer
 {
+    public enum PeerConfigProfile
+    {
+        RawUdp,
+        WebSocket,
+        StatefulUdp,
+        Custom
+    }
+
     // todo add validation for this config
     public class Config
     {
@@ -9,6 +17,12 @@ namespace Mirage.SocketLayer
         /// </summary>
         // todo remove replace with "stop connections" instead. add some high level feature (maybe net authenticator?)
         public int MaxConnections = 100;
+
+        /// <summary>
+        /// Send reject if a new (unconnected) endPoint sends an invalid packet. If this is false then invalid packets will be ignored
+        /// <para>Setting this to true is useful if the EndPoint/Socket has a stateful connection and can listen for reject to close the connection</para>
+        /// </summary>
+        public bool SendRejectIfUnconnectedPacketIsInvalid = false;
         #endregion
 
         #region client
@@ -103,6 +117,41 @@ namespace Mirage.SocketLayer
         /// Enable if the Socket you are using has its own Reliable layer. For example using Websocket, which is TCP.
         /// </summary>
         public bool DisableReliableLayer = false;
+        #endregion
+
+        #region profiles
+        public static Config Create(PeerConfigProfile profile)
+        {
+            switch (profile)
+            {
+                case PeerConfigProfile.RawUdp: return RawUdp();
+                case PeerConfigProfile.WebSocket: return WebSocket();
+                case PeerConfigProfile.StatefulUdp: return StatefulUdp();
+                default: return new Config();
+            }
+        }
+
+        public static Config RawUdp()
+        {
+            return new Config();
+        }
+
+        public static Config WebSocket()
+        {
+            return new Config
+            {
+                SendRejectIfUnconnectedPacketIsInvalid = true,
+                DisableReliableLayer = true
+            };
+        }
+
+        public static Config StatefulUdp()
+        {
+            return new Config
+            {
+                SendRejectIfUnconnectedPacketIsInvalid = true
+            };
+        }
         #endregion
     }
 }

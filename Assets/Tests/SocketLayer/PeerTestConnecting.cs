@@ -8,27 +8,35 @@ using NUnit.Framework;
 namespace Mirage.SocketLayer.Tests.PeerTests
 {
     [Category("SocketLayer"), Description("tests using multiple instances of peer to check they can connect to each other")]
+    [TestFixture(SocketBehavior.PollReceive)]
+    [TestFixture(SocketBehavior.TickEvent)]
     public class PeerTestConnecting
     {
         private const int ClientCount = 4;
         private PeerInstanceWithSocket server;
         private PeerInstanceWithSocket[] clients;
+        private SocketBehavior _behavior;
+
+        public PeerTestConnecting(SocketBehavior behavior)
+        {
+            _behavior = behavior;
+        }
 
         [SetUp]
         public void SetUp()
         {
-            server = new PeerInstanceWithSocket(new Config { MaxConnections = ClientCount });
+            server = new PeerInstanceWithSocket(_behavior, new Config { MaxConnections = ClientCount });
             clients = new PeerInstanceWithSocket[ClientCount];
             for (var i = 0; i < ClientCount; i++)
             {
-                clients[i] = new PeerInstanceWithSocket();
+                clients[i] = new PeerInstanceWithSocket(_behavior);
             }
         }
 
         [Test]
         public void ServerAcceptsAllClients()
         {
-            server.peer.Bind(TestEndPoint.CreateSubstitute());
+            server.peer.Bind(Substitute.For<IBindEndPoint>());
 
             var connectAction = Substitute.For<Action<IConnection>>();
             server.peer.OnConnected += connectAction;
@@ -36,7 +44,7 @@ namespace Mirage.SocketLayer.Tests.PeerTests
             for (var i = 0; i < ClientCount; i++)
             {
                 // tell client i to connect
-                clients[i].peer.Connect(server.endPoint);
+                clients[i].peer.Connect((IConnectEndPoint)server.endPoint);
                 var clientConnectAction = Substitute.For<Action<IConnection>>();
                 clients[i].peer.OnConnected += clientConnectAction;
 
@@ -70,7 +78,7 @@ namespace Mirage.SocketLayer.Tests.PeerTests
         [Test]
         public void EachServerConnectionIsANewInstance()
         {
-            server.peer.Bind(TestEndPoint.CreateSubstitute());
+            server.peer.Bind(Substitute.For<IBindEndPoint>());
             var serverConnections = new List<IConnection>();
 
             Action<IConnection> connectAction = (conn) =>
@@ -82,7 +90,7 @@ namespace Mirage.SocketLayer.Tests.PeerTests
             for (var i = 0; i < ClientCount; i++)
             {
                 // tell client i to connect
-                clients[i].peer.Connect(server.endPoint);
+                clients[i].peer.Connect((IConnectEndPoint)server.endPoint);
 
                 // run tick on server, should read packet from client i
                 server.peer.UpdateTest();

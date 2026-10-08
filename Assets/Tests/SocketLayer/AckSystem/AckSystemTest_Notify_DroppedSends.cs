@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -39,12 +40,12 @@ namespace Mirage.SocketLayer.Tests.AckSystemTests
 
             instance1 = new AckTestInstance();
             instance1.connection = new SubIRawConnection();
-            instance1.ackSystem = new AckSystem(instance1.connection, config, MAX_PACKET_SIZE, new Time(), bufferPool);
+            instance1.ackSystem = CreateAckSystem(instance1.connection, config, new Time(), null);
 
 
             instance2 = new AckTestInstance();
             instance2.connection = new SubIRawConnection();
-            instance2.ackSystem = new AckSystem(instance2.connection, config, MAX_PACKET_SIZE, new Time(), bufferPool);
+            instance2.ackSystem = CreateAckSystem(instance2.connection, config, new Time(), null);
 
             // create and send n messages
             instance1.messages = new List<byte[]>();
@@ -61,13 +62,13 @@ namespace Mirage.SocketLayer.Tests.AckSystemTests
 
                 // give to instance2 if received
                 if (received2[i])
-                    instance2.ackSystem.ReceiveNotify(instance1.connection.packets[i], instance1.connection.packets[i].Length);
+                    instance2.ackSystem.ReceiveNotify(instance1.connection.packets[i].AsSpan());
 
                 // send to conn2
                 instance2.ackSystem.SendNotify(instance2.messages[i]);
                 // give to instance1 if received
                 if (received1[i])
-                    instance1.ackSystem.ReceiveNotify(instance2.connection.packets[i], instance2.connection.packets[i].Length);
+                    instance1.ackSystem.ReceiveNotify(instance2.connection.packets[i].AsSpan());
             }
 
             // should have got 1 packet
@@ -92,7 +93,7 @@ namespace Mirage.SocketLayer.Tests.AckSystemTests
 
                 // do at end becuase 1 is sending first
                 if (received1[i])
-                    nextReceive = (ushort)(i);
+                    nextReceive = (ushort)i;
             }
 
             nextReceive = maxSequence;
@@ -100,7 +101,7 @@ namespace Mirage.SocketLayer.Tests.AckSystemTests
             {
                 // do at start becuase 2 is sending second
                 if (received2[i])
-                    nextReceive = (ushort)(i);
+                    nextReceive = (ushort)i;
 
                 var offset = 3;
                 var received = ByteUtils.ReadUShort(instance2.packet(i), ref offset);

@@ -9,8 +9,19 @@ using UnityEngine.TestTools;
 namespace Mirage.SocketLayer.Tests.PeerTests
 {
     [Category("SocketLayer"), Description("tests for Peer that apply to both server and client")]
+    [TestFixture(SocketBehavior.PollReceive, ConnectionHandleBehavior.Stateful)]
+    [TestFixture(SocketBehavior.PollReceive, ConnectionHandleBehavior.Stateless)]
+    [TestFixture(SocketBehavior.TickEvent, ConnectionHandleBehavior.Stateful)]
+    [TestFixture(SocketBehavior.TickEvent, ConnectionHandleBehavior.Stateless)]
     public class PeerTest : PeerTestBase
     {
+        private readonly ConnectionHandleBehavior _handleBehavior;
+
+        public PeerTest(SocketBehavior behavior, ConnectionHandleBehavior handleBehavior) : base(behavior)
+        {
+            _handleBehavior = handleBehavior;
+        }
+
         [Test]
         public void ThrowIfSocketIsNull()
         {
@@ -71,60 +82,65 @@ namespace Mirage.SocketLayer.Tests.PeerTests
         public void CloseShouldCallSocketClose()
         {
             // activate peer
-            peer.Bind(default);
+            peer.Bind(Substitute.For<IBindEndPoint>());
             // close peer
             peer.Close();
             socket.Received(1).Close();
         }
 
         [Test]
+        public void FlushShouldCallSocketFlush()
+        {
+            // activate peer
+            peer.Bind(Substitute.For<IBindEndPoint>());
+            // flush peer via UpdateSent
+            peer.UpdateSent();
+            socket.Received(1).Flush();
+        }
+
+        [Test]
         public void IgnoresMessageThatIsTooShort()
         {
-            peer.Bind(TestEndPoint.CreateSubstitute());
+            peer.Bind(Substitute.For<IBindEndPoint>());
 
             var connectAction = Substitute.For<Action<IConnection>>();
             peer.OnConnected += connectAction;
 
-            socket.SetupReceiveCall(new byte[1] {
+            socket.AsMock().QueueReceiveCall(new byte[1] {
                 (byte)UnityEngine.Random.Range(0, 255),
-            });
+            }, TestEndPoint.CreateSubstitute(_handleBehavior));
 
             peer.UpdateTest();
 
             // server does nothing for invalid
-            socket.DidNotReceiveWithAnyArgs().Send(default, default, default);
+            socket.AsMock().AssertSendDidNotReceive();
             connectAction.DidNotReceiveWithAnyArgs().Invoke(default);
         }
 
         [Test]
         public void ThrowsIfSocketGivesLengthThatIsTooHigh()
         {
-            peer.Bind(TestEndPoint.CreateSubstitute());
+            peer.Bind(Substitute.For<IBindEndPoint>());
 
             var connectAction = Substitute.For<Action<IConnection>>();
             peer.OnConnected += connectAction;
 
             const int aboveMTU = 5000;
-            socket.SetupReceiveCall(new byte[1000], length: aboveMTU);
+            socket.AsMock().QueueReceiveCall(new byte[1000], TestEndPoint.CreateSubstitute(_handleBehavior), length: aboveMTU);
 
-            var exception = Assert.Throws<IndexOutOfRangeException>(() =>
-            {
-                peer.UpdateTest();
-            });
-
-            Assert.That(exception, Has.Message.EqualTo($"Socket returned length above MTU. MaxPacketSize:{MAX_PACKET_SIZE} length:{aboveMTU}"));
+            LogAssert.Expect(LogType.Error, new Regex($".*Socket returned length above MTU. MaxPacketSize:{MAX_PACKET_SIZE} length:{aboveMTU}"));
+            peer.UpdateTest();
+            LogAssert.NoUnexpectedReceived();
         }
 
         [Test]
         [Repeat(10)]
         public void IgnoresRandomData()
         {
-            peer.Bind(TestEndPoint.CreateSubstitute());
+            peer.Bind(Substitute.For<IBindEndPoint>());
 
             var connectAction = Substitute.For<Action<IConnection>>();
             peer.OnConnected += connectAction;
-
-            var endPoint = TestEndPoint.CreateSubstitute();
 
             // 2 is min length of a message
             var randomData = new byte[UnityEngine.Random.Range(2, 20)];
@@ -140,12 +156,12 @@ namespace Mirage.SocketLayer.Tests.PeerTests
                 randomData[0] = 0;
             }
 
-            socket.SetupReceiveCall(randomData);
+            socket.AsMock().QueueReceiveCall(randomData, TestEndPoint.CreateSubstitute(_handleBehavior));
 
             peer.UpdateTest();
 
             // server does nothing for invalid
-            socket.DidNotReceiveWithAnyArgs().Send(default, default, default);
+            socket.AsMock().AssertSendDidNotReceive();
             connectAction.DidNotReceiveWithAnyArgs().Invoke(default);
         }
 
@@ -153,12 +169,12 @@ namespace Mirage.SocketLayer.Tests.PeerTests
         [Repeat(10)]
         public void SendsInvalidKeyForRandomKey()
         {
-            peer.Bind(TestEndPoint.CreateSubstitute());
+            peer.Bind(Substitute.For<IBindEndPoint>());
 
             var connectAction = Substitute.For<Action<IConnection>>();
             peer.OnConnected += connectAction;
 
-            var endPoint = TestEndPoint.CreateSubstitute();
+            var endPoint = TestEndPoint.CreateSubstitute(_handleBehavior);
 
             // 2 is min length of a message
             var randomData = new byte[UnityEngine.Random.Range(2, 20)];
@@ -173,19 +189,16 @@ namespace Mirage.SocketLayer.Tests.PeerTests
             if (randomData.Length >= 3)
                 randomData[2] = 1; // set to 1 so tests desn't randomly pick valid key
 
-            socket.SetupReceiveCall(randomData, endPoint);
+            socket.AsMock().QueueReceiveCall(randomData, endPoint);
 
             peer.UpdateTest();
 
             // server does nothing for invalid
-            socket.Received(1).Send(
-                endPoint: endPoint,
-                length: 3,
-                packet: Arg.Is<byte[]>(sent =>
-                    sent[0] == (byte)PacketType.Command &&
-                    sent[1] == (byte)Commands.ConnectionRejected &&
-                    sent[2] == (byte)RejectReason.KeyInvalid
-                ));
+            socket.AsMock().AssertSendCall(1, endPoint, 3, sent =>
+                sent[0] == (byte)PacketType.Command &&
+                sent[1] == (byte)Commands.ConnectionRejected &&
+                sent[2] == (byte)RejectReason.KeyInvalid
+            );
             connectAction.DidNotReceiveWithAnyArgs().Invoke(default);
         }
 
@@ -197,6 +210,82 @@ namespace Mirage.SocketLayer.Tests.PeerTests
 
             // if a receive handler calls close while in receive loop we should stop the loop before calling poll again
             // if we dont we will get object disposed errors
+        }
+
+        [Test]
+        [TestCase(new byte[] { })] // empty
+        [TestCase(new byte[] { 0 })] // too short
+        [TestCase(new byte[] { 255, 255 })] // not a command
+        [TestCase(new byte[] { (byte)PacketType.Command, 255 })] // command but not ConnectRequest
+        public void SendsRejectForInvalidUnconnectedPacketIfConfigIsTrue(byte[] invalidPacket)
+        {
+            config.SendRejectIfUnconnectedPacketIsInvalid = true;
+            peer.Bind(Substitute.For<IBindEndPoint>());
+
+            var connectAction = Substitute.For<Action<IConnection>>();
+            peer.OnConnected += connectAction;
+
+            var endPoint = TestEndPoint.CreateSubstitute(_handleBehavior);
+            socket.AsMock().QueueReceiveCall(invalidPacket, endPoint);
+
+            peer.UpdateTest();
+
+            // server sends reject for invalid
+            socket.AsMock().AssertSendCall(1, endPoint, 3, sent =>
+                sent[0] == (byte)PacketType.Command &&
+                sent[1] == (byte)Commands.ConnectionRejected &&
+                sent[2] == (byte)RejectReason.InvalidUnconnectedPacket
+            );
+            connectAction.DidNotReceiveWithAnyArgs().Invoke(default);
+        }
+
+        [Test]
+        public void IgnoresInvalidCommandWhenConfigIsFalse()
+        {
+            // config.SendRejectIfUnconnectedPacketIsInvalid is false by default
+            peer.Bind(Substitute.For<IBindEndPoint>());
+
+            var connectAction = Substitute.For<Action<IConnection>>();
+            peer.OnConnected += connectAction;
+
+            var endPoint = TestEndPoint.CreateSubstitute(_handleBehavior);
+            var invalidPacket = new byte[] { (byte)PacketType.Command, 255 };
+            socket.AsMock().QueueReceiveCall(invalidPacket, endPoint);
+
+            peer.UpdateTest();
+
+            // server does nothing for invalid
+            socket.AsMock().AssertSendDidNotReceive();
+            connectAction.DidNotReceiveWithAnyArgs().Invoke(default);
+        }
+
+        [Test]
+        public void ReceiveLoopContinuesIfHandlerThrows()
+        {
+            peer.Bind(Substitute.For<IBindEndPoint>());
+
+            var endPoint1 = TestEndPoint.CreateSubstitute(_handleBehavior);
+            var endPoint2 = TestEndPoint.CreateSubstitute(_handleBehavior);
+
+            socket.AsMock().QueueReceiveCall(connectRequest, endPoint1);
+            socket.AsMock().QueueReceiveCall(connectRequest, endPoint2);
+
+            // Throw when the first connection is accepted
+            peer.OnConnected += (conn) =>
+            {
+                if (conn.Handle == endPoint1)
+                    throw new Exception("Test Exception");
+            };
+
+            LogAssert.Expect(LogType.Error, new Regex("Error from OnData, disconnecting .*\\. Exception: System\\.Exception: Test Exception"));
+
+            peer.UpdateTest();
+
+            // Verify that the second connection still sent its Acceptance command
+            socket.AsMock().AssertSendCall(handle: endPoint2, validateLast: sent =>
+                sent[0] == (byte)PacketType.Command &&
+                sent[1] == (byte)Commands.ConnectionAccepted
+            );
         }
     }
 }

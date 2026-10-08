@@ -7,6 +7,7 @@ using Mirage.Events;
 using Mirage.Logging;
 using Mirage.Serialization;
 using Mirage.SocketLayer;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -25,6 +26,21 @@ namespace Mirage
     {
         private static readonly ILogger logger = LogFactory.GetLogger(typeof(NetworkServer));
 
+        private static readonly ProfilerMarker startedInvokeMarker = new ProfilerMarker("Mirage.NetworkServer.Started.Invoke");
+        private static readonly ProfilerMarker connectedInvokeMarker = new ProfilerMarker("Mirage.NetworkServer.Connected.Invoke");
+        private static readonly ProfilerMarker authenticatedInvokeMarker = new ProfilerMarker("Mirage.NetworkServer.Authenticated.Invoke");
+        private static readonly ProfilerMarker disconnectedInvokeMarker = new ProfilerMarker("Mirage.NetworkServer.Disconnected.Invoke");
+        private static readonly ProfilerMarker stoppedInvokeMarker = new ProfilerMarker("Mirage.NetworkServer.Stopped.Invoke");
+        private static readonly ProfilerMarker onStartHostInvokeMarker = new ProfilerMarker("Mirage.NetworkServer.OnStartHost.Invoke");
+        private static readonly ProfilerMarker onStopHostInvokeMarker = new ProfilerMarker("Mirage.NetworkServer.OnStopHost.Invoke");
+        private static readonly ProfilerMarker errorRateLimitCallbackMarker = new ProfilerMarker("Mirage.NetworkServer.Callback.ErrorRateLimit.Invoke");
+        private static readonly ProfilerMarker authFailCallbackMarker = new ProfilerMarker("Mirage.NetworkServer.Callback.AuthFailed.Invoke");
+        private static readonly ProfilerMarker updateReceiveMarker = new ProfilerMarker("Mirage.NetworkServer.UpdateReceive");
+        private static readonly ProfilerMarker updateSentMarker = new ProfilerMarker("Mirage.NetworkServer.UpdateSent");
+
+        public delegate void RateLimitCallback(INetworkPlayer player);
+        public delegate void AuthFailCallback(INetworkPlayer player, AuthenticationResult result);
+
         public bool EnablePeerMetrics;
         [Tooltip("Sequence size of buffer in bits.\n10 => array size 1024 => ~17 seconds at 60hz")]
         public int MetricsSize = 10;
@@ -35,6 +51,9 @@ namespace Mirage
         /// </summary>
         public Config PeerConfig { get; set; }
 
+        [Tooltip("Config profile to use if PeerConfig is null.")]
+        public PeerConfigProfile PeerConfigProfile = PeerConfigProfile.RawUdp;
+
         /// <summary>
         /// The maximum number of concurrent network connections to support. Excluding the host player.
         /// <para>This field is only used if the <see cref="PeerConfig"/> property is null</para>
@@ -42,10 +61,6 @@ namespace Mirage
         [Tooltip("Maximum number of concurrent connections. Excluding the host player.\nNOTE: this field is not used if PeerConfig is set via code.")]
         [Min(1)]
         public int MaxConnections = 4;
-
-        public bool DisconnectOnException = true;
-        [Tooltip("Should the message handler rethrow the exception after logging. This should only be used when deubgging as it may stop other Mirage functions from running after messages handling")]
-        public bool RethrowException = false;
 
         [Tooltip("If true will set Application.runInBackground")]
         public bool RunInBackground = true;
@@ -108,12 +123,30 @@ namespace Mirage
         [SerializeField] private AddLateEventUnity _onStopHost = new AddLateEventUnity();
         public IAddLateEventUnity OnStopHost => _onStopHost;
 
+        [Header("Error Spam")]
+        [System.Obsolete("Use RpcErrorConfig and RateLimitCallback", true)]
+        [HideInInspector]
+        public bool DisconnectOnException = true;
+
+        [Tooltip("Should the message handler rethrow the exception after logging. This should only be used when debugging as it may stop other Mirage functions from running after messages handling")]
+        public bool RethrowException = false;
+
+        /// <summary>
+        /// Will kick players or run callback if players hit Error limit set by <see cref="ErrorRateLimitConfig"/>. If changed at runtime, new value will only apply to new connections
+        /// </summary>
+        public bool ErrorRateLimitEnabled = true;
+
+        [Tooltip("Configuration for kicking players who send too many invalid Network network messages and RPC. Errors may cost more than 1 token.")]
+        public RateLimitBucket.RefillConfig ErrorRateLimitConfig = new RateLimitBucket.RefillConfig
+        {
+            MaxTokens = 200,
+            Refill = 50,
+            Interval = 1,
+        };
+
         /// <summary>
         /// The connection to the host mode client (if any).
         /// </summary>
-        // original HLAPI has .localConnections list with only m_LocalConnection in it
-        // (for backwards compatibility because they removed the real localConnections list a while ago)
-        // => removed it for easier code. use .localConnection now!
         public INetworkPlayer LocalPlayer { get; private set; }
 
         /// <summary>
@@ -151,21 +184,56 @@ namespace Mirage
         /// <para>This will be true after NetworkServer.Listen() has been called.</para>
         /// </summary>
         public bool Active { get; private set; }
+        /// <summary>
+        /// use new number each time we call StartServer, to make sure any async function works when calling Start/Stop in the same frame
+        /// </summary>
+        [NonSerialized] private int _startNumber;
 
         public NetworkWorld World { get; private set; }
-        // todo move syncVarsender, it doesn't need to be a public fields on network server any more
+        // todo move syncVarSender, it doesn't need to be a public fields on network server any more
         public SyncVarSender SyncVarSender { get; private set; }
 
-        private SyncVarReceiver _syncVarReceiver;
         public MessageHandler MessageHandler { get; private set; }
 
-        private Action<INetworkPlayer, AuthenticationResult> _authFallCallback;
+        private AuthFailCallback _authFailCallback;
+        private RateLimitCallback _errorRateLimitReached;
 
         /// <summary>
         /// Set to true if you want to manually call <see cref="UpdateReceive"/> and <see cref="UpdateSent"/> and stop mirage from automatically calling them
         /// </summary>
         [HideInInspector]
         public bool ManualUpdate = false;
+
+        public void ErrorRateLimitReached(INetworkPlayer player)
+        {
+            if (_errorRateLimitReached != null)
+            {
+                if (logger.WarnEnabled())
+                    logger.LogWarning($"ErrorRateLimit reached {player}. Invoking user callback");
+                using (errorRateLimitCallbackMarker.Auto())
+                    _errorRateLimitReached.Invoke(player);
+            }
+            else
+            {
+                if (logger.WarnEnabled())
+                    logger.LogWarning($"ErrorRateLimit reached {player}. Disconnecting player");
+                player.Disconnect();
+            }
+        }
+        public void SetErrorRateLimitReachedCallback(RateLimitCallback callback)
+        {
+            if (_errorRateLimitReached != null && callback != null && logger.WarnEnabled())
+                logger.LogWarning($"Replacing old callback. Only 1 error limit callback can be used at once");
+
+            _errorRateLimitReached = callback;
+        }
+
+        private void UpdatePlayerErrorLimits()
+        {
+            var now = Time.unscaledTimeAsDouble;
+            foreach (var player in AllPlayers)
+                player.ErrorRateLimit?.CheckRefill(now);
+        }
 
         private void OnDestroy()
         {
@@ -194,7 +262,8 @@ namespace Mirage
 
             if (LocalClient != null)
             {
-                _onStopHost?.Invoke();
+                using (onStopHostInvokeMarker.Auto())
+                    _onStopHost?.Invoke();
                 LocalClient.Disconnect();
             }
 
@@ -204,7 +273,8 @@ namespace Mirage
             LocalClient = null;
             LocalPlayer = null;
 
-            _stopped?.Invoke();
+            using (stoppedInvokeMarker.Auto())
+                _stopped?.Invoke();
             Active = false;
 
             _started.Reset();
@@ -215,7 +285,6 @@ namespace Mirage
             // Clear references to help GC collect
             World = null;
             SyncVarSender = null;
-            _syncVarReceiver = null;
             MessageHandler = null;
             Metrics = null;
 
@@ -251,15 +320,13 @@ namespace Mirage
             logger.Assert(_authenticatedPlayers.Count == 0, "Player should have been reset since previous session");
             logger.Assert(_connections.Count == 0, "Connections should have been reset since previous session");
 
+            _startNumber++;
             World = new NetworkWorld();
             SyncVarSender = new SyncVarSender();
 
             LocalClient = localClient;
-            MessageHandler = new MessageHandler(World, DisconnectOnException, RethrowException);
+            MessageHandler = new MessageHandler(World, disconnectOnException: false, RethrowException);
             MessageHandler.RegisterHandler<NetworkPingMessage>(World.Time.OnServerPing, allowUnauthenticated: true);
-
-            // create after MessageHandler, SyncVarReceiver uses it 
-            _syncVarReceiver = new SyncVarReceiver(this, World);
 
             var dataHandler = new DataHandler(this, MessageHandler, _connections);
             Metrics = EnablePeerMetrics ? new Metrics(MetricsSize) : null;
@@ -267,11 +334,9 @@ namespace Mirage
             var config = PeerConfig;
             if (config == null)
             {
-                config = new Config
-                {
-                    // only use MaxConnections if config was null
-                    MaxConnections = MaxConnections,
-                };
+                config = Config.Create(PeerConfigProfile);
+                // only use MaxConnections if config was null
+                config.MaxConnections = MaxConnections;
             }
 
             // Are we listening for incoming connections?
@@ -314,23 +379,26 @@ namespace Mirage
                 ObjectManager.ServerStarted(this);
                 // if no hostClient, then  spawn objects right away
                 if (LocalClient == null)
-                    ObjectManager.SpawnOrActivate();
+                    ObjectManager.FirstServerSpawn();
             }
-            _started?.Invoke();
+            using (startedInvokeMarker.Auto())
+                _started?.Invoke();
 
             if (LocalClient != null)
             {
                 localClient.ConnectHost(this, dataHandler);
 
                 // onStartHost needs to be called after the client is active
-                _onStartHost?.Invoke();
+                using (onStartHostInvokeMarker.Auto())
+                    _onStartHost?.Invoke();
 
                 // spawn scene objects in starting scene AFTER host client has activated,
                 // otherwise IsClient will be false for objects in starting scene
                 if (ObjectManager != null)
-                    ObjectManager.SpawnOrActivate();
+                    ObjectManager.FirstServerSpawn();
 
-                Connected?.Invoke(LocalPlayer);
+                using (connectedInvokeMarker.Auto())
+                    Connected?.Invoke(LocalPlayer);
 
                 if (logger.LogEnabled()) logger.Log("NetworkServer StartHost");
                 Authenticate(LocalPlayer);
@@ -359,23 +427,34 @@ namespace Mirage
             UpdateSent();
         }
 
-        public void UpdateReceive() => _peer?.UpdateReceive();
+        public void UpdateReceive()
+        {
+            using var _ = updateReceiveMarker.Auto();
+
+            if (ErrorRateLimitEnabled)
+                UpdatePlayerErrorLimits();
+            _peer?.UpdateReceive();
+        }
+
         public void UpdateSent()
         {
+            using var _ = updateSentMarker.Auto();
+
             SyncVarSender?.Update();
             _peer?.UpdateSent();
         }
 
         private void Peer_OnConnected(IConnection conn)
         {
-            var player = new NetworkPlayer(conn, false);
+            var player = new NetworkPlayer(conn, false, this, ErrorRateLimitEnabled ? ErrorRateLimitConfig : null);
             if (logger.LogEnabled()) logger.Log($"Server new player {player}");
 
             // add connection
             _connections[player.Connection] = player;
 
             // let everyone know we just accepted a connection
-            Connected?.Invoke(player);
+            using (connectedInvokeMarker.Auto())
+                Connected?.Invoke(player);
 
             Authenticate(player);
         }
@@ -391,7 +470,13 @@ namespace Mirage
 
         private async UniTaskVoid AuthenticateAsync(INetworkPlayer player)
         {
+            var startNumber = _startNumber;
             var result = await Authenticator.ServerAuthenticate(player);
+            if (!Active || startNumber != _startNumber) // server stopped (and/or started again) 
+            {
+                if (logger.WarnEnabled()) logger.LogWarning($"Server stopped while AuthenticateAsync was running, ignoring auth AuthenticationResult");
+                return;
+            }
 
             // process results
             if (result.Success)
@@ -400,10 +485,11 @@ namespace Mirage
             }
             else
             {
-                if (_authFallCallback != null)
+                if (_authFailCallback != null)
                 {
                     if (logger.LogEnabled()) logger.Log($"Calling user auth failed callback");
-                    _authFallCallback.Invoke(player, result);
+                    using (authFailCallbackMarker.Auto())
+                        _authFailCallback.Invoke(player, result);
                 }
                 else
                 {
@@ -413,16 +499,23 @@ namespace Mirage
             }
         }
 
-        public void SetAuthenticationFailedCallback(Action<INetworkPlayer, AuthenticationResult> callback)
+        public void SetAuthenticationFailedCallback(AuthFailCallback callback)
         {
-            if (_authFallCallback != null && callback != null && logger.WarnEnabled())
+            if (_authFailCallback != null && callback != null && logger.WarnEnabled())
                 logger.LogWarning($"Replacing old callback. Only 1 auth failed callback can be used at once");
 
-            _authFallCallback = callback;
+            _authFailCallback = callback;
         }
 
         private void AuthenticationSuccess(INetworkPlayer player, AuthenticationResult result)
         {
+            // Safety check incase developer calls player.Disconnect() from the Server.Connected event
+            if (!player.IsConnected)
+            {
+                logger.LogError($"AuthenticationSuccess called for disconnected player {player}. Make sure to not call player.Disconnect() from Server.Connected event, Use a NetworkAuthenticator instead.");
+                return;
+            }
+
             player.SetAuthentication(new PlayerAuthentication(result.Authenticator, result.Data));
 
             // send message to let client know
@@ -433,7 +526,8 @@ namespace Mirage
 
             // add connection
             _authenticatedPlayers.Add(player);
-            Authenticated?.Invoke(player);
+            using (authenticatedInvokeMarker.Auto())
+                Authenticated?.Invoke(player);
         }
 
         private void Peer_OnDisconnected(IConnection conn, DisconnectReason reason)
@@ -472,7 +566,7 @@ namespace Mirage
                 throw new InvalidOperationException("Local client connection already exists");
             }
 
-            var player = new NetworkPlayer(connection, true);
+            var player = new NetworkPlayer(connection, true, this, null);
             LocalPlayer = player;
             LocalClient = client;
 
@@ -576,6 +670,8 @@ namespace Mirage
         /// </summary>
         public static void SendToMany<T>(IReadOnlyList<INetworkPlayer> players, T msg, Channel channelId = Channel.Reliable)
         {
+            using var _ = MessageIdCache<T>.SendToManyMarker.Auto();
+
             // avoid serializing when list is empty
             if (players.Count == 0)
                 return;
@@ -609,7 +705,8 @@ namespace Mirage
 
             RemoveConnection(player);
 
-            Disconnected?.Invoke(player);
+            using (disconnectedInvokeMarker.Auto())
+                Disconnected?.Invoke(player);
 
             player.DestroyOwnedObjects();
             player.Identity = null;
@@ -639,17 +736,30 @@ namespace Mirage
             {
                 if (!_server.Active)
                 {
-                    if (logger.WarnEnabled()) logger.LogWarning("Received message after disconnect");
+                    if (logger.WarnEnabled()) logger.LogWarning("Received message after server stopped");
+                    return;
+                }
+
+                if (connection.State != ConnectionState.Connected)
+                {
+                    if (logger.WarnEnabled()) logger.LogWarning($"Received message but connection is not connected");
                     return;
                 }
 
                 if (_players.TryGetValue(connection, out var player))
                 {
-                    _messageHandler.HandleMessage(player, message);
+                    // safety try/catch so that SocketLayer is not effected
+                    try
+                    {
+                        _messageHandler.HandleMessage(player, message);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
                 }
                 else
                 {
-                    // todo remove or replace with assert
                     if (logger.WarnEnabled()) logger.LogWarning($"No player found for message received from client {connection}");
                 }
             }

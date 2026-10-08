@@ -17,12 +17,13 @@ namespace Mirage.SocketLayer
     /// <summary>
     /// Connection for <see cref="Peer"/>
     /// </summary>
-    public interface IConnection
+    public interface IConnection : ISocketLayerConnection
     {
-        IEndPoint EndPoint { get; }
+        IConnectionHandle Handle { get; }
         ConnectionState State { get; }
 
         void Disconnect();
+        void Disconnect(DisconnectReason reason);
 
         INotifyToken SendNotify(byte[] packet, int offset, int length);
 
